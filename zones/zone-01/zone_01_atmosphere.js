@@ -7,7 +7,7 @@ window.Zone01Atmosphere = (() => {
 
   const CONFIG = {
     sharpStart: 0.03,
-    sharpEnd: 0.32,
+    sharpEnd: 0.28,
 
     maxBlur: 16,
     returnBlur: 0,

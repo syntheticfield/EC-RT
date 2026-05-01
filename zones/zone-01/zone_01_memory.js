@@ -1,5 +1,7 @@
 window.Zone01Memory = (() => {
-  let data = { points: [] };
+  let data = {
+    points: []
+  };
 
   function addPoint(point) {
     data.points.push(point);

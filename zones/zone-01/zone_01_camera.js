@@ -6,9 +6,9 @@ window.Zone01Camera = (() => {
 
   const CONFIG = {
     maxZoomMultiplier: 36,
-    zoomSpeed: 0.0011,
-    pinchSpeed: 1,
-    zoomSmooth: 0.16,
+    zoomSpeed: 0.0022,
+    pinchSpeed: 1.1,
+    zoomSmooth: 0.18,
     panSmooth: 0.18
   };
 
@@ -80,18 +80,18 @@ window.Zone01Camera = (() => {
     state.targetX = clamp(state.targetX, -bounds.maxX, bounds.maxX);
     state.targetY = clamp(state.targetY, -bounds.maxY, bounds.maxY);
 
-    if (state.targetScale <= state.minScale * 1.01) {
-      state.targetScale = state.minScale;
-      state.targetX = 0;
-      state.targetY = 0;
-    }
+   if (state.targetScale <= state.minScale) {
+  // visuellement bloqué
+  state.targetX = 0;
+  state.targetY = 0;
+}
   }
 
   function applyTransform() {
     img.style.transform = `
       translate(-50%, -50%)
       translate3d(${state.x}px, ${state.y}px, 0)
-      scale(${state.scale})
+      scale(${Math.max(state.scale, state.minScale)})
     `;
   }
 
@@ -103,11 +103,16 @@ window.Zone01Camera = (() => {
 
     const oldScale = state.targetScale;
 
-    state.targetScale = clamp(
-      state.targetScale * factor,
-      state.minScale,
-      state.maxScale
-    );
+  const nextScale = state.targetScale * factor;
+
+// autorise un léger dépassement sous minScale
+const minSoft = state.minScale * 0.85;
+
+state.targetScale = clamp(
+  nextScale,
+  minSoft,
+  state.maxScale
+);
 
     const ratio = state.targetScale / oldScale;
 

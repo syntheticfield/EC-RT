@@ -9,8 +9,8 @@ window.Zone01Exploration = (() => {
     holdToRecord: 720,
     maxMemoryPoints: 6,
 
-    recompositionStartDepth: 0.38,
-    recompositionFullDepth: 0.08,
+    recompositionStartDepth: 0.21,
+    recompositionFullDepth: 0.16,
     returnMessageDepth: 0.36,
 
     memoryFadeDuration: 90000,
@@ -28,11 +28,15 @@ window.Zone01Exploration = (() => {
 
   let lastPointerX = 0;
   let lastPointerY = 0;
+  let lastTouchTapTime = 0;
 
   let messageText = "";
   let messageUntil = 0;
   let wasReturning = false;
-  let lastTouchTapTime = 0;
+
+  let memoryDepth = 0;
+  let extraReturn = 0;
+  let extraReturnTarget = 0;
 
   const memoryMarks = new Map();
 
@@ -50,6 +54,7 @@ window.Zone01Exploration = (() => {
 
   function updateMessage() {
     if (!whisper) return;
+
     const visible = performance.now() < messageUntil;
     whisper.textContent = visible ? messageText : "";
     whisper.classList.toggle("is-visible", visible);
@@ -57,8 +62,16 @@ window.Zone01Exploration = (() => {
 
   function pointerToImage(cam) {
     return {
-      x: clamp(0.5 + (cam.pointerX - cam.x) / (img.naturalWidth * cam.scale), 0, 1),
-      y: clamp(0.5 + (cam.pointerY - cam.y) / (img.naturalHeight * cam.scale), 0, 1)
+      x: clamp(
+        0.5 + (cam.pointerX - cam.x) / (img.naturalWidth * cam.scale),
+        0,
+        1
+      ),
+      y: clamp(
+        0.5 + (cam.pointerY - cam.y) / (img.naturalHeight * cam.scale),
+        0,
+        1
+      )
     };
   }
 
@@ -88,6 +101,7 @@ window.Zone01Exploration = (() => {
 
     const birth = document.createElement("div");
     birth.className = "memory-birth-fx";
+
     birth.style.left = `calc(50% + ${screen.x}px)`;
     birth.style.top = `calc(50% + ${screen.y}px)`;
 
@@ -97,17 +111,23 @@ window.Zone01Exploration = (() => {
       birth.classList.add("is-active");
     });
 
-    setTimeout(() => birth.remove(), 900);
+    setTimeout(() => {
+      birth.remove();
+    }, 900);
   }
 
   function trimMemoryIfNeeded() {
     const memories = window.Zone01Memory.all();
+
     if (memories.length <= CONFIG.maxMemoryPoints) return;
 
     const kept = memories.slice(memories.length - CONFIG.maxMemoryPoints);
 
     window.Zone01Memory.reset();
-    kept.forEach(memory => window.Zone01Memory.addPoint(memory));
+
+    kept.forEach(memory => {
+      window.Zone01Memory.addPoint(memory);
+    });
   }
 
   function registerAttention(point, holdTime, depth) {
@@ -146,12 +166,12 @@ window.Zone01Exploration = (() => {
       sizeSeed: 0.45 + Math.random() * 2.1,
 
       scatterX: (Math.random() - 0.5) * 520,
-scatterY: (Math.random() - 0.5) * 380,
+      scatterY: (Math.random() - 0.5) * 380,
 
       shapeA: 38 + Math.random() * 24,
-shapeB: 42 + Math.random() * 22,
-shapeC: 36 + Math.random() * 26,
-shapeD: 40 + Math.random() * 24
+      shapeB: 42 + Math.random() * 22,
+      shapeC: 36 + Math.random() * 26,
+      shapeD: 40 + Math.random() * 24
     };
 
     window.Zone01Memory.addPoint(memory);
@@ -170,6 +190,7 @@ shapeD: 40 + Math.random() * 24
     const memories = window.Zone01Memory.all();
     const totalStrength = memories.reduce((sum, m) => sum + m.strength, 0);
     const ratio = clamp(totalStrength / 7, 0, 1);
+
     viewer.style.setProperty("--memory", ratio.toFixed(3));
   }
 
@@ -237,6 +258,7 @@ shapeD: 40 + Math.random() * 24
     if (!recompositionLayer) return;
 
     const memories = window.Zone01Memory.all();
+
     memories.forEach(createMark);
 
     for (const [id, mark] of memoryMarks.entries()) {
@@ -248,19 +270,42 @@ shapeD: 40 + Math.random() * 24
   }
 
   function returnVisibility(depth) {
-    return 1 - smoothstep(
-      CONFIG.recompositionFullDepth,
-      CONFIG.recompositionStartDepth,
-      depth
+    return (
+      1 -
+      smoothstep(
+        CONFIG.recompositionFullDepth,
+        CONFIG.recompositionStartDepth,
+        depth
+      )
     );
   }
 
   function updateRecomposition(cam) {
     const memories = window.Zone01Memory.all();
+
     const visible = returnVisibility(cam.depth);
+    const softFade =
+  1 - smoothstep(
+    CONFIG.recompositionStartDepth - 0.12,
+    CONFIG.recompositionStartDepth + 0.08,
+    cam.depth
+  );
     const deepReturn = 1 - smoothstep(0.05, 0.22, cam.depth);
     const finalStrate = 1 - smoothstep(0.0, 0.24, cam.depth);
     const isSurface = finalStrate > 0.92;
+
+    const underZoom =
+      cam.scale < cam.minScale
+        ? clamp((cam.minScale - cam.scale) / (cam.minScale * 0.15), 0, 1)
+        : 0;
+
+    memoryDepth += (underZoom - memoryDepth) * 0.08;
+    extraReturn += (extraReturnTarget - extraReturn) * 0.06;
+
+    if (cam.depth > 0.08) {
+      extraReturnTarget = 0;
+    }
+
     const active = memories.length > 0 && visible > 0.01;
 
     recompositionLayer.classList.toggle("is-visible", active);
@@ -277,26 +322,58 @@ shapeD: 40 + Math.random() * 24
       const strength = clamp(memory.strength, 0.2, 1);
       const zoomIndex = memory.zoomIndex ?? 1;
 
-      const memoryPull = 0.28;
-const archiveDrift = visible * (1.8 + deepReturn * 1.2);
-      const rememberedX = rect.width * memory.x - rect.width / 2;
-      const rememberedY = rect.height * memory.y - rect.height / 2;
+      const layerOpacity =
+        zoomIndex === 0 ? 0.95 :
+        zoomIndex === 1 ? 0.82 :
+        0.62;
 
-      const bubbleX = rememberedX * memoryPull + memory.scatterX * archiveDrift;
-      const bubbleY = rememberedY * memoryPull + memory.scatterY * archiveDrift;
+      const memoryPull = 0.58;
+      const archiveDrift = visible * (1.8 + deepReturn * 1.2);
 
-      const fullX =
-        (index - memories.length / 2) *
-        rect.width *
-        (0.11 + zoomIndex * 0.05);
+      const imageScreenX =
+  (memory.x - 0.5) * img.naturalWidth * cam.scale + cam.x;
 
-      const fullY =
-        Math.sin(index * 1.7) *
-        rect.height *
-        0.04;
+      const imageScreenY =
+  (memory.y - 0.5) * img.naturalHeight * cam.scale + cam.y;
 
-      const baseX = bubbleX * (1 - finalStrate) + fullX * finalStrate;
-      const baseY = bubbleY * (1 - finalStrate) + fullY * finalStrate;
+      const bubbleX =
+  imageScreenX * memoryPull +
+  memory.scatterX * archiveDrift;
+
+      const bubbleY =
+  imageScreenY * memoryPull +
+  memory.scatterY * archiveDrift;
+
+     const finalMove =
+  finalStrate * finalStrate;
+
+const fullX =
+  (index - memories.length / 2) *
+    rect.width *
+    (0.16 + zoomIndex * 0.08) +
+  Math.sin(memoryDepth * 2.4 + index * 2.1) *
+    rect.width *
+    0.64 *
+    memoryDepth *
+    finalMove;
+
+const fullY =
+  Math.sin(index * 1.7) *
+    rect.height *
+    0.08 +
+  Math.cos(memoryDepth * 2.1 + index * 1.4) *
+    rect.height *
+    0.66 *
+    memoryDepth *
+    finalMove;
+
+      const baseX =
+        bubbleX * (1 - finalStrate) +
+        fullX * finalStrate;
+
+      const baseY =
+        bubbleY * (1 - finalStrate) +
+        fullY * finalStrate;
 
       const bubbleSize =
         memory.sizeSeed *
@@ -305,27 +382,37 @@ const archiveDrift = visible * (1.8 + deepReturn * 1.2);
       const fullPageSize =
         10 +
         zoomIndex * 4 +
-        index * 0.8;
+        index * 0.8 +
+        memoryDepth * 5;
 
-      const size =
-        bubbleSize * (1 - finalStrate) +
-        fullPageSize * finalStrate;
+      const disappearScale =
+  0.72 + softFade * 0.28;
+
+const size =
+  (
+    bubbleSize * (1 - finalStrate) +
+    fullPageSize * finalStrate
+  ) * disappearScale;
 
       mark.el.style.opacity =
-        visible > 0.04 ? 0.78 + finalStrate * 0.22 : 0;
+  layerOpacity *
+  softFade *
+  (0.78 + finalStrate * 0.22);
 
       mark.el.style.mixBlendMode =
         finalStrate > 0.45
-          ? ["multiply", "screen", "overlay", "soft-light"][index % 4]
+          ? ["multiply", "overlay", "soft-light", "screen"][
+              Math.floor(index + extraReturn * 3) % 4
+            ]
           : "normal";
 
       mark.el.style.filter =
         finalStrate > 0.35
           ? `
-            contrast(${1.05 + index * 0.04})
-            brightness(${0.72 + (index % 3) * 0.12})
-            saturate(${0.65 + (index % 4) * 0.18})
-            blur(${index % 2 === 0 ? 0 : 1.2}px)
+            contrast(${1.05 + index * 0.04 + extraReturn * 0.18})
+            brightness(${0.72 + (index % 3) * 0.12 + extraReturn * 0.08})
+            saturate(${0.65 + (index % 4) * 0.18 + extraReturn * 0.22})
+            blur(${index % 2 === 0 ? 0 : 1.2 + extraReturn * 1.6}px)
           `
           : "";
 
@@ -342,17 +429,10 @@ const archiveDrift = visible * (1.8 + deepReturn * 1.2);
         ${memory.shapeD}% ${100 - memory.shapeD}%
       `;
 
-mark.el.style.borderRadius = isSurface
-  ? "0"
-  : organicRadius;
+      mark.el.style.borderRadius = isSurface ? "0" : organicRadius;
+      mark.el.style.overflow = isSurface ? "visible" : "hidden";
+      mark.crop.style.inset = isSurface ? "-160%" : "0";
 
-mark.el.style.overflow = isSurface
-  ? "visible"
-  : "hidden";
-
-mark.crop.style.inset = isSurface
-  ? "-160%"
-  : "0";
       mark.el.style.setProperty("--strength", strength.toFixed(3));
 
       const faithfulZoom =
@@ -361,6 +441,7 @@ mark.crop.style.inset = isSurface
         zoomIndex * 420;
 
       mark.crop.style.backgroundSize = `${faithfulZoom}% auto`;
+
       mark.crop.style.backgroundPosition = `
         ${clamp(memory.x * 100, 0, 100)}%
         ${clamp(memory.y * 100, 0, 100)}%
@@ -381,6 +462,26 @@ mark.crop.style.inset = isSurface
   }
 
   function bindEvents() {
+    viewer.addEventListener(
+      "wheel",
+      event => {
+        const cam = window.Zone01Camera?.getState();
+        if (!cam) return;
+
+        const isAtMaxDezoom = cam.depth < 0.035;
+        const isDezoomingMore = event.deltaY > 0;
+
+        if (isAtMaxDezoom && isDezoomingMore) {
+          extraReturnTarget = clamp(extraReturnTarget + 0.08, 0, 1);
+        }
+
+        if (event.deltaY < 0) {
+          extraReturnTarget = clamp(extraReturnTarget - 0.12, 0, 1);
+        }
+      },
+      { passive: true }
+    );
+
     viewer.addEventListener("pointerdown", event => {
       if (event.pointerType === "mouse" && event.button !== 0) return;
 
@@ -395,6 +496,7 @@ mark.crop.style.inset = isSurface
       if (event.pointerType === "touch") {
         const now = performance.now();
         const isDoubleTap = now - lastTouchTapTime < 360;
+
         lastTouchTapTime = now;
 
         if (isDoubleTap) {
@@ -402,6 +504,7 @@ mark.crop.style.inset = isSurface
           if (!cam || cam.depth < CONFIG.minDepthToRecord) return;
 
           const point = pointerToImage(cam);
+
           registerAttention(point, CONFIG.holdToRecord, cam.depth);
           playMemoryBirth(point, cam);
 
@@ -419,7 +522,9 @@ mark.crop.style.inset = isSurface
         event.clientY - lastPointerY
       );
 
-      if (d > 22) pointerMovedTooMuch = true;
+      if (d > 22) {
+        pointerMovedTooMuch = true;
+      }
     });
 
     function endPointer() {
@@ -428,7 +533,9 @@ mark.crop.style.inset = isSurface
       pointerHasRecorded = false;
       pointerMovedTooMuch = false;
 
-      if (localTrace) localTrace.style.opacity = 0;
+      if (localTrace) {
+        localTrace.style.opacity = 0;
+      }
     }
 
     viewer.addEventListener("pointerup", endPointer);
@@ -441,6 +548,7 @@ mark.crop.style.inset = isSurface
     bindEvents();
     rebuildRecomposition();
     updateMemoryCSS();
+
     showMessage("zoomer, maintenir, relâcher, revenir", 3200);
   }
 
