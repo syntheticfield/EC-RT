@@ -1,6 +1,7 @@
 function initZone02() {
   const canvas = document.getElementById("unity-canvas");
   const container = document.getElementById("unity-container");
+
   const loading = document.getElementById("unity-loading");
   const loadingText = document.getElementById("unity-loading-text");
   const progressBar = document.getElementById("unity-progress-bar");
@@ -25,6 +26,11 @@ function initZone02() {
     productVersion: "1.0"
   };
 
+  let realProgress = 0;
+  let visualProgress = 0;
+  let loaderReady = false;
+  let progressLoop = null;
+
   function showWarning(message) {
     if (!warningBox) return;
     warningBox.textContent = message;
@@ -32,10 +38,9 @@ function initZone02() {
   }
 
   function updateLoading(progress) {
-    const percent = Math.round(progress * 100);
+    realProgress = progress;
 
-    if (progressBar) progressBar.style.width = `${percent}%`;
-    if (progressValue) progressValue.textContent = `${percent}%`;
+    const percent = Math.round(progress * 100);
 
     if (loadingText) {
       if (percent < 20) {
@@ -50,8 +55,52 @@ function initZone02() {
     }
   }
 
+  function startVisualProgress() {
+  if (progressLoop) return;
+
+  progressLoop = window.setInterval(() => {
+    let target;
+
+    if (loaderReady) {
+      target = 1;
+    } else {
+      // 👇 limite la progression réelle pour éviter le blocage
+      const capped = Math.min(realProgress, 0.92);
+
+      // 👇 drift doux vers 98% même si Unity est bloqué
+      const drift = 0.98;
+
+      target = capped + (drift - capped) * 0.15;
+    }
+
+    // interpolation douce
+    visualProgress += (target - visualProgress) * 0.06;
+
+    if (progressBar) {
+      progressBar.style.width = `${visualProgress * 100}%`;
+    }
+
+    if (progressValue) {
+      progressValue.textContent = `${Math.round(visualProgress * 100)}%`;
+    }
+
+    if (loaderReady && visualProgress > 0.995) {
+      clearInterval(progressLoop);
+      progressLoop = null;
+    }
+  }, 40);
+}
+
   function hideLoading() {
-    if (loading) loading.classList.add("is-hidden");
+    if (!loading) return;
+
+    loading.classList.add("is-hidden");
+
+    setTimeout(() => {
+      if (loading.parentNode) {
+        loading.remove();
+      }
+    }, 950);
   }
 
   function ensureCanvasSizing() {
@@ -60,6 +109,8 @@ function initZone02() {
   }
 
   ensureCanvasSizing();
+  startVisualProgress();
+
   window.addEventListener("resize", ensureCanvasSizing);
   window.addEventListener("orientationchange", ensureCanvasSizing);
 
@@ -77,8 +128,27 @@ function initZone02() {
     createUnityInstance(canvas, config, updateLoading)
       .then((unityInstance) => {
         window.unityInstance = unityInstance;
-        hideLoading();
+
+        loaderReady = true;
+        realProgress = 1;
+
+        if (progressBar) {
+          progressBar.style.width = "100%";
+        }
+
+        if (progressValue) {
+          progressValue.textContent = "100%";
+        }
+
+        if (loadingText) {
+          loadingText.textContent = "Scène prête.";
+        }
+
         ensureCanvasSizing();
+
+        setTimeout(() => {
+          hideLoading();
+        }, 500);
 
         if (typeof initUnityMobileFix === "function") {
           initUnityMobileFix();
@@ -86,7 +156,9 @@ function initZone02() {
       })
       .catch((error) => {
         console.error(error);
+
         showWarning("Impossible de charger la scène Unity.");
+
         if (loadingText) {
           loadingText.textContent = "Le chargement a échoué.";
         }
@@ -95,7 +167,9 @@ function initZone02() {
 
   script.onerror = () => {
     console.error("Loader Unity introuvable :", loaderUrl);
+
     showWarning("Impossible de charger le fichier loader Unity.");
+
     if (loadingText) {
       loadingText.textContent = "Le loader Unity est introuvable.";
     }

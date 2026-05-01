@@ -175,6 +175,11 @@ body.menu-open .sections {
     writing-mode: horizontal-tb;
     text-orientation: mixed;
     font-size: clamp(2rem, 8vw, 3.2rem);
+
+    text-shadow:
+    0 0 6px rgba(255,255,255,0.15),
+    0 0 14px rgba(255,255,255,0.08),
+    0 2px 6px rgba(0,0,0,0.6);
   }
 
   .menu-toggle::after {
@@ -231,24 +236,52 @@ body.menu-open .sections {
    sans casser Unity
    ========================= */
 
-@media (orientation: landscape) and (max-width: 980px) {
+/* =========================
+   PAYSAGE — EC@RT vertical sans bloc invisible
+   ========================= */
+
+@media (orientation: landscape) {
   .sidebar {
+    position: fixed;
     top: 14px;
     left: 14px;
+    z-index: 99990;
 
     width: 48px;
     height: auto;
+    min-height: 0;
+
+    padding: 0;
+    border: none;
+    background: transparent;
+
+    display: block;
+
+    pointer-events: none;
   }
 
   .sidebar-top {
+    position: relative;
+    z-index: 99992;
+
+    width: 48px;
+    height: auto;
+    min-height: 0;
+
+    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+
+    pointer-events: auto;
   }
 
-  .home-button {
-    width: 30px;
-    height: 30px;
+  .home-button,
+  .menu-toggle,
+  .site-title {
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .site-title,
@@ -256,15 +289,20 @@ body.menu-open .sections {
     writing-mode: vertical-rl;
     text-orientation: upright;
 
-    font-size: 1.45rem !important;
+    font-size: 1.5rem;
     line-height: 1;
     letter-spacing: 0.02em;
+
+    text-shadow:
+    0 0 6px rgba(255,255,255,0.15),
+    0 0 14px rgba(255,255,255,0.08),
+    0 2px 6px rgba(0,0,0,0.6);
   }
 
   .menu-toggle::after {
     margin-left: 0;
     margin-top: 0.45em;
-    font-size: 0.75em;
+    font-size: 0.7em;
   }
 
   .zones-nav,
@@ -272,99 +310,229 @@ body.menu-open .sections {
     top: 0;
     left: 0;
 
-    width: 270px;
+    width: 280px;
     height: 100vh;
 
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 8px;
+    gap: 9px;
 
     padding: 24px 22px 24px 86px;
 
-    border: none;
-    border-right: 1px solid rgba(255,255,255,0.18);
-    border-radius: 0;
+    background: rgba(0,0,0,0.54);
+    border-right: 1px solid rgba(255,255,255,0.16);
 
     transform: translateX(-100%);
+    pointer-events: none;
   }
 
   body.menu-open .zones-nav,
   body.menu-open .sections {
     transform: translateX(0);
-  }
-
-  .zone-main,
-  .viewer {
-    padding: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-  }
-
-  .unity-container,
-  #unity-container,
-  #unity-canvas,
-  canvas {
-    width: 100vw !important;
-    height: 100vh !important;
+    pointer-events: auto;
   }
 }
 /* =========================
    DESKTOP PAYSAGE
    barre fine depuis EC@RT
    ========================= */
+/* =========================
+   DESKTOP — SIDEBAR NOIRE CLASSIQUE
+   ========================= */
+
+/* =========================
+   DESKTOP — SIDEBAR RAFFINÉE
+   EC@RT vertical + Unity collé
+   ========================= */
+/* =========================
+   DESKTOP — SIDEBAR RAFFINÉE
+   EC@RT vertical + Unity collé
+   ========================= */
 
 @media (orientation: landscape) and (min-width: 981px) {
+  .page {
+    display: grid !important;
+    grid-template-columns: 220px 1fr !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+
   .sidebar {
-    top: 18px;
-    left: 18px;
+    position: relative !important;
+    grid-column: 1 !important;
+
+    top: auto !important;
+    left: auto !important;
+
+    width: 220px !important;
+    min-width: 220px !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+
+    padding: 22px 18px !important;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(0,0,0,0.98),
+        rgba(0,0,0,0.88)
+      ) !important;
+
+    border-right: 1px solid rgba(255,255,255,0.10) !important;
+
+    z-index: 20 !important;
+    pointer-events: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
   }
 
   .sidebar-top {
-    flex-direction: row;
-    align-items: center;
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+
+    pointer-events: auto !important;
+  }
+
+  .home-button {
+    width: 38px !important;
+    height: 38px !important;
+    flex: 0 0 38px !important;
+
+    font-size: 1rem !important;
+
+    background: rgba(255,255,255,0.025) !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
   }
 
   .site-title,
   .menu-toggle {
-    writing-mode: horizontal-tb;
-    text-orientation: mixed;
+    writing-mode: vertical-rl !important;
+    text-orientation: upright !important;
+
+    font-size: 1.85rem !important;
+    line-height: 1 !important;
+    letter-spacing: 0.02em !important;
+
+    text-shadow:
+      0 0 6px rgba(255,255,255,0.12),
+      0 0 18px rgba(255,255,255,0.08),
+      0 2px 6px rgba(0,0,0,0.72) !important;
+
+    pointer-events: auto !important;
+  }
+
+  .menu-toggle::after {
+    margin-left: 0 !important;
+    margin-top: 0.45em !important;
+    font-size: 0.72em !important;
   }
 
   .zones-nav,
   .sections {
-    top: 26px;
-    left: 190px;
+    position: absolute !important;
+    top: 22px !important;
+    left: 86px !important;
 
-    height: 40px;
-    width: min(760px, calc(100vw - 230px));
+    width: calc(100% - 104px) !important;
+    height: calc(100vh - 44px) !important;
 
-    flex-direction: row;
-    align-items: center;
-    gap: 18px;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    padding: 0 18px;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
 
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 999px;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
 
-    transform: translateX(-28px) scaleX(0.94);
-    transform-origin: left center;
+    opacity: 0 !important;
+    pointer-events: none !important;
 
-    overflow-x: auto;
+    transform: translateX(-10px) !important;
+
+    transition:
+      opacity 220ms ease,
+      transform 260ms ease;
   }
 
   body.menu-open .zones-nav,
   body.menu-open .sections {
-    transform: translateX(0) scaleX(1);
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateX(0) !important;
   }
 
   .zone-link,
   .section-link {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    font-size: 0.76rem;
-    line-height: 1;
+    white-space: normal !important;
+
+    font-size: 0.88rem !important;
+    line-height: 1.16 !important;
+
+    color: rgba(255,255,255,0.42) !important;
+    text-decoration: none !important;
+
+    transform: none !important;
   }
+
+  .zone-link:hover,
+  .section-link:hover,
+  .zone-link.active,
+  .section-link.active {
+    color: #fff !important;
+    text-shadow:
+      0 0 8px rgba(255,255,255,0.18),
+      0 0 20px rgba(255,255,255,0.08) !important;
+  }
+
+  .zone-link::before,
+  .section-link::before {
+    display: none !important;
+  }
+
+  .zone-main,
+  .viewer,
+  .zone-content,
+  .zone-content-unity {
+    grid-column: 2 !important;
+
+    width: 100% !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+  }
+}
+  /* Empêche EC@RT / HOME / menu d’être sélectionnés au clic */
+.sidebar,
+.sidebar *,
+.zones-nav,
+.zones-nav *,
+.sections,
+.sections *,
+.home-button,
+.menu-toggle,
+.site-title {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  -webkit-touch-callout: none !important;
 }

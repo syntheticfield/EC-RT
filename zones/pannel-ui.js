@@ -1,7 +1,6 @@
 /* =========================
    EC@RT — INTERFACE UNIFIÉE
    SOUND / INFO / MAP
-   Desktop + mobile
    ========================= */
 
 (function () {
@@ -18,6 +17,14 @@
   function emitPanelOpen(panelName) {
     document.dispatchEvent(
       new CustomEvent("ecart:panel-open", {
+        detail: { panel: panelName }
+      })
+    );
+  }
+
+  function closeAllPanelsExcept(panelName) {
+    document.dispatchEvent(
+      new CustomEvent("ecart:panel-close-others", {
         detail: { panel: panelName }
       })
     );
@@ -56,14 +63,6 @@
     });
   }
 
-  function closeAllPanelsExcept(panelName) {
-    document.dispatchEvent(
-      new CustomEvent("ecart:panel-close-others", {
-        detail: { panel: panelName }
-      })
-    );
-  }
-
   function initInfoPanel() {
     const btn = qs("#infoToggle");
     const panel = qs("#infoPanel");
@@ -88,9 +87,7 @@
     if (refBox && Array.isArray(data.references) && data.references.length) {
       refBox.innerHTML =
         "<h3>Références</h3>" +
-        data.references
-          .map((item) => `<div class="info-ref-item">${item}</div>`)
-          .join("");
+        data.references.map((item) => `<div class="info-ref-item">${item}</div>`).join("");
     }
 
     function openPanel() {
@@ -279,6 +276,7 @@
     const zones = qsa(".mini-zone", overlay);
     const currentZone = document.body.dataset.zone || "";
     const zoneLinks = qsa(".zone-link, .section-link");
+
     let typingTimer = null;
 
     if (currentZone) addVisitedZone(currentZone);
@@ -297,23 +295,7 @@
       }
     }
 
-    function resetZoneHints() {
-      stopTyping();
-
-      zones.forEach((zone) => {
-        zone.classList.remove("is-armed", "is-hovered");
-        zone.dataset.armed = "false";
-
-        const hint = qs(".mobile-zone-hint", zone);
-        if (hint) hint.textContent = "";
-      });
-    }
-
-    function resetStatus() {
-      if (status) status.textContent = "Sélectionne une zone.";
-    }
-
-    function typeText(element, text, speed = 22) {
+    function typeText(element, text, speed = 24) {
       if (!element) return;
 
       stopTyping();
@@ -323,8 +305,26 @@
       typingTimer = setInterval(() => {
         element.textContent = text.slice(0, i + 1);
         i += 1;
+
         if (i >= text.length) stopTyping();
       }, speed);
+    }
+
+    function resetStatus() {
+      stopTyping();
+      if (status) status.textContent = "Sélectionne une zone.";
+    }
+
+    function resetZones() {
+      stopTyping();
+
+      zones.forEach((zone) => {
+        zone.dataset.armed = "false";
+        zone.classList.remove("is-armed", "is-hovered");
+
+        const hint = qs(".mobile-zone-hint", zone);
+        if (hint) hint.textContent = "";
+      });
     }
 
     function setHoveredZone(zoneId) {
@@ -349,7 +349,8 @@
       closeAllPanelsExcept("map");
       overlay.classList.add("is-open");
       setToggleState(true);
-      resetZoneHints();
+      resetZones();
+      resetStatus();
       applyVisitedZones(zones, currentZone);
       emitPanelOpen("map");
     }
@@ -357,7 +358,7 @@
     function closeMap() {
       overlay.classList.remove("is-open");
       setToggleState(false);
-      resetZoneHints();
+      resetZones();
       resetStatus();
       clearHoveredZone();
     }
@@ -384,21 +385,23 @@
       zone.addEventListener("mouseenter", () => {
         const zoneId = zone.dataset.miniZone;
         const name = zone.dataset.zoneName || `Zone ${zoneId}`;
-        const hint = qs(".mobile-zone-hint", zone);
 
         if (zoneId) setHoveredZone(zoneId);
-        if (status) status.textContent = `Zone sélectionnée : ${name}`;
-        if (hint && !hint.textContent) hint.textContent = `vers ${name}...`;
+        if (status) typeText(status, `vers ${name}...`);
       });
 
       zone.addEventListener("mouseleave", () => {
         clearHoveredZone();
-        if (status) resetStatus();
+
+        const hasArmedZone = zones.some((item) => item.dataset.armed === "true");
+
+        if (!hasArmedZone) {
+          resetStatus();
+        }
       });
 
       zone.addEventListener("click", (event) => {
         const name = zone.dataset.zoneName || "zone";
-        const hint = qs(".mobile-zone-hint", zone);
         const isArmed = zone.dataset.armed === "true";
 
         if (!isArmed) {
@@ -408,17 +411,14 @@
             if (otherZone !== zone) {
               otherZone.dataset.armed = "false";
               otherZone.classList.remove("is-armed");
-
-              const otherHint = qs(".mobile-zone-hint", otherZone);
-              if (otherHint) otherHint.textContent = "";
             }
           });
 
           zone.dataset.armed = "true";
           zone.classList.add("is-armed");
 
-          if (status) status.textContent = `Zone sélectionnée : ${name}`;
-          typeText(hint, `vers ${name}...`);
+          if (status) typeText(status, `vers ${name}...`);
+
           return;
         }
 

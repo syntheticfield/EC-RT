@@ -12,6 +12,8 @@
 
   function toggleMenu(event) {
     event.preventDefault();
+    event.stopPropagation();
+
     setMenu(!body.classList.contains("menu-open"));
   }
 
