@@ -1,30 +1,32 @@
 window.Zone01Memory = (() => {
-  let points = [];
-
-  const MAX_POINTS = 10;
+  let data = { points: [] };
 
   function addPoint(point) {
-    points.push(point);
+    data.points.push(point);
+  }
 
-    if (points.length > MAX_POINTS) {
-      points = points.slice(points.length - MAX_POINTS);
-    }
+  function updatePoint(index, patch) {
+    if (!data.points[index]) return;
+    data.points[index] = { ...data.points[index], ...patch };
   }
 
   function all() {
-    return points;
+    return [...data.points];
   }
 
   function count() {
-    return points.length;
+    return data.points.length;
   }
 
   function reset() {
-    points = [];
+    data = { points: [] };
   }
+
+  reset();
 
   return {
     addPoint,
+    updatePoint,
     all,
     count,
     reset
