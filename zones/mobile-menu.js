@@ -4,47 +4,39 @@
   const nav = document.querySelector(".zones-nav, .sections");
 
   if (!body || !toggle || !nav) return;
-  if (!body.classList.contains("has-mobile-menu")) return;
 
- function isMobile() {
-  return true;
-}
-
-  function closeMenu() {
-    body.classList.remove("menu-open");
-    toggle.setAttribute("aria-expanded", "false");
+  function setMenu(open) {
+    body.classList.toggle("menu-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
   }
 
-  function openMenu() {
-    body.classList.add("menu-open");
-    toggle.setAttribute("aria-expanded", "true");
-  }
-
-  function onToggleClick(event) {
-    if (!isMobile()) return;
+  function toggleMenu(event) {
     event.preventDefault();
-
-    if (body.classList.contains("menu-open")) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
+    setMenu(!body.classList.contains("menu-open"));
   }
 
   toggle.setAttribute("aria-expanded", "false");
 
   if (!nav.id) {
-    nav.id = "mobile-nav";
+    nav.id = "ecart-zone-menu";
   }
+
   toggle.setAttribute("aria-controls", nav.id);
 
-  toggle.addEventListener("click", onToggleClick);
+  toggle.addEventListener("click", toggleMenu);
 
- window.addEventListener("resize", closeMenu);
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+      setMenu(false);
+    }
+  });
 
-  nav.querySelectorAll(".zone-link, .section-link").forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenu();
-    });
+  document.addEventListener("click", function (event) {
+    const insideSidebar = event.target.closest(".sidebar");
+    const insideNav = event.target.closest(".zones-nav, .sections");
+
+    if (!insideSidebar && !insideNav) {
+      setMenu(false);
+    }
   });
 })();

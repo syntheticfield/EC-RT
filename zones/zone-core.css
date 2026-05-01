@@ -1,3 +1,8 @@
+/* =========================
+   EC@RT — CORE.CSS REFOUND
+   Socle global sans sidebar fixe
+   ========================= */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,14 +10,16 @@
 }
 
 :root {
-  --bg: #000000;
-  --fg: #ffffff;
-  --fg-soft: rgba(255, 255, 255, 0.42);
-  --fg-mid: rgba(255, 255, 255, 0.72);
-  --line: rgba(255, 255, 255, 0.08);
-  --panel: rgba(255, 255, 255, 0.02);
-  --panel-border: rgba(255, 255, 255, 0.08);
-  --panel-glow: rgba(255, 255, 255, 0.03);
+  --bg: #000;
+  --fg: #fff;
+
+  --fg-soft: rgba(255,255,255,0.42);
+  --fg-mid: rgba(255,255,255,0.72);
+
+  --line: rgba(255,255,255,0.10);
+  --panel: rgba(255,255,255,0.025);
+  --panel-border: rgba(255,255,255,0.08);
+  --panel-glow: rgba(255,255,255,0.035);
 }
 
 html,
@@ -24,55 +31,193 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   overflow-x: hidden;
   background:
-    radial-gradient(circle at center, rgba(255,255,255,0.015), rgba(255,255,255,0.002) 42%, transparent 72%),
+    radial-gradient(
+      circle at center,
+      rgba(255,255,255,0.018),
+      rgba(255,255,255,0.004) 42%,
+      transparent 72%
+    ),
     #000;
 }
 
+/* =========================
+   PAGE
+   plus de grille sidebar
+   ========================= */
+
 .page {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  min-height: 100vh;
+  position: relative;
   width: 100%;
+  min-height: 100vh;
+  display: block;
 }
+
+/* =========================
+   ZONE PRINCIPALE
+   contenu plein écran possible
+   ========================= */
 
 .zone-main {
   position: relative;
+  width: 100%;
   min-width: 0;
   min-height: 100vh;
-  padding: 34px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  padding: 0;
+  overflow: hidden;
 }
 
+/* utile pour les zones texte / éditoriales */
 .zone-content {
-  width: min(1180px, 100%);
+  position: relative;
+  z-index: 1;
+  width: min(1180px, calc(100vw - 40px));
+  margin: 0 auto;
 }
 
+/* cadre optionnel pour zones non fullscreen */
 .zone-frame {
   position: relative;
+
+  width: 100%;
   min-height: 72vh;
+
+  padding: 32px;
+
   border: 1px solid var(--panel-border);
   background: var(--panel);
+
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.02),
     0 0 34px var(--panel-glow);
-  padding: 32px;
 }
 
+/* =========================
+   TYPOGRAPHIE
+   ========================= */
+
 .zone-heading {
+  margin-bottom: 18px;
+
   font-size: 1.4rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  margin-bottom: 18px;
 }
 
 .zone-text {
   max-width: 760px;
+
   color: var(--fg-mid);
   line-height: 1.62;
   font-size: 1rem;
+}
+
+.zone-text p + p {
+  margin-top: 1em;
+}
+
+/* =========================
+   FULLSCREEN MEDIA / UNITY
+   ========================= */
+
+.viewer,
+.image-viewer,
+.unity-container,
+#unity-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+}
+
+#unity-canvas,
+.unity-canvas,
+canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* images fullscreen */
+img {
+  max-width: 100%;
+}
+
+.zoom-image,
+.fullscreen-image {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* =========================
+   LIENS / BOUTONS GLOBAUX
+   ========================= */
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* =========================
+   MOBILE
+   garde les scènes plein écran
+   ========================= */
+
+@media (max-width: 980px) {
+  .zone-main {
+    width: 100vw;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .viewer,
+  .image-viewer,
+  .unity-container,
+  #unity-container {
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+  }
+
+  .zone-content {
+    width: min(100%, calc(100vw - 28px));
+  }
+
+  .zone-frame {
+    padding: 20px;
+    min-height: auto;
+  }
+}
+
+/* =========================
+   PETITS ÉCRANS
+   ========================= */
+
+@media (max-width: 540px) {
+  .zone-heading {
+    font-size: 1.1rem;
+  }
+
+  .zone-text {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .zone-frame {
+    padding: 16px;
+  }
 }
