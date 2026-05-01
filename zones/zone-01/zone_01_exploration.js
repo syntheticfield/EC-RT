@@ -5,36 +5,35 @@ window.Zone01Exploration = (() => {
   if (!viewer || !img) return null;
 
   const CONFIG = {
-    minDepthToRecord: 0.18,
-    stillDelay: 360,
-    recordDelay: 1050,
+    minDepthToRecord: 0.22,
+    holdToRecord: 720,
+    maxMemoryPoints: 10,
 
-    maxMemoryPoints: 36,
+    recompositionStartDepth: 0.42,
+    recompositionFullDepth: 0.08,
+    imageSharpDepth: 0.42,
 
-    recompositionStartDepth: 0.78,
-    recompositionFullDepth: 0.28,
-    returnMessageDepth: 0.34,
-
-    memoryFadeDuration: 45000,
-    messageDuration: 2200
+    messageDuration: 1600
   };
 
-  let whisper = null;
-  let localTrace = null;
   let recompositionLayer = null;
+  let localTrace = null;
+  let whisper = null;
 
-  let lastPointerX = 0;
-  let lastPointerY = 0;
-  let lastMoveTime = performance.now();
-
-  let currentDwell = 0;
-  let lastRecordTime = 0;
+  let pointerDown = false;
+  let pointerStartedAt = 0;
+  let pointerHasRecorded = false;
+  let pointerMovedTooMuch = false;
+  let pointerStartX = 0;
+  let pointerStartY = 0;
 
   let messageText = "";
   let messageUntil = 0;
   let wasReturning = false;
 
-  const memoryMarks = new Map();
+  let cachedRect = { width: 1, height: 1 };
+  let cachedMemories = [];
+  const marks = new Map();
 
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
@@ -43,8 +42,14 @@ window.Zone01Exploration = (() => {
     return t * t * (3 - 2 * t);
   }
 
-  function distance(a, b, c, d) {
-    return Math.hypot(a - c, b - d);
+  function random(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function updateRectCache() {
+    const rect = viewer.getBoundingClientRect();
+    cachedRect.width = rect.width || 1;
+    cachedRect.height = rect.height || 1;
   }
 
   function showMessage(text, duration = CONFIG.messageDuration) {
@@ -53,8 +58,6 @@ window.Zone01Exploration = (() => {
   }
 
   function updateMessage() {
-    if (!whisper) return;
-
     const visible = performance.now() < messageUntil;
     whisper.textContent = visible ? messageText : "";
     whisper.classList.toggle("is-visible", visible);
@@ -62,16 +65,8 @@ window.Zone01Exploration = (() => {
 
   function pointerToImage(cam) {
     return {
-      x: clamp(
-        0.5 + (cam.pointerX - cam.x) / (img.naturalWidth * cam.scale),
-        0,
-        1
-      ),
-      y: clamp(
-        0.5 + (cam.pointerY - cam.y) / (img.naturalHeight * cam.scale),
-        0,
-        1
-      )
+      x: clamp(0.5 + (cam.pointerX - cam.x) / (img.naturalWidth * cam.scale), 0, 1),
+      y: clamp(0.5 + (cam.pointerY - cam.y) / (img.naturalHeight * cam.scale), 0, 1)
     };
   }
 
@@ -80,6 +75,12 @@ window.Zone01Exploration = (() => {
       x: (point.x - 0.5) * img.naturalWidth * cam.scale + cam.x,
       y: (point.y - 0.5) * img.naturalHeight * cam.scale + cam.y
     };
+  }
+
+  function getZoomLayer(depth) {
+    if (depth < 0.35) return { zoomLayer: "surface", zoomIndex: 0 };
+    if (depth < 0.68) return { zoomLayer: "detail", zoomIndex: 1 };
+    return { zoomLayer: "grain", zoomIndex: 2 };
   }
 
   function createInterface() {
@@ -96,283 +97,251 @@ window.Zone01Exploration = (() => {
     viewer.appendChild(whisper);
   }
 
-  function trimMemoryIfNeeded() {
-    const memories = window.Zone01Memory.all();
-
-    if (memories.length <= CONFIG.maxMemoryPoints) return;
-
-    const kept = memories.slice(memories.length - CONFIG.maxMemoryPoints);
-
-    window.Zone01Memory.reset();
-
-    kept.forEach(memory => {
-      window.Zone01Memory.addPoint(memory);
-    });
-  }
-
-  function registerAttention(point, dwellTime, depth) {
+  function registerAttention(point, holdTime, depth) {
+    const cam = window.Zone01Camera?.getState?.();
     const now = Date.now();
+    const layer = getZoomLayer(depth);
 
     const memory = {
-      id: `m-${now}-${Math.floor(Math.random() * 99999)}`,
+      id: `m-${now}-${Math.floor(Math.random() * 100000)}`,
 
       x: point.x,
       y: point.y,
 
-      dwellTime,
-      strength: clamp(dwellTime / 2200, 0.22, 1),
+      captureDepth: depth,
+      captureScale: cam?.scale || 1,
+      zoomLayer: layer.zoomLayer,
+      zoomIndex: layer.zoomIndex,
 
-      firstSeen: now,
-      lastSeen: now,
-      lastDepth: depth,
-      zoomScale: depth,
+      holdTime,
+      strength: clamp(holdTime / 1800, 0.25, 1),
 
-      sizeSeed: 0.7 + Math.random() * 0.9,
+      scatterX: random(-180, 180),
+      scatterY: random(-130, 130),
+      phase: random(0, Math.PI * 2),
 
-      shapeA: 38 + Math.random() * 28,
-      shapeB: 52 + Math.random() * 34,
-      shapeC: 42 + Math.random() * 32,
-      shapeD: 58 + Math.random() * 28,
+      bubbleScale: random(0.82, 1.35),
+      strateScale: random(0.92, 1.18),
 
-      offsetX: (Math.random() - 0.5) * 18,
-      offsetY: (Math.random() - 0.5) * 18
+      shape: `${random(24, 44)}% ${random(56, 76)}% ${random(38, 62)}% ${random(40, 70)}% / ${random(42, 70)}% ${random(32, 58)}% ${random(48, 74)}% ${random(28, 56)}%`
     };
 
     window.Zone01Memory.addPoint(memory);
-    trimMemoryIfNeeded();
-
     rebuildRecomposition();
-    updateMemoryCSS();
 
-    showMessage("mémoire-image inscrite", 1500);
-  }
+    viewer.classList.add("archive-pulse");
+    window.setTimeout(() => viewer.classList.remove("archive-pulse"), 500);
 
-  function updateMemoryCSS() {
-    const memories = window.Zone01Memory.all();
-    const totalStrength = memories.reduce((sum, m) => sum + m.strength, 0);
-    const ratio = clamp(totalStrength / 7, 0, 1);
-
-    viewer.style.setProperty("--memory", ratio.toFixed(3));
-  }
-
-  function updateStillness(cam) {
-    const moved = distance(
-      cam.pointerX,
-      cam.pointerY,
-      lastPointerX,
-      lastPointerY
-    );
-
-    if (moved > 2.5) {
-      lastMoveTime = performance.now();
-      currentDwell = 0;
-      lastPointerX = cam.pointerX;
-      lastPointerY = cam.pointerY;
-    }
-  }
-
-  function updateAttentionRecording(time, cam, dt) {
-    const point = pointerToImage(cam);
-
-    const canRecord =
-      cam.depth >= CONFIG.minDepthToRecord &&
-      performance.now() - lastMoveTime > CONFIG.stillDelay;
-
-    if (canRecord) {
-      currentDwell += dt;
-    } else {
-      currentDwell *= 0.86;
-    }
-
-    const dwellRatio = clamp(currentDwell / CONFIG.recordDelay, 0, 1);
-    const screen = imagePointToScreen(point, cam);
-
-    localTrace.style.transform = `
-      translate(-50%, -50%)
-      translate3d(${screen.x}px, ${screen.y}px, 0)
-      scale(${0.7 + dwellRatio * 0.85 + cam.depth * 0.45})
-    `;
-
-    localTrace.style.opacity =
-      canRecord ? 0.18 + dwellRatio * 0.76 : dwellRatio * 0.12;
-
-    localTrace.style.setProperty("--dwell", dwellRatio.toFixed(3));
-
-    if (dwellRatio >= 1 && time - lastRecordTime > 900) {
-      registerAttention(point, currentDwell, cam.depth);
-
-      currentDwell = 0;
-      lastRecordTime = time;
-
-      viewer.classList.add("archive-pulse");
-
-      setTimeout(() => {
-        viewer.classList.remove("archive-pulse");
-      }, 750);
-    }
+    showMessage("fragment prélevé", 1200);
   }
 
   function createMark(memory) {
-    if (memoryMarks.has(memory.id)) return;
+    if (marks.has(memory.id)) return;
 
     const mark = document.createElement("div");
     mark.className = "memory-recomposition-mark";
-    mark.dataset.memoryId = memory.id;
 
-    const crop = img.cloneNode(true);
-    crop.removeAttribute("id");
+    const crop = document.createElement("div");
     crop.className = "memory-recomposition-crop";
-    crop.setAttribute("aria-hidden", "true");
-    crop.draggable = false;
+    crop.style.setProperty("--soft-x", `${35 + Math.random() * 30}%`);
+crop.style.setProperty("--soft-y", `${35 + Math.random() * 30}%`);
+    crop.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
 
+    const faithfulZoom =
+      180 +
+      Math.pow(memory.captureDepth, 1.8) * 2400 +
+      memory.zoomIndex * 420;
+
+    crop.style.backgroundSize = `${faithfulZoom}% auto`;
+    crop.style.backgroundPosition = `${memory.x * 100}% ${memory.y * 100}%`;
+
+    mark.style.borderRadius = memory.shape;
     mark.appendChild(crop);
     recompositionLayer.appendChild(mark);
 
-    memoryMarks.set(memory.id, {
-      id: memory.id,
-      el: mark,
-      crop,
-      phase: Math.random() * Math.PI * 2,
-      screenX: 0,
-      screenY: 0
-    });
+    marks.set(memory.id, { el: mark, crop });
   }
 
   function rebuildRecomposition() {
-    if (!recompositionLayer) return;
+    cachedMemories = window.Zone01Memory.all().slice(-CONFIG.maxMemoryPoints);
 
-    const memories = window.Zone01Memory.all();
+    cachedMemories.forEach(createMark);
 
-    memories.forEach(createMark);
-
-    for (const [id, mark] of memoryMarks.entries()) {
-      if (!memories.some(memory => memory.id === id)) {
+    for (const [id, mark] of marks.entries()) {
+      if (!cachedMemories.some(memory => memory.id === id)) {
         mark.el.remove();
-        memoryMarks.delete(id);
+        marks.delete(id);
       }
     }
 
-    recompositionLayer
-      .querySelectorAll(".memory-recomposition-line")
-      .forEach(line => line.remove());
+    const totalStrength = cachedMemories.reduce((sum, m) => sum + m.strength, 0);
+    viewer.style.setProperty("--memory", clamp(totalStrength / 7, 0, 1).toFixed(3));
   }
 
-  function returnVisibility(depth) {
-    return (
-      1 -
-      smoothstep(
-        CONFIG.recompositionFullDepth,
-        CONFIG.recompositionStartDepth,
-        depth
-      )
-    );
+  function updateHolding(cam) {
+    const point = pointerToImage(cam);
+    const screen = imagePointToScreen(point, cam);
+
+    const canRecord =
+      pointerDown &&
+      !pointerHasRecorded &&
+      !pointerMovedTooMuch &&
+      cam.depth >= CONFIG.minDepthToRecord;
+
+    const dwell = canRecord
+      ? clamp((performance.now() - pointerStartedAt) / CONFIG.holdToRecord, 0, 1)
+      : 0;
+
+    localTrace.style.opacity = canRecord ? (0.14 + dwell * 0.55).toFixed(3) : 0;
+    localTrace.style.setProperty("--dwell", dwell.toFixed(3));
+    localTrace.style.transform =
+      `translate3d(${screen.x}px, ${screen.y}px, 0) translate(-50%, -50%) scale(${0.8 + dwell * 0.9})`;
+
+    if (dwell >= 1 && canRecord) {
+      registerAttention(point, performance.now() - pointerStartedAt, cam.depth);
+      pointerHasRecorded = true;
+    }
   }
 
   function updateRecomposition(cam, time) {
-    const memories = window.Zone01Memory.all();
-    const visible = returnVisibility(cam.depth);
-    const active = memories.length > 0 && visible > 0.01;
+    if (!cachedMemories.length) {
+      recompositionLayer.classList.remove("is-visible");
+      viewer.classList.remove("is-return-blur");
+      return;
+    }
+
+    const depth = clamp(cam.depth || 0, 0, 1);
+
+    const visible =
+      1 - smoothstep(CONFIG.recompositionFullDepth, CONFIG.recompositionStartDepth, depth);
+
+    const strate =
+      1 - smoothstep(0.02, CONFIG.recompositionFullDepth, depth);
+
+    const active = visible > 0.01 && depth < CONFIG.imageSharpDepth;
 
     recompositionLayer.classList.toggle("is-visible", active);
     viewer.classList.toggle("is-return-blur", active);
 
     if (!active) return;
 
-    const rect = viewer.getBoundingClientRect();
+    const w = cachedRect.width;
+    const h = cachedRect.height;
+    const count = cachedMemories.length;
+    const breath = Math.sin(time * 0.00018) * 0.5 + 0.5;
 
-    memories.forEach((memory, index) => {
-      const mark = memoryMarks.get(memory.id);
+    cachedMemories.forEach((memory, index) => {
+      const mark = marks.get(memory.id);
       if (!mark) return;
 
-      const age = Date.now() - memory.lastSeen;
-      const fade = clamp(1 - age / CONFIG.memoryFadeDuration, 0, 1);
+      const strength = clamp(memory.strength, 0.25, 1);
+      const zi = memory.zoomIndex || 0;
 
-      const baseX = rect.width * memory.x - rect.width / 2;
-      const baseY = rect.height * memory.y - rect.height / 2;
+      const rememberedX = (memory.x - 0.5) * w * 0.55;
+      const rememberedY = (memory.y - 0.5) * h * 0.55;
 
-      const strength = clamp(memory.strength, 0.18, 1);
-      const dwellBoost = clamp(memory.dwellTime / 5000, 0, 1);
+      const bubbleX = rememberedX + memory.scatterX * visible;
+      const bubbleY = rememberedY + memory.scatterY * visible;
 
-      const driftX =
-        Math.sin(time * 0.00055 + mark.phase + index) * 7 * visible;
+    const organicX =
+  (memory.x - 0.5) * w * 0.42 +
+  Math.cos(memory.phase) * w * 0.16 +
+  Math.sin(memory.phase * 1.7) * w * 0.08;
 
-      const driftY =
-        Math.cos(time * 0.00068 + mark.phase - index) * 6 * visible;
+const organicY =
+  (memory.y - 0.5) * h * 0.24 +
+  Math.sin(memory.phase) * h * 0.18 +
+  Math.cos(memory.phase * 1.4) * h * 0.08;
 
-      const size =
-        memory.sizeSeed *
-        (0.42 + visible * 0.34 + strength * 0.26 + dwellBoost * 0.22);
+const strateX = organicX;
+const strateY = organicY;
 
-      mark.screenX = baseX + driftX;
-      mark.screenY = baseY + driftY;
+      const x = bubbleX * (1 - strate) + strateX * strate;
+      const y = bubbleY * (1 - strate) + strateY * strate;
 
-      mark.el.style.transform = `
-        translate(-50%, -50%)
-        translate3d(${mark.screenX}px, ${mark.screenY}px, 0)
-        scale(${size})
-      `;
+      const bubbleScale = memory.bubbleScale * (0.75 + visible * 0.8);
+     const fullScale =
+  memory.strateScale *
+  (4.6 + zi * 1.45 + count * 0.14 + strength * 0.9);const scale = bubbleScale * (1 - strate) + fullScale * strate;
 
-      mark.el.style.opacity =
-        clamp((0.12 + visible * (0.55 + strength * 0.45)) * fade, 0, 0.78);
+      const slowY = Math.sin(time * 0.00012 + memory.phase) * 6 * visible;
+      const slowScale = 1 + (breath - 0.5) * 0.018;
 
-      mark.el.style.borderRadius = `
-        ${memory.shapeA}% ${100 - memory.shapeA}%
-        ${memory.shapeB}% ${100 - memory.shapeB}% /
-        ${memory.shapeC}% ${100 - memory.shapeC}%
-        ${memory.shapeD}% ${100 - memory.shapeD}%
-      `;
+      mark.el.style.opacity = (visible * (0.62 + strength * 0.26)).toFixed(3);
+      mark.el.style.transform =
+        `translate3d(${x}px, ${y + slowY}px, 0) rotate(${(strate * (index - count / 2) * 2.2).toFixed(2)}deg) scale(${(scale * slowScale).toFixed(3)})`;
 
-      mark.el.style.setProperty("--strength", strength.toFixed(3));
+   mark.el.classList.toggle("is-strate", strate > 0.62);
 
-      const cropZoom = 1.8 + memory.zoomScale * 7.5;
+mark.crop.style.opacity = (
+  0.62 +
+  visible * 0.18 +
+  strate * 0.16
+).toFixed(3);
 
-      mark.crop.style.transform = `
-        translate(-50%, -50%)
-        scale(${cropZoom})
-      `;
-
-      mark.crop.style.objectPosition = `
-        ${clamp(memory.x * 100 + memory.offsetX, 0, 100)}%
-        ${clamp(memory.y * 100 + memory.offsetY, 0, 100)}%
-      `;
+mark.crop.style.transform = `
+  scale(${1.08 + strate * 0.16})
+  translate3d(${Math.sin(memory.phase) * strate * 8}px, ${Math.cos(memory.phase) * strate * 6}px, 0)
+`;
     });
   }
 
   function updateReturnMessage(cam) {
-    const inReturn =
-      cam.depth < CONFIG.returnMessageDepth &&
-      window.Zone01Memory.count() > 0;
+    const returning = cam.depth < CONFIG.recompositionStartDepth && cachedMemories.length > 0;
 
-    if (inReturn && !wasReturning) {
-      showMessage("les fragments regardés persistent", 1800);
+    if (returning && !wasReturning) {
+      showMessage("les fragments prélevés reviennent", 1400);
     }
 
-    wasReturning = inReturn;
+    wasReturning = returning;
+  }
+
+  function bindEvents() {
+    viewer.addEventListener("pointerdown", event => {
+      pointerDown = true;
+      pointerStartedAt = performance.now();
+      pointerHasRecorded = false;
+      pointerMovedTooMuch = false;
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+    }, { passive: true });
+
+    viewer.addEventListener("pointermove", event => {
+      if (!pointerDown) return;
+
+      const d = Math.hypot(event.clientX - pointerStartX, event.clientY - pointerStartY);
+      if (d > 24) pointerMovedTooMuch = true;
+    }, { passive: true });
+
+    const endPointer = () => {
+      pointerDown = false;
+      pointerStartedAt = 0;
+      pointerHasRecorded = false;
+      pointerMovedTooMuch = false;
+      localTrace.style.opacity = 0;
+    };
+
+    viewer.addEventListener("pointerup", endPointer, { passive: true });
+    viewer.addEventListener("pointercancel", endPointer, { passive: true });
+    viewer.addEventListener("pointerleave", endPointer, { passive: true });
+
+    window.addEventListener("resize", updateRectCache, { passive: true });
   }
 
   function init() {
     createInterface();
+    updateRectCache();
+    bindEvents();
     rebuildRecomposition();
-    updateMemoryCSS();
-
-    showMessage("zoomer, attendre, revenir", 3200);
+    showMessage("zoomer, maintenir, revenir", 2600);
   }
 
-  let lastTime = 0;
-
   function update(time, cam) {
-    const dt = lastTime ? Math.min(48, time - lastTime) : 16.666;
-    lastTime = time;
-
-    updateStillness(cam);
-    updateAttentionRecording(time, cam, dt);
+    updateHolding(cam);
     updateRecomposition(cam, time);
     updateReturnMessage(cam);
     updateMessage();
   }
 
-  return {
-    init,
-    update
-  };
+  return { init, update };
 })();

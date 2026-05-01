@@ -77,9 +77,29 @@ a.site-title:visited {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 1.6rem;
+  margin-top: 0;
+
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+
+  transition:
+    max-height 280ms ease,
+    opacity 220ms ease,
+    transform 220ms ease,
+    margin-top 220ms ease;
 }
 
+body.menu-open .zones-nav,
+body.menu-open .sections {
+  max-height: 80vh;
+  margin-top: 1.6rem;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
 .zone-link,
 .section-link {
   position: relative;

@@ -6,9 +6,9 @@
   if (!body || !toggle || !nav) return;
   if (!body.classList.contains("has-mobile-menu")) return;
 
-  function isMobile() {
-    return window.innerWidth <= 768;
-  }
+ function isMobile() {
+  return true;
+}
 
   function closeMenu() {
     body.classList.remove("menu-open");
@@ -40,11 +40,7 @@
 
   toggle.addEventListener("click", onToggleClick);
 
-  window.addEventListener("resize", () => {
-    if (!isMobile()) {
-      closeMenu();
-    }
-  });
+ window.addEventListener("resize", closeMenu);
 
   nav.querySelectorAll(".zone-link, .section-link").forEach((link) => {
     link.addEventListener("click", () => {

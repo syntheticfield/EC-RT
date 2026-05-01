@@ -1,52 +1,30 @@
 window.Zone01Memory = (() => {
-  const STORAGE_KEY = "ecart_zone01_attention_memory_v1";
+  let points = [];
 
-  let data = {
-    points: []
-  };
+  const MAX_POINTS = 10;
 
-  function load() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved && Array.isArray(saved.points)) data = saved;
-    } catch {
-      data = { points: [] };
+  function addPoint(point) {
+    points.push(point);
+
+    if (points.length > MAX_POINTS) {
+      points = points.slice(points.length - MAX_POINTS);
     }
   }
 
-  function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }
-
-  function addPoint(point) {
-    data.points.push(point);
-    save();
-  }
-
-  function updatePoint(index, patch) {
-    if (!data.points[index]) return;
-    data.points[index] = { ...data.points[index], ...patch };
-    save();
-  }
-
   function all() {
-    return [...data.points];
+    return points;
   }
 
   function count() {
-    return data.points.length;
+    return points.length;
   }
 
   function reset() {
-    data = { points: [] };
-    save();
+    points = [];
   }
-
-  load();
 
   return {
     addPoint,
-    updatePoint,
     all,
     count,
     reset
