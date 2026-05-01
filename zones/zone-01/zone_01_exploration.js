@@ -202,11 +202,14 @@ window.Zone01Exploration = (() => {
 
     let dwellRatio = 0;
 
-    const canRecord =
-      pointerDown &&
-      !pointerHasRecorded &&
-      !pointerMovedTooMuch &&
-      cam.depth >= CONFIG.minDepthToRecord;
+    const isTouch = navigator.maxTouchPoints > 0;
+
+const canRecord =
+  !isTouch && // ❌ bloque le hold sur mobile
+  pointerDown &&
+  !pointerHasRecorded &&
+  !pointerMovedTooMuch &&
+  cam.depth >= CONFIG.minDepthToRecord;
 
     if (canRecord) {
       dwellRatio = clamp(
@@ -462,25 +465,29 @@ const size =
   }
 
   function bindEvents() {
-    viewer.addEventListener(
-      "wheel",
-      event => {
-        const cam = window.Zone01Camera?.getState();
-        if (!cam) return;
+   viewer.addEventListener(
+  "wheel",
+  event => {
+    event.preventDefault();
 
-        const isAtMaxDezoom = cam.depth < 0.035;
-        const isDezoomingMore = event.deltaY > 0;
+    const isTrackpad = Math.abs(event.deltaY) < 40;
 
-        if (isAtMaxDezoom && isDezoomingMore) {
-          extraReturnTarget = clamp(extraReturnTarget + 0.08, 0, 1);
-        }
+    let speed;
 
-        if (event.deltaY < 0) {
-          extraReturnTarget = clamp(extraReturnTarget - 0.12, 0, 1);
-        }
-      },
-      { passive: true }
-    );
+    if (isTrackpad) {
+      // ⚡ trackpad → plus rapide
+      speed = CONFIG.zoomSpeed * 45.2;
+    } else {
+      // 🐌 souris → ralentie
+      speed = CONFIG.zoomSpeed * 0.1;
+    }
+
+    const factor = 1 + (-event.deltaY * speed);
+
+    zoomAt(event.clientX, event.clientY, factor);
+  },
+  { passive: false }
+);
 
     viewer.addEventListener("pointerdown", event => {
       if (event.pointerType === "mouse" && event.button !== 0) return;

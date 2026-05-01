@@ -150,16 +150,23 @@ state.targetScale = clamp(
     applyTransform();
   }
 
-  viewer.addEventListener(
-    "wheel",
-    event => {
-      event.preventDefault();
+viewer.addEventListener(
+  "wheel",
+  event => {
+    event.preventDefault();
 
-      const factor = Math.exp(-event.deltaY * CONFIG.zoomSpeed);
-      zoomAt(event.clientX, event.clientY, factor);
-    },
-    { passive: false }
-  );
+    const isTrackpad = Math.abs(event.deltaY) < 40;
+
+    const speed = isTrackpad
+      ? CONFIG.zoomSpeed * 3.2
+      : CONFIG.zoomSpeed * 0.28;
+
+    const factor = 1 + (-event.deltaY * speed);
+
+    zoomAt(event.clientX, event.clientY, factor);
+  },
+  { passive: false }
+);
 
   viewer.addEventListener("pointerdown", event => {
     pointers.set(event.pointerId, event);
