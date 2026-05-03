@@ -7,33 +7,35 @@
 
   <link rel="stylesheet" href="../zone-core.css" />
   <link rel="stylesheet" href="../zone-sidebar.css" />
-  <link rel="stylesheet" href="../zone_minimap.css" />
-  <link rel="stylesheet" href="../zone-mobile.css" />
-  <link rel="stylesheet" href="../zone_mobile_minimap.css" />
-     <link rel="stylesheet" href="../panel-info.css" />
-  <link rel="stylesheet" href="../panel-sound.css" />
+  <link rel="stylesheet" href="../pannel-ui.css" />
   <link rel="stylesheet" href="./zone-06-glb.css" />
 
+  <!-- model-viewer (Google) — chargé en module ES -->
   <script
     type="module"
-    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
-  </script>
+    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+  ></script>
 </head>
 
 <body data-zone="6" class="has-mobile-menu">
 
   <main class="page">
 
+    <!-- ═══════════════════════════
+         SIDEBAR
+         ═══════════════════════════ -->
     <aside class="sidebar">
       <div class="sidebar-top">
-        <a href="../../index.html" class="home-button">⌂</a>
-
-        <button class="site-title menu-toggle" type="button">
-          EC@RT
-        </button>
+        <a href="../../index.html" class="home-button" aria-label="Retour à l'accueil">⌂</a>
+        <button
+          class="site-title menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-label="Ouvrir ou fermer le menu"
+        >EC@RT</button>
       </div>
 
-      <nav class="zones-nav">
+      <nav class="zones-nav" aria-label="Zones de l'exposition">
         <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
         <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">Background</a>
         <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
@@ -50,87 +52,97 @@
       </nav>
     </aside>
 
+    <!-- ═══════════════════════════
+         CONTENU GLB
+         ═══════════════════════════ -->
     <section class="zone-content zone-glb-content">
       <div class="glb-shell">
-        <p class="glb-kicker"></p>
-        <h1 class="glb-title">VILE Magazine</h1>
+
+        <p class="glb-kicker">Zone 06 — Modèles 3D</p>
+        <h1 class="glb-title">VILE</h1>
         <p class="glb-intro">
-          Scans 3D issus de photographies de magazines. Les objets peuvent être manipulés à la souris ou au doigt.
+          Reconstructions tridimensionnelles de publications ECART.
+          Cliquer sur un modèle pour l'activer — naviguer à la souris ou au doigt.
         </p>
+
+        <div class="glb-divider"></div>
 
         <div class="glb-grid">
 
-   
-         <article class="glb-card">
+          <!-- ── Card 01 — large (pleine largeur) ── -->
+          <article class="glb-card">
+            <div class="glb-viewer-wrap glb-overlay">
 
-  <div class="glb-viewer-wrap glb-overlay">
+              <img
+                src="../../assets/Vile/Vile-02-V.png"
+                alt="VILE 02 — prévisualisation"
+                class="glb-preview"
+              />
 
-    <!-- IMAGE FOND -->
-    <img
-      src="../../assets/Vile/Vile-02-V.png"
-      alt="Scan VILE 01"
-      class="glb-preview"
-    />
+              <model-viewer
+                class="glb-viewer glb-overlay-model"
+                src="../../assets/Vile/Vile-02-V.glb"
+                alt="Scan 3D VILE 02"
+                camera-controls
+                interaction-prompt="none"
+                shadow-intensity="1"
+                exposure="1"
+                auto-rotate
+                auto-rotate-delay="0"
+                rotation-per-second="14deg"
+              ></model-viewer>
 
-    <!-- MODEL 3D -->
-    <model-viewer
-      class="glb-viewer glb-overlay-model"
-      src="../../assets/Vile/Vile-02-V.glb"
-      camera-controls
-      interaction-prompt="none"
-      shadow-intensity="1"
-      exposure="1"
-      auto-rotate
-      auto-rotate-delay="0"
-      rotation-per-second="18deg">
-    </model-viewer>
+            </div>
+            <p class="glb-caption">VILE — scan 02</p>
+          </article>
 
-</article>
+          <!-- ── Card 02 ── -->
+          <article class="glb-card">
+            <div class="glb-viewer-wrap glb-overlay">
 
-         <article class="glb-card">
+              <img
+                src="../../assets/Vile/Vile-01-V.png"
+                alt="VILE 01 — prévisualisation"
+                class="glb-preview"
+              />
 
-  <div class="glb-viewer-wrap glb-overlay">
+              <model-viewer
+                class="glb-viewer glb-overlay-model"
+                src="../../assets/Vile/Vile-01-V.glb"
+                alt="Scan 3D VILE 01"
+                camera-controls
+                interaction-prompt="none"
+                shadow-intensity="1"
+                exposure="1"
+                auto-rotate
+                auto-rotate-delay="0"
+                rotation-per-second="14deg"
+              ></model-viewer>
 
-    <!-- IMAGE FOND -->
-    <img
-      src="../../assets/Vile/Vile-01-V.png"
-      alt="Scan VILE 01"
-      class="glb-preview"
-    />
+            </div>
+            <p class="glb-caption">VILE — scan 01</p>
+          </article>
 
-    <!-- MODEL 3D -->
-    <model-viewer
-      class="glb-viewer glb-overlay-model"
-      src="../../assets/Vile/Vile-01-V.glb"
-      camera-controls
-      interaction-prompt="none"
-      shadow-intensity="1"
-      exposure="1"
-      auto-rotate
-      auto-rotate-delay="0"
-      rotation-per-second="18deg">
-    </model-viewer>
-
-  </div>
-
-  <p class="glb-caption">VILE scan 01</p>
-
-</article>
-
+          <!-- ── Card 03 ── -->
           <article class="glb-card">
             <div class="glb-viewer-wrap">
+
               <model-viewer
                 class="glb-viewer"
                 src="../../assets/Vile/Vile_01-R.glb"
-                alt="Scan 3D VILE 03"
+                alt="Scan 3D VILE — recto"
                 camera-controls
                 touch-action="pan-y"
                 interaction-prompt="none"
                 shadow-intensity="1"
-                exposure="1">
-              </model-viewer>
+                exposure="1"
+                auto-rotate
+                auto-rotate-delay="0"
+                rotation-per-second="14deg"
+              ></model-viewer>
+
             </div>
-            <p class="glb-caption">VILE scan 03</p>
+            <p class="glb-caption">VILE — recto</p>
           </article>
 
         </div>
@@ -139,37 +151,17 @@
 
   </main>
 
-  <aside class="mini-map">
-    <a href="../../index.html" class="mini-map-title"></a>
-
-    <div class="mini-map-wrap">
-      <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
-
-      <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1"></a>
-      <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2"></a>
-      <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3"></a>
-      <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4"></a>
-      <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5"></a>
-      <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6"></a>
-      <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7"></a>
-      <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8"></a>
-      <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9"></a>
-      <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10"></a>
-      <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11"></a>
-      <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12"></a>
-      <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13"></a>
-    </div>
-  </aside>
-
-
+  <!-- ═══════════════════════════
+       BOUTONS FLOTTANTS
+       ═══════════════════════════ -->
 
   <button
     id="mobileMapToggle"
     class="mobile-map-toggle"
+    type="button"
     aria-label="Ouvrir la carte"
     aria-expanded="false"
     aria-controls="mobileMapOverlay"
-    type="button"
   >
     <span class="mobile-map-toggle__label mobile-map-toggle__label--open">MAP</span>
     <span class="mobile-map-toggle__label mobile-map-toggle__label--close">
@@ -177,29 +169,27 @@
     </span>
   </button>
 
+  <button id="soundToggle" type="button">SOUND</button>
+  <section id="soundPanel" aria-hidden="true">
+    <div class="sound-panel-inner">
+      <button class="sound-close" type="button">✕</button>
+      <h2 class="sound-panel-title">SOUND</h2>
+    </div>
+  </section>
 
-<button id="soundToggle" type="button">SOUND</button>
+  <button id="infoToggle" type="button">INFO</button>
+  <section id="infoPanel" aria-hidden="true">
+    <div class="info-panel-inner">
+      <button class="info-close" type="button">✕</button>
+      <h2 class="info-title"></h2>
+      <div class="info-description"></div>
+      <div class="info-ref"></div>
+    </div>
+  </section>
 
-<section id="soundPanel" aria-hidden="true">
-  <div class="sound-panel-inner">
-    <button class="sound-close" type="button">✕</button>
-    <h2 class="sound-panel-title">SOUND</h2>
-  </div>
-</section>
-
-
-
-<button id="infoToggle" type="button">INFO</button>
-
-<section id="infoPanel" aria-hidden="true">
-  <div class="info-panel-inner">
-    <button class="info-close" type="button">✕</button>
-    <h2 class="info-title"></h2>
-    <div class="info-description"></div>
-    <div class="info-ref"></div>
-  </div>
-</section>
-
+  <!-- ═══════════════════════════
+       OVERLAY MOBILE MAP
+       ═══════════════════════════ -->
   <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true">
     <div class="mobile-map-panel" id="mobileMapPanel">
       <div class="mobile-map-panel-inner">
@@ -212,72 +202,36 @@
           <div class="mini-map-wrap mobile-mini-map-wrap">
             <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
 
-            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1" data-zone-name="Poster">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2" data-zone-name="Background">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3" data-zone-name="Anthropomorph">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4" data-zone-name="NWMV">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5" data-zone-name="Bad publications &amp; mailers">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6" data-zone-name="VILE">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7" data-zone-name="Cazazza">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8" data-zone-name="Futurist Sound">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9" data-zone-name="Irène Dogmatic">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy">
-              <span class="mobile-zone-hint"></span>
-            </a>
+            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1"  data-mini-zone="1"  data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2"  data-mini-zone="2"  data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3"  data-mini-zone="3"  data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4"  data-mini-zone="4"  data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5"  data-mini-zone="5"  data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6"  data-mini-zone="6"  data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7"  data-mini-zone="7"  data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8"  data-mini-zone="8"  data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9"  data-mini-zone="9"  data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy"><span class="mobile-zone-hint"></span></a>
           </div>
         </div>
 
       </div>
     </div>
   </div>
+  <!-- /mobileMapOverlay -->
 
-   <script src="./data-infos.js"></script>
+  <!-- ═══════════════════════════
+       SCRIPTS
+       ═══════════════════════════ -->
+  <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
-  <script src="../minimap.js"></script>
-  <script src="../zone_mobile_minimap.js"></script>
-     <script src="../panel-sound.js"></script>
-     <script src="../panel-info.js"></script>
+  <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
   <script src="./zone-06-glb.js"></script>
+
 </body>
 </html>

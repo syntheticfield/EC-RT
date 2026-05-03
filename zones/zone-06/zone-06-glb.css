@@ -1,108 +1,160 @@
-/* CONTENEUR GLOBAL */
+/* =========================
+   EC@RT — Zone 06 VILE
+   Viewer GLB — modèles 3D
+   ========================= */
+
+/* =========================
+   ZONE CONTENEUR
+   ========================= */
 
 .zone-glb-content {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  min-height: 100vh;
-  padding: 28px;
+  padding: clamp(48px, 6vw, 88px) clamp(24px, 4vw, 52px);
 }
 
-/* COQUILLE */
+/* =========================
+   SHELL
+   ========================= */
 
 .glb-shell {
-  width: min(100%, 1180px);
-  padding: clamp(24px, 4vw, 48px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background:
-    radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent 40%),
-    rgba(0, 0, 0, 0.86);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.03),
-    0 24px 80px rgba(0,0,0,0.35);
+  width: min(100%, 1240px);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: clamp(14px, 2vw, 22px);
 }
 
-/* TYPO */
+/* =========================
+   TYPOGRAPHIE
+   ========================= */
 
 .glb-kicker {
   margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .glb-title {
   margin: 0;
-  font-size: clamp(2rem, 4vw, 4rem);
-  line-height: 0.95;
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.2rem, 5vw, 5rem);
+  line-height: 0.92;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  color: #fff;
 }
 
 .glb-intro {
-  margin: 0 0 8px 0;
-  max-width: 42rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  opacity: 0.86;
+  margin: 0;
+  max-width: 38rem;
+  font-size: 0.9rem;
+  line-height: 1.62;
+  color: rgba(255, 255, 255, 0.52);
+  letter-spacing: 0.02em;
 }
 
-/* GRID */
+/* =========================
+   SÉPARATEUR
+   ========================= */
+
+.glb-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: clamp(4px, 1vw, 10px) 0;
+}
+
+/* =========================
+   GRID
+   ========================= */
 
 .glb-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px, 2vw, 24px);
   width: 100%;
-  margin-top: 10px;
 }
 
-/* CARD */
+/* Premier item en pleine largeur */
+.glb-grid .glb-card:first-child {
+  grid-column: 1 / -1;
+}
+
+/* =========================
+   CARD
+   ========================= */
 
 .glb-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  cursor: pointer;
 }
 
 .glb-caption {
   margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.7;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.32);
+  transition: color 0.22s ease;
 }
 
-/* VIEWER WRAP */
+.glb-card:hover .glb-caption,
+.glb-card.is-active .glb-caption {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* =========================
+   VIEWER WRAP
+   ========================= */
 
 .glb-viewer-wrap {
   position: relative;
   width: 100%;
-  height: 520px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background:
-    radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 48%),
-    #050505;
+  /* Premier card : format paysage. Autres : carré */
+  aspect-ratio: 16 / 7;
   overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
 }
 
-/* léger relief visuel */
+/* Cards secondaires : format proche du carré */
+.glb-grid .glb-card:not(:first-child) .glb-viewer-wrap {
+  aspect-ratio: 4 / 5;
+}
+
 .glb-card:hover .glb-viewer-wrap {
-  border-color: rgba(255,255,255,0.25);
-  box-shadow: 0 0 40px rgba(255,255,255,0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 0 60px rgba(255, 255, 255, 0.04);
 }
 
-/* OVERLAY */
+.glb-card.is-active .glb-viewer-wrap {
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.10),
+    0 0 80px rgba(255, 255, 255, 0.06);
+}
+
+/* =========================
+   OVERLAY (preview image + model)
+   ========================= */
 
 .glb-overlay {
   position: relative;
-  overflow: hidden;
 }
 
-/* IMAGE */
-
+/* Image de prévisualisation */
 .glb-preview {
   position: absolute;
   inset: 0;
@@ -110,11 +162,13 @@
   height: 100%;
   object-fit: cover;
   z-index: 1;
-  transition: opacity 0.4s ease;
+  opacity: 1;
+  filter: grayscale(0.4) brightness(0.72);
+  transition: opacity 0.5s ease, filter 0.5s ease;
+  pointer-events: none;
 }
 
-/* MODEL */
-
+/* Modèle 3D — inactif par défaut */
 .glb-viewer,
 .glb-overlay-model {
   position: absolute;
@@ -122,7 +176,7 @@
   width: 100%;
   height: 100%;
   background: transparent;
-  --progress-bar-color: rgba(255,255,255,0.7);
+  --progress-bar-color: rgba(255, 255, 255, 0.5);
   --poster-color: transparent;
 }
 
@@ -130,53 +184,113 @@
   z-index: 2;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease;
-  filter: brightness(1.05) contrast(1.05);
+  transition: opacity 0.5s ease;
 }
 
-/* ETAT ACTIF */
-
+/* État actif : modèle visible, image en retrait */
 .glb-card.is-active .glb-overlay-model {
   opacity: 1;
   pointer-events: auto;
 }
 
 .glb-card.is-active .glb-preview {
-  opacity: 0.35;
+  opacity: 0.12;
+  filter: grayscale(1) brightness(0.4);
 }
 
-/* CURSEUR */
+/* Hint — touch uniquement */
+.glb-viewer-wrap::after {
+  content: "Toucher pour interagir";
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+/* Touch : affiche le hint avant activation */
+@media (pointer: coarse) {
+  .glb-viewer-wrap::after        { opacity: 1; }
+  .glb-card.is-active .glb-viewer-wrap::after { opacity: 0; }
+}
+
+/* Desktop : activation au hover, aucune interaction souris sur le modèle */
+@media (pointer: fine) {
+  .glb-card:hover .glb-overlay-model {
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  .glb-card:hover .glb-preview {
+    opacity: 0.12;
+    filter: grayscale(1) brightness(0.4);
+  }
+
+  .glb-card:hover .glb-viewer-wrap {
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+}
+
+/* =========================
+   MODEL VIEWER (sans overlay)
+   ========================= */
 
 .glb-viewer {
   cursor: grab;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .glb-viewer.is-interacting {
   cursor: grabbing;
 }
 
-/* MOBILE */
+/* =========================
+   RESPONSIVE
+   ========================= */
 
 @media (max-width: 980px) {
   .zone-glb-content {
-    padding: 18px;
-  }
-
-  .glb-shell {
-    width: 100%;
-    padding: 24px;
+    padding: clamp(28px, 5vw, 52px) 18px;
   }
 
   .glb-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 14px;
   }
 
-  .glb-viewer-wrap {
-    height: 380px;
+  .glb-grid .glb-card:first-child {
+    grid-column: 1;
+  }
+
+  .glb-viewer-wrap,
+  .glb-grid .glb-card:not(:first-child) .glb-viewer-wrap {
+    aspect-ratio: 4 / 3;
   }
 
   .glb-title {
-    font-size: clamp(1.8rem, 8vw, 2.8rem);
+    font-size: clamp(2rem, 10vw, 3.2rem);
+  }
+}
+
+@media (max-width: 540px) {
+  .glb-viewer-wrap,
+  .glb-grid .glb-card:not(:first-child) .glb-viewer-wrap {
+    aspect-ratio: 3 / 4;
+  }
+
+  .glb-viewer-wrap::after {
+    font-size: 0.58rem;
   }
 }

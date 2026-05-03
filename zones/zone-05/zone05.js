@@ -10,6 +10,7 @@
     "./BAD-img/BAD_01.png",
     "./BAD-img/BAD_02.png",
     "./BAD-img/BAD_03.png",
+    "./BAD-img/BAD_04.png",
   ];
 
   let zoom = 1;
@@ -89,7 +90,6 @@
 
   function applyTransform() {
     blurTable.style.transformOrigin = `${originX}% ${originY}%`;
-
     blurTable.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
 
     if (lensX && lensY) {
@@ -132,7 +132,8 @@
     return Math.sqrt(dx * dx + dy * dy) <= radius;
   }
 
-  // PC / TRACKPAD
+  // ── PC / TRACKPAD ──
+
   zone.addEventListener(
     "wheel",
     (e) => {
@@ -149,9 +150,7 @@
       e.preventDefault();
       updateOrigin(e.clientX, e.clientY);
 
-      const isTrackpad =
-        Math.abs(e.deltaX) > 0 ||
-        Math.abs(e.deltaY) < 40;
+      const isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) < 40;
 
       if (e.ctrlKey || !isTrackpad) {
         const delta = -e.deltaY * 0.0012;
@@ -208,7 +207,8 @@
     zone.classList.remove("is-dragging");
   });
 
-  // MOBILE / TABLETTE
+  // ── MOBILE / TABLETTE ──
+
   zone.addEventListener(
     "touchstart",
     (e) => {
@@ -220,9 +220,7 @@
 
       if (isDoubleTap) {
         lensZoom = lensZoom > 1 ? 1 : 2;
-
         moveLens(lensX || touch.clientX, lensY || touch.clientY);
-
         lastTapTime = 0;
         return;
       }
@@ -234,9 +232,7 @@
       touchPanStartX = panX;
       touchPanStartY = panY;
 
-      touchMode = isInsideLens(touch.clientX, touch.clientY)
-        ? "lens"
-        : "pan";
+      touchMode = isInsideLens(touch.clientX, touch.clientY) ? "lens" : "pan";
 
       lens.style.opacity = "1";
     },

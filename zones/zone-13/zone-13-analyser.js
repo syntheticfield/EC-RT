@@ -1,4 +1,4 @@
-export class Zone10AnalyserData {
+export class Zone13AnalyserData {
   constructor(analyser) {
     this.analyser = analyser;
     this.freqData = new Uint8Array(analyser.frequencyBinCount);

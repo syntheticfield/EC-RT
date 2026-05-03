@@ -1,48 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
   const viewers = document.querySelectorAll(".glb-viewer");
-  const cards = document.querySelectorAll(".glb-card");
+  const cards   = document.querySelectorAll(".glb-card");
 
+  const isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+  /* ── Camera-controls uniquement sur touch ── */
   viewers.forEach((viewer) => {
-    viewer.addEventListener("load", () => {
-      viewer.classList.add("is-ready");
-    });
+    if (isTouch) {
+      viewer.setAttribute("camera-controls", "");
+    } else {
+      viewer.removeAttribute("camera-controls");
+    }
 
     viewer.addEventListener("error", () => {
-      console.warn("Erreur chargement GLB :", viewer.getAttribute("src"));
+      console.warn("[VILE] Erreur chargement GLB :", viewer.getAttribute("src"));
     });
 
-    viewer.addEventListener("pointerdown", () => {
-      viewer.classList.add("is-interacting");
-    });
+    /* Curseur grabbing (touch uniquement — inutile sur desktop sans nav) */
+    if (isTouch) {
+      viewer.addEventListener("pointerdown", () => viewer.classList.add("is-interacting"));
+      window.addEventListener("pointerup",   () => viewer.classList.remove("is-interacting"));
+    }
 
-    window.addEventListener("pointerup", () => {
-      viewer.classList.remove("is-interacting");
-    });
-
-    viewer.addEventListener("click", (event) => {
-      event.stopPropagation();
-    });
+    viewer.addEventListener("click", (e) => e.stopPropagation());
   });
 
-  cards.forEach((card) => {
-    card.addEventListener("click", (event) => {
-      event.stopPropagation();
-
-      const isAlreadyActive = card.classList.contains("is-active");
-
-      cards.forEach((otherCard) => {
-        otherCard.classList.remove("is-active");
-      });
-
-      if (!isAlreadyActive) {
-        card.classList.add("is-active");
-      }
-    });
-  });
-
-  document.addEventListener("click", () => {
+  /* ── Activation ──
+     Desktop : hover géré en CSS (pointer: fine)
+     Touch   : clic pour activer / désactiver         ── */
+  if (isTouch) {
     cards.forEach((card) => {
-      card.classList.remove("is-active");
+      card.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        const already = card.classList.contains("is-active");
+        cards.forEach((c) => c.classList.remove("is-active"));
+        if (!already) card.classList.add("is-active");
+      });
     });
-  });
+
+    document.addEventListener("click", () => {
+      cards.forEach((c) => c.classList.remove("is-active"));
+    });
+  }
 });

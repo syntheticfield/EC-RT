@@ -1,4 +1,4 @@
-export class Zone10GlitchRenderer {
+export class Zone13GlitchRenderer {
   constructor(canvas, image) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d", { willReadFrequently: true });

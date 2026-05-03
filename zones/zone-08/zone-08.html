@@ -5,106 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Zone 08 — Futurist Sound — EC@RT</title>
 
+  <!--
+    Ordre de chargement CSS :
+    1. zone-core.css   → reset, body, variables
+    2. zone-sidebar.css → sidebar desktop/mobile/portrait/paysage
+    3. unity-loader.css → layout Unity + loader unifié
+    4. pannel-ui.css   → boutons SOUND / INFO / MAP + panels
+  -->
   <link rel="stylesheet" href="../zone-core.css" />
   <link rel="stylesheet" href="../zone-sidebar.css" />
-    <link rel="stylesheet" href="zone-08-unity.css" />
-  <link rel="stylesheet" href="../zone_minimap.css" />
-  <link rel="stylesheet" href="../zone-mobile.css" />
-  <link rel="stylesheet" href="../zone_mobile_minimap.css" />
-   <link rel="stylesheet" href="../panel-info.css" />
-  <link rel="stylesheet" href="../panel-sound.css" />
-
-  <style>
-    .zone-content-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 28px;
-    }
-
-    .placeholder-shell {
-      width: min(100%, 920px);
-      min-height: 62vh;
-      padding: clamp(24px, 4vw, 48px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent 40%),
-        rgba(0, 0, 0, 0.86);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.03),
-        0 24px 80px rgba(0,0,0,0.35);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 18px;
-    }
-
-    .placeholder-kicker {
-      margin: 0;
-      font-size: 0.78rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      opacity: 0.7;
-    }
-
-    .placeholder-title {
-      margin: 0;
-      font-size: clamp(2rem, 4vw, 4rem);
-      line-height: 0.95;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-    }
-
-    .placeholder-text {
-      margin: 0;
-      max-width: 34rem;
-      font-size: 1rem;
-      line-height: 1.5;
-      opacity: 0.86;
-    }
-
-    .placeholder-note {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      opacity: 0.55;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    @media (max-width: 980px) {
-      .zone-content-placeholder {
-        min-height: auto;
-        padding: 18px;
-        align-items: flex-start;
-        justify-content: flex-start;
-      }
-
-      .placeholder-shell {
-        width: 100%;
-        min-height: auto;
-        padding: 24px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../unity-loader.css" />
+  <link rel="stylesheet" href="../pannel-ui.css" />
 </head>
 
 <body data-zone="8" class="has-mobile-menu">
 
   <main class="page">
 
+    <!-- ═══════════════════════════
+         SIDEBAR
+         ═══════════════════════════ -->
     <aside class="sidebar">
       <div class="sidebar-top">
-        <a href="../../index.html" class="home-button">⌂</a>
-
-        <button class="site-title menu-toggle" type="button">
-          EC@RT
-        </button>
+        <a href="../../index.html" class="home-button" aria-label="Retour à l'accueil">⌂</a>
+        <button
+          class="site-title menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-label="Ouvrir ou fermer le menu"
+        >EC@RT</button>
       </div>
 
-      
-
-      <nav class="zones-nav">
+      <nav class="zones-nav" aria-label="Zones de l'exposition">
         <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
         <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">Background</a>
         <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
@@ -121,67 +53,69 @@
       </nav>
     </aside>
 
-   <section class="zone-content zone-content-unity">
-      <div class="unity-shell">
-        <div id="unity-container" class="unity-container">
-          <canvas id="unity-canvas" tabindex="1"></canvas>
+    <!-- ═══════════════════════════
+         ZONE UNITY
+         ═══════════════════════════ -->
+    <section class="zone-content-unity">
 
-          <div id="unity-warning" class="unity-warning"></div>
+      <div id="unity-container">
 
-          <div class="unity-loading" id="unity-loading">
-            <div class="unity-loading-panel">
-              <h2 class="unity-loading-title">EC@RT — Loading Environment</h2>
+        <canvas id="unity-canvas" tabindex="1"></canvas>
 
-              <p id="unity-loading-text">
+        <!-- Loader EC@RT unifié
+             Changer uniquement : src de ecart-loader-bg (image spécifique par zone) -->
+        <div class="ecart-unity-loader" id="ecartLoader">
+
+          <img
+            class="ecart-loader-bg"
+            src="./08-back-image.png"
+            alt=""
+          />
+
+          <div class="ecart-loader-ui">
+            <div class="ecart-loader-signal">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <div class="ecart-loader-text">
+              <div class="ecart-loader-title">EC@RT</div>
+              <div class="ecart-loader-status" id="ecartLoaderStatus">
                 Initialisation de l'environnement numérique.
-              </p>
-
-              <div class="unity-progress">
-                <div id="unity-progress-bar"></div>
               </div>
-
-              <div class="unity-progress-meta">
-                <span>WebGL</span>
-                <span id="unity-progress-value">0%</span>
+              <div class="ecart-loader-bar-wrap">
+                <div class="ecart-loader-bar" id="ecartLoaderBar"></div>
               </div>
+              <div class="ecart-loader-percent" id="ecartLoaderPercent">0%</div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
 
+        </div>
+        <!-- /ecartLoader -->
+
+        <div class="ecart-unity-warning" id="ecartUnityWarning"></div>
+
+      </div>
+      <!-- /unity-container -->
+
+    </section>
+    <!-- /zone-content-unity -->
 
   </main>
 
-  <aside class="mini-map">
-    <a href="../../index.html" class="mini-map-title"></a>
-
-    <div class="mini-map-wrap">
-      <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
-
-      <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1"></a>
-      <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2"></a>
-      <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3"></a>
-      <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4"></a>
-      <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5"></a>
-      <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6"></a>
-      <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7"></a>
-      <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8"></a>
-      <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9"></a>
-      <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10"></a>
-      <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11"></a>
-      <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12"></a>
-      <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13"></a>
-    </div>
-  </aside>
+  <!-- ═══════════════════════════
+       BOUTONS FLOTTANTS
+       (hors <main> pour le z-index)
+       ═══════════════════════════ -->
 
   <button
     id="mobileMapToggle"
     class="mobile-map-toggle"
+    type="button"
     aria-label="Ouvrir la carte"
     aria-expanded="false"
     aria-controls="mobileMapOverlay"
-    type="button"
   >
     <span class="mobile-map-toggle__label mobile-map-toggle__label--open">MAP</span>
     <span class="mobile-map-toggle__label mobile-map-toggle__label--close">
@@ -189,30 +123,27 @@
     </span>
   </button>
 
-  
+  <button id="soundToggle" type="button">SOUND</button>
+  <section id="soundPanel" aria-hidden="true">
+    <div class="sound-panel-inner">
+      <button class="sound-close" type="button">✕</button>
+      <h2 class="sound-panel-title">SOUND</h2>
+    </div>
+  </section>
 
-<button id="soundToggle" type="button">SOUND</button>
+  <button id="infoToggle" type="button">INFO</button>
+  <section id="infoPanel" aria-hidden="true">
+    <div class="info-panel-inner">
+      <button class="info-close" type="button">✕</button>
+      <h2 class="info-title"></h2>
+      <div class="info-description"></div>
+      <div class="info-ref"></div>
+    </div>
+  </section>
 
-<section id="soundPanel" aria-hidden="true">
-  <div class="sound-panel-inner">
-    <button class="sound-close" type="button">✕</button>
-    <h2 class="sound-panel-title">SOUND</h2>
-  </div>
-</section>
-
-
-
-<button id="infoToggle" type="button">INFO</button>
-
-<section id="infoPanel" aria-hidden="true">
-  <div class="info-panel-inner">
-    <button class="info-close" type="button">✕</button>
-    <h2 class="info-title"></h2>
-    <div class="info-description"></div>
-    <div class="info-ref"></div>
-  </div>
-</section>
-
+  <!-- ═══════════════════════════
+       OVERLAY MOBILE MAP
+       ═══════════════════════════ -->
   <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true">
     <div class="mobile-map-panel" id="mobileMapPanel">
       <div class="mobile-map-panel-inner">
@@ -225,73 +156,44 @@
           <div class="mini-map-wrap mobile-mini-map-wrap">
             <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
 
-            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1" data-zone-name="Poster">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2" data-zone-name="Background">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3" data-zone-name="Anthropomorph">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4" data-zone-name="NWMV">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5" data-zone-name="Bad publications &amp; mailers">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6" data-zone-name="VILE">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7" data-zone-name="Cazazza">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8" data-zone-name="Futurist Sound">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9" data-zone-name="Irène Dogmatic">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy">
-              <span class="mobile-zone-hint"></span>
-            </a>
+            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1"  data-mini-zone="1"  data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2"  data-mini-zone="2"  data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3"  data-mini-zone="3"  data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4"  data-mini-zone="4"  data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5"  data-mini-zone="5"  data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6"  data-mini-zone="6"  data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7"  data-mini-zone="7"  data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8"  data-mini-zone="8"  data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9"  data-mini-zone="9"  data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy"><span class="mobile-zone-hint"></span></a>
           </div>
         </div>
 
       </div>
     </div>
   </div>
+  <!-- /mobileMapOverlay -->
 
-   <script src="./data-infos.js"></script>
+  <!-- ═══════════════════════════
+       SCRIPTS
+       Ordre critique — ne pas changer
+       ═══════════════════════════ -->
+  <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
-  <script src="zone_08.js"></script>
-   <script src="../zone-02/zone-02-unity-mobile-fix.js"></script>
-  <script src="../minimap.js"></script>
-  <script src="../zone_mobile_minimap.js"></script>
-   <script src="../panel-sound.js"></script>
-     <script src="../panel-info.js"></script>
+  <!-- Système loader unifié -->
+  <script src="../unity-mobile-fix.js"></script>
+  <script src="../unity-loader.js"></script>
+
+  <!-- Config spécifique zone 02 (3 lignes) -->
+  <script src="./08_FS-Path.js"></script>
+
+  <!-- UI commune -->
+  <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
+
 </body>
 </html>

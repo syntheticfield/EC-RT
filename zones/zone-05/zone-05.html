@@ -3,115 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Zone 05 — Bad publications & mailers — EC@RT</title>
+  <title>Zone 05 — Bad publications &amp; mailers — EC@RT</title>
 
   <link rel="stylesheet" href="../zone-core.css" />
   <link rel="stylesheet" href="../zone-sidebar.css" />
-  <link rel="stylesheet" href="../zone_minimap.css" />
-  <link rel="stylesheet" href="../zone-mobile.css" />
-  <link rel="stylesheet" href="../zone_mobile_minimap.css" />
-     <link rel="stylesheet" href="../panel-info.css" />
-  <link rel="stylesheet" href="../panel-sound.css" />
+  <link rel="stylesheet" href="../pannel-ui.css" />
 
- <style>
-.bad-zone {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  background: #050505;
-  cursor: none;
-  touch-action: none;
-}
+  <style>
+    /* =========================
+       ZONE 05 — BAD PUBLICATIONS
+       Loupe + table de scans
+       ========================= */
 
-.bad-table,
-.bad-lens-table {
-  transform-origin: center center;
-  overflow: visible;
-}
+    .bad-zone {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #050505;
+      cursor: none;
+      touch-action: none;
+    }
 
-.bad-table {
-  position: absolute;
-  inset: 0;
-}
+    .bad-table,
+    .bad-lens-table {
+      transform-origin: center center;
+      overflow: visible;
+    }
 
-.bad-table--blur {
-  filter: blur(7px) contrast(0.9) brightness(0.9);
-  opacity: 0.9;
-}
+    .bad-table {
+      position: absolute;
+      inset: 0;
+    }
 
-.bad-paper {
-  position: absolute;
-  width: clamp(220px, 30vw, 620px);
-  height: auto;
-  user-select: none;
-  pointer-events: none;
-  transform-origin: center;
-  box-shadow:
-    0 24px 65px rgba(0, 0, 0, 0.65),
-    0 0 1px rgba(255, 255, 255, 0.45);
-}
+    .bad-table--blur {
+      filter: blur(7px) contrast(0.9) brightness(0.9);
+      opacity: 0.9;
+    }
 
-.bad-lens {
-  position: fixed;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 999;
-  transform: translate(-50%, -50%);
-  opacity: 1;
-  background: rgba(245, 241, 220, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow:
-    0 0 30px rgba(255, 255, 255, 0.18),
-    inset 0 0 30px rgba(255, 255, 255, 0.12);
-}
+    .bad-paper {
+      position: absolute;
+      width: clamp(220px, 30vw, 620px);
+      height: auto;
+      user-select: none;
+      pointer-events: none;
+      transform-origin: center;
+      box-shadow:
+        0 24px 65px rgba(0, 0, 0, 0.65),
+        0 0 1px rgba(255, 255, 255, 0.45);
+    }
 
-.bad-lens-table {
-  position: absolute;
-  filter: none;
-}
+    .bad-lens {
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+      opacity: 1;
+      background: rgba(245, 241, 220, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow:
+        0 0 30px rgba(255, 255, 255, 0.18),
+        inset 0 0 30px rgba(255, 255, 255, 0.12);
+    }
 
-.bad-zone.is-dragging {
-  cursor: grabbing;
-}
+    .bad-lens-table {
+      position: absolute;
+      filter: none;
+    }
 
-@media (pointer: fine) {
-  .bad-zone {
-    touch-action: auto;
-  }
-}
+    .bad-zone.is-dragging {
+      cursor: grabbing;
+    }
 
-@media (max-width: 768px) {
-  .bad-lens {
-    width: 210px;
-    height: 210px;
-  }
+    @media (pointer: fine) {
+      .bad-zone {
+        touch-action: auto;
+      }
+    }
 
-  .bad-paper {
-    width: clamp(160px, 44vw, 360px);
-  }
-}
-</style>
+    @media (max-width: 768px) {
+      .bad-lens {
+        width: 210px;
+        height: 210px;
+      }
 
+      .bad-paper {
+        width: clamp(160px, 44vw, 360px);
+      }
+    }
+
+    /* Portrait mobile : plein écran derrière la sidebar flottante */
+    @media (orientation: portrait) {
+      .bad-zone {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+      }
+    }
+  </style>
 </head>
 
 <body data-zone="5" class="has-mobile-menu">
 
   <main class="page">
 
+    <!-- ═══════════════════════════
+         SIDEBAR
+         ═══════════════════════════ -->
     <aside class="sidebar">
       <div class="sidebar-top">
-        <a href="../../index.html" class="home-button">⌂</a>
-
-        <button class="site-title menu-toggle" type="button">
-          EC@RT
-        </button>
+        <a href="../../index.html" class="home-button" aria-label="Retour à l'accueil">⌂</a>
+        <button
+          class="site-title menu-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-label="Ouvrir ou fermer le menu"
+        >EC@RT</button>
       </div>
 
-      <nav class="zones-nav">
+      <nav class="zones-nav" aria-label="Zones de l'exposition">
         <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
         <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">Background</a>
         <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
@@ -128,46 +143,30 @@
       </nav>
     </aside>
 
-   <section class="zone-content bad-zone">
-  <div id="badBlurTable" class="bad-table bad-table--blur"></div>
+    <!-- ═══════════════════════════
+         ZONE LOUPE
+         ═══════════════════════════ -->
+    <section class="bad-zone">
+      <div id="badBlurTable" class="bad-table bad-table--blur"></div>
 
-  <div id="badLens" class="bad-lens">
-    <div id="badLensTable" class="bad-lens-table"></div>
-  </div>
-</section>
+      <div id="badLens" class="bad-lens">
+        <div id="badLensTable" class="bad-lens-table"></div>
+      </div>
+    </section>
 
   </main>
 
-  <aside class="mini-map">
-    <a href="../../index.html" class="mini-map-title"></a>
-
-    <div class="mini-map-wrap">
-      <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
-
-      <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1"></a>
-      <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2"></a>
-      <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3"></a>
-      <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4"></a>
-      <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5"></a>
-      <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6"></a>
-      <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7"></a>
-      <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8"></a>
-      <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9"></a>
-      <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10"></a>
-      <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11"></a>
-      <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12"></a>
-      <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13"></a>
-    </div>
-  </aside>
-
+  <!-- ═══════════════════════════
+       BOUTONS FLOTTANTS
+       ═══════════════════════════ -->
 
   <button
     id="mobileMapToggle"
     class="mobile-map-toggle"
+    type="button"
     aria-label="Ouvrir la carte"
     aria-expanded="false"
     aria-controls="mobileMapOverlay"
-    type="button"
   >
     <span class="mobile-map-toggle__label mobile-map-toggle__label--open">MAP</span>
     <span class="mobile-map-toggle__label mobile-map-toggle__label--close">
@@ -175,30 +174,27 @@
     </span>
   </button>
 
+  <button id="soundToggle" type="button">SOUND</button>
+  <section id="soundPanel" aria-hidden="true">
+    <div class="sound-panel-inner">
+      <button class="sound-close" type="button">✕</button>
+      <h2 class="sound-panel-title">SOUND</h2>
+    </div>
+  </section>
 
-<button id="soundToggle" type="button">SOUND</button>
+  <button id="infoToggle" type="button">INFO</button>
+  <section id="infoPanel" aria-hidden="true">
+    <div class="info-panel-inner">
+      <button class="info-close" type="button">✕</button>
+      <h2 class="info-title"></h2>
+      <div class="info-description"></div>
+      <div class="info-ref"></div>
+    </div>
+  </section>
 
-<section id="soundPanel" aria-hidden="true">
-  <div class="sound-panel-inner">
-    <button class="sound-close" type="button">✕</button>
-    <h2 class="sound-panel-title">SOUND</h2>
-  </div>
-</section>
-
-
-
-<button id="infoToggle" type="button">INFO</button>
-
-<section id="infoPanel" aria-hidden="true">
-  <div class="info-panel-inner">
-    <button class="info-close" type="button">✕</button>
-    <h2 class="info-title"></h2>
-    <div class="info-description"></div>
-    <div class="info-ref"></div>
-  </div>
-</section>
-
-
+  <!-- ═══════════════════════════
+       OVERLAY MOBILE MAP
+       ═══════════════════════════ -->
   <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true">
     <div class="mobile-map-panel" id="mobileMapPanel">
       <div class="mobile-map-panel-inner">
@@ -211,72 +207,36 @@
           <div class="mini-map-wrap mobile-mini-map-wrap">
             <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
 
-            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1" data-zone-name="Poster">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2" data-zone-name="Background">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3" data-zone-name="Anthropomorph">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4" data-zone-name="NWMV">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5" data-zone-name="Bad publications &amp; mailers">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6" data-zone-name="VILE">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7" data-zone-name="Cazazza">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8" data-zone-name="Futurist Sound">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9" data-zone-name="Irène Dogmatic">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD">
-              <span class="mobile-zone-hint"></span>
-            </a>
-
-            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy">
-              <span class="mobile-zone-hint"></span>
-            </a>
+            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1"  data-mini-zone="1"  data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2"  data-mini-zone="2"  data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3"  data-mini-zone="3"  data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4"  data-mini-zone="4"  data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5"  data-mini-zone="5"  data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6"  data-mini-zone="6"  data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7"  data-mini-zone="7"  data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8"  data-mini-zone="8"  data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9"  data-mini-zone="9"  data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy"><span class="mobile-zone-hint"></span></a>
           </div>
         </div>
 
       </div>
     </div>
   </div>
+  <!-- /mobileMapOverlay -->
 
-   <script src="./data-infos.js"></script>
+  <!-- ═══════════════════════════
+       SCRIPTS
+       ═══════════════════════════ -->
+  <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
-  <script src="../minimap.js"></script>
-  <script src="../zone_mobile_minimap.js"></script>
-     <script src="../panel-sound.js"></script>
-     <script src="../panel-info.js"></script>
+  <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
   <script src="./zone05.js"></script>
+
 </body>
 </html>

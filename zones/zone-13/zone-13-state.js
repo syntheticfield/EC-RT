@@ -1,6 +1,6 @@
-const STORAGE_KEY = "ecart_zone10_state";
+const STORAGE_KEY = "ecart_zone13_state";
 
-export function getZone10State() {
+export function getZone13State() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
       visits: 0,
@@ -11,6 +11,6 @@ export function getZone10State() {
   }
 }
 
-export function saveZone10State(state) {
+export function saveZone13State(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
