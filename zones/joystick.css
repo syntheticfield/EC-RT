@@ -1,0 +1,161 @@
+/* =========================
+   EC@RT — JOYSTICK VIRTUEL
+   Mobile / tablette uniquement
+   Position : bas gauche
+   ========================= */
+
+/* Caché par défaut — affiché uniquement sur touch */
+.ecart-joystick-wrap {
+  display: none;
+}
+
+@media (pointer: coarse) {
+
+  .ecart-joystick-wrap {
+    display: block;
+    position: fixed;
+    left: clamp(18px, 4vw, 32px);
+    bottom: clamp(18px, 4vw, 32px);
+    z-index: 100005;
+
+    /* Hors du flux — ne perturbe pas Unity */
+    pointer-events: none;
+  }
+
+  /* =========================
+     ZONE TACTILE
+     Plus grande que le visuel pour faciliter le touch
+     ========================= */
+
+  .ecart-joystick-touch {
+    position: relative;
+    width: clamp(110px, 22vw, 148px);
+    height: clamp(110px, 22vw, 148px);
+    pointer-events: auto;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* =========================
+     BASE (anneau extérieur)
+     ========================= */
+
+  .ecart-joystick-base {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 8px 28px rgba(0, 0, 0, 0.38);
+
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+
+  .ecart-joystick-touch.is-active .ecart-joystick-base {
+    border-color: rgba(255, 255, 255, 0.26);
+    background: rgba(0, 0, 0, 0.58);
+  }
+
+  /* Graduation interne */
+  .ecart-joystick-base::before {
+    content: "";
+    position: absolute;
+    inset: 22%;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* =========================
+     KNOB (point central mobile)
+     ========================= */
+
+  .ecart-joystick-knob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width: 36%;
+    height: 36%;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+
+    box-shadow:
+      0 0 14px rgba(255, 255, 255, 0.28),
+      0 2px 8px rgba(0, 0, 0, 0.45);
+
+    transform: translate(-50%, -50%);
+    transition: transform 0.08s ease, background 0.18s ease, box-shadow 0.18s ease;
+
+    will-change: transform;
+  }
+
+  .ecart-joystick-touch.is-active .ecart-joystick-knob {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 0 20px rgba(255, 255, 255, 0.52),
+      0 2px 8px rgba(0, 0, 0, 0.45);
+    /* transform géré par JS — pas de transition pendant le drag */
+    transition: background 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  /* =========================
+     LABELS DIRECTIONNELS
+     ========================= */
+
+  .ecart-joystick-label {
+    position: absolute;
+    font-size: 0.48rem;
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.22);
+    text-transform: uppercase;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .ecart-joystick-label--n { top: 6px;    left: 50%; transform: translateX(-50%); }
+  .ecart-joystick-label--s { bottom: 6px; left: 50%; transform: translateX(-50%); }
+  .ecart-joystick-label--w { left: 6px;   top: 50%;  transform: translateY(-50%); }
+  .ecart-joystick-label--e { right: 6px;  top: 50%;  transform: translateY(-50%); }
+
+  /* =========================
+     PAYSAGE MOBILE
+     Repositionné pour ne pas gêner
+     ========================= */
+
+  @media (orientation: landscape) and (max-height: 620px) {
+    .ecart-joystick-wrap {
+      left: clamp(12px, 3vw, 24px);
+      bottom: clamp(12px, 3vw, 24px);
+    }
+
+    .ecart-joystick-touch {
+      width: clamp(88px, 16vw, 118px);
+      height: clamp(88px, 16vw, 118px);
+    }
+  }
+
+  /* =========================
+     MASQUÉ si un panel est ouvert
+     ========================= */
+
+  .ecart-joystick-wrap.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+  }
+
+  .ecart-joystick-wrap:not(.is-hidden) {
+    opacity: 1;
+    transition: opacity 0.22s ease;
+  }
+
+}
