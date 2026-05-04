@@ -4,4 +4,8 @@ window.addEventListener("load", () => {
     buildPath: "./07_MC/Build",
     buildName: "07_MC"
   });
+    ECARTJoystick.init({
+    gameObject: "Main Camera",
+    method: "ReceiveJoystick"
+  });
 });

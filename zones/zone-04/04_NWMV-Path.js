@@ -4,4 +4,9 @@ window.addEventListener("load", () => {
     buildPath: "./04_NWMV/Build",
     buildName: "04_NWMV"
   });
+
+   ECARTJoystick.init({
+    gameObject: "Main Camera",
+    method: "ReceiveJoystick"
+  });
 });
