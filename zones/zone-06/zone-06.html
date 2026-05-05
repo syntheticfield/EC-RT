@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Zone 06 — VILE — EC@RT</title>
 
+  <!--
+    Ordre de chargement CSS :
+    1. zone-core.css   → reset, body, variables
+    2. zone-sidebar.css → sidebar desktop/mobile/portrait/paysage
+    3. unity-loader.css → layout Unity + loader unifié
+    4. pannel-ui.css   → boutons SOUND / INFO / MAP + panels
+  -->
   <link rel="stylesheet" href="../zone-core.css" />
   <link rel="stylesheet" href="../zone-sidebar.css" />
+  <link rel="stylesheet" href="../unity-loader.css" />
   <link rel="stylesheet" href="../pannel-ui.css" />
-  <link rel="stylesheet" href="./zone-06-glb.css" />
-
-  <!-- model-viewer (Google) — chargé en module ES -->
-  <script
-    type="module"
-    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
-  ></script>
+  <link rel="stylesheet" href="../joystick.css" />
 </head>
 
 <body data-zone="6" class="has-mobile-menu">
@@ -53,106 +55,59 @@
     </aside>
 
     <!-- ═══════════════════════════
-         CONTENU GLB
+         ZONE UNITY
          ═══════════════════════════ -->
-    <section class="zone-content zone-glb-content">
-      <div class="glb-shell">
+    <section class="zone-content-unity">
 
-        <p class="glb-kicker">Zone 06 — Modèles 3D</p>
-        <h1 class="glb-title">VILE</h1>
-        <p class="glb-intro">
-          Reconstructions tridimensionnelles de publications ECART.
-          Cliquer sur un modèle pour l'activer — naviguer à la souris ou au doigt.
-        </p>
+      <div id="unity-container">
 
-        <div class="glb-divider"></div>
+        <canvas id="unity-canvas" tabindex="1"></canvas>
 
-        <div class="glb-grid">
+        <!-- Loader EC@RT unifié
+             Changer uniquement : src de ecart-loader-bg (image spécifique par zone) -->
+        <div class="ecart-unity-loader" id="ecartLoader">
 
-          <!-- ── Card 01 — large (pleine largeur) ── -->
-          <article class="glb-card">
-            <div class="glb-viewer-wrap glb-overlay">
+          <img
+            class="ecart-loader-bg"
+            src="./06-back-image.png"
+            alt=""
+          />
 
-              <img
-                src="../../assets/Vile/Vile-02-V.png"
-                alt="VILE 02 — prévisualisation"
-                class="glb-preview"
-              />
-
-              <model-viewer
-                class="glb-viewer glb-overlay-model"
-                src="../../assets/Vile/Vile-02-V.glb"
-                alt="Scan 3D VILE 02"
-                camera-controls
-                interaction-prompt="none"
-                shadow-intensity="1"
-                exposure="1"
-                auto-rotate
-                auto-rotate-delay="0"
-                rotation-per-second="14deg"
-              ></model-viewer>
-
+          <div class="ecart-loader-ui">
+            <div class="ecart-loader-signal">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
-            <p class="glb-caption">VILE — scan 02</p>
-          </article>
 
-          <!-- ── Card 02 ── -->
-          <article class="glb-card">
-            <div class="glb-viewer-wrap glb-overlay">
-
-              <img
-                src="../../assets/Vile/Vile-01-V.png"
-                alt="VILE 01 — prévisualisation"
-                class="glb-preview"
-              />
-
-              <model-viewer
-                class="glb-viewer glb-overlay-model"
-                src="../../assets/Vile/Vile-01-V.glb"
-                alt="Scan 3D VILE 01"
-                camera-controls
-                interaction-prompt="none"
-                shadow-intensity="1"
-                exposure="1"
-                auto-rotate
-                auto-rotate-delay="0"
-                rotation-per-second="14deg"
-              ></model-viewer>
-
+            <div class="ecart-loader-text">
+              <div class="ecart-loader-title">EC@RT</div>
+              <div class="ecart-loader-status" id="ecartLoaderStatus">
+                Initialisation de l'environnement numérique.
+              </div>
+              <div class="ecart-loader-bar-wrap">
+                <div class="ecart-loader-bar" id="ecartLoaderBar"></div>
+              </div>
+              <div class="ecart-loader-percent" id="ecartLoaderPercent">0%</div>
             </div>
-            <p class="glb-caption">VILE — scan 01</p>
-          </article>
-
-          <!-- ── Card 03 ── -->
-          <article class="glb-card">
-            <div class="glb-viewer-wrap">
-
-              <model-viewer
-                class="glb-viewer"
-                src="../../assets/Vile/Vile_01-R.glb"
-                alt="Scan 3D VILE — recto"
-                camera-controls
-                touch-action="pan-y"
-                interaction-prompt="none"
-                shadow-intensity="1"
-                exposure="1"
-                auto-rotate
-                auto-rotate-delay="0"
-                rotation-per-second="14deg"
-              ></model-viewer>
-
-            </div>
-            <p class="glb-caption">VILE — recto</p>
-          </article>
+          </div>
 
         </div>
+        <!-- /ecartLoader -->
+
+        <div class="ecart-unity-warning" id="ecartUnityWarning"></div>
+
       </div>
+      <!-- /unity-container -->
+
     </section>
+    <!-- /zone-content-unity -->
 
   </main>
 
   <!-- ═══════════════════════════
        BOUTONS FLOTTANTS
+       (hors <main> pour le z-index)
        ═══════════════════════════ -->
 
   <button
@@ -186,6 +141,23 @@
       <div class="info-ref"></div>
     </div>
   </section>
+
+
+  <!-- ═══════════════════════════
+       JOYSTICK MOBILE
+       Bas gauche — touch uniquement
+       ═══════════════════════════ -->
+  <div class="ecart-joystick-wrap" id="ecartJoystick">
+    <div class="ecart-joystick-touch" id="ecartJoystickTouch">
+      <div class="ecart-joystick-base">
+        <span class="ecart-joystick-label ecart-joystick-label--n">↑</span>
+        <span class="ecart-joystick-label ecart-joystick-label--s">↓</span>
+        <span class="ecart-joystick-label ecart-joystick-label--w">←</span>
+        <span class="ecart-joystick-label ecart-joystick-label--e">→</span>
+      </div>
+      <div class="ecart-joystick-knob" id="ecartJoystickKnob"></div>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════
        OVERLAY MOBILE MAP
@@ -225,13 +197,23 @@
 
   <!-- ═══════════════════════════
        SCRIPTS
+       Ordre critique — ne pas changer
        ═══════════════════════════ -->
   <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
+  <!-- Système loader unifié -->
+  <script src="../unity-mobile-fix.js"></script>
+  <script src="../unity-loader.js"></script>
+  <script src="../ecart-joystick.js"></script>
+
+  <!-- Config spécifique zone 06 -->
+  <script src="./06_VILE-Path.js"></script>
+
+
+  <!-- UI commune -->
   <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
-  <script src="./zone-06-glb.js"></script>
 
 </body>
 </html>
