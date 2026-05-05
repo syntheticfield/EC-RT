@@ -588,4 +588,63 @@ body.menu-open .sections {
   -webkit-user-select: none !important;
   -ms-user-select: none !important;
   -webkit-touch-callout: none !important;
+
+  /* =========================
+   FIX TABLETTE PAYSAGE ≠ DESKTOP
+   ========================= */
+
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+
+  /* 🔥 on casse le mode desktop grid */
+  .page {
+    display: block !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    top: 14px !important;
+    left: 14px !important;
+
+    width: 48px !important;
+    height: auto !important;
+
+    background: transparent !important;
+    border: none !important;
+  }
+
+  /* EC@RT vertical comme mobile */
+  .site-title,
+  .menu-toggle {
+    writing-mode: vertical-rl !important;
+    text-orientation: upright !important;
+    font-size: 1.5rem !important;
+  }
+
+  /* menu mobile style */
+  .zones-nav,
+  .sections {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+
+    width: min(280px, 42vw) !important;
+    height: 100vh !important;
+
+    transform: translateX(-100%) !important;
+  }
+
+  body.menu-open .zones-nav,
+  body.menu-open .sections {
+    transform: translateX(0) !important;
+  }
+
+  /* 🔥 UNITY FULLSCREEN */
+  .zone-main,
+  .viewer,
+  #unity-container,
+  #unity-canvas {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+}
 }
