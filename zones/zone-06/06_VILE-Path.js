@@ -2,7 +2,7 @@ window.addEventListener("load", () => {
 
   // 1. Lance Unity
   ECARTLoader.init({
-    buildPath: "./06_Vile/Build",
+    buildPath: "./06_VILE/Build",
     buildName: "06_VILE"
   });
 
