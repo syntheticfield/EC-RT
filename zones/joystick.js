@@ -1,20 +1,32 @@
 /* =========================
    EC@RT — JOYSTICK VIRTUEL
-   Version 1.2
+   Version 1.3
 
-   FIX PRINCIPAL v1.2 :
-   Le canvas Unity WebGL intercepte tous les events touch/pointer
-   avant qu'ils n'atteignent les éléments HTML au-dessus (même à
-   z-index élevé). Correction : les listeners sont enregistrés sur
-   `window` en phase de CAPTURE ({ capture: true }), ce qui s'exécute
-   avant que le canvas ne reçoive quoi que ce soit. Quand le doigt est
-   dans la zone joystick, on appelle stopPropagation() + preventDefault()
-   pour bloquer Unity sur ce touch précis.
+   FIXES v1.3 :
+   ─────────────────────────────
+   v1.2 utilisait les Pointer Events. Sur iOS Safari, Unity WebGL
+   appelle preventDefault() sur touchstart/touchmove du canvas, ce qui
+   supprime les Pointer Events générés à partir de ce touch.
+   Résultat : pointerdown ne tire jamais → knob immobile.
+
+   Solution : utiliser directement les Touch Events (touchstart /
+   touchmove / touchend), enregistrés sur window en phase CAPTURE avec
+   { passive: false }. Les Touch Events sont la couche native — ils
+   ne peuvent pas être supprimés par les Pointer Events du canvas.
+   On utilise stopImmediatePropagation() (pas juste stopPropagation)
+   pour bloquer tous les autres listeners window-level.
+
+   RAPPEL IMPORTANT :
+   ─────────────────────────────
+   Dans zone-XX.html, le script doit s'appeler exactement comme le
+   fichier sur le serveur. Vérifier que :
+     <script src="../ecart-joystick.js"></script>
+   correspond bien au nom du fichier déployé.
 
    USAGE :
    ─────────────────────────────
    ECARTJoystick.init({
-     gameObject : "Main Camera",
+     gameObject : "Main Camera",    // nom exact du GO Unity
      method     : "ReceiveJoystick",
      sendRate   : 60,
      deadzone   : 0.08,
@@ -25,20 +37,20 @@
 window.ECARTJoystick = (() => {
 
   const state = {
-    active:    false,
-    pointerId: null,
-    centerX:   0,
-    centerY:   0,
-    radius:    0,
-    x:         0,
-    y:         0,
-    lastSend:  0
+    active:   false,
+    touchId:  null,   // touch.identifier (Touch Events)
+    centerX:  0,
+    centerY:  0,
+    radius:   0,
+    x:        0,
+    y:        0,
+    lastSend: 0
   };
 
   let cfg = {};
 
   /* ─────────────────────────────
-     Helpers
+     Envoi Unity
      ───────────────────────────── */
 
   function sendToUnity(x, y) {
@@ -53,7 +65,10 @@ window.ECARTJoystick = (() => {
     } catch (_) { /* Unity pas encore prêt */ }
   }
 
-  // Retourne true si le point (clientX, clientY) est dans le joystick
+  /* ─────────────────────────────
+     Vérifie si un point est dans le joystick
+     ───────────────────────────── */
+
   function isInJoystickBounds(clientX, clientY) {
     const el = document.getElementById("ecartJoystickTouch");
     if (!el) return false;
@@ -63,7 +78,7 @@ window.ECARTJoystick = (() => {
   }
 
   /* ─────────────────────────────
-     Mise à jour knob
+     Mise à jour visuelle du knob
      ───────────────────────────── */
 
   function updateKnob(clientX, clientY) {
@@ -91,13 +106,13 @@ window.ECARTJoystick = (() => {
     if (Math.abs(ny) < cfg.deadzone) ny = 0;
 
     state.x = nx;
-    state.y = -ny;
+    state.y = -ny; // haut = positif
 
     if (typeof cfg.onInput === "function") cfg.onInput(state.x, state.y);
   }
 
   /* ─────────────────────────────
-     Boucle d'envoi
+     Boucle d'envoi rate-limited
      ───────────────────────────── */
 
   function loop(now) {
@@ -115,10 +130,10 @@ window.ECARTJoystick = (() => {
      ───────────────────────────── */
 
   function reset() {
-    state.active    = false;
-    state.pointerId = null;
-    state.x         = 0;
-    state.y         = 0;
+    state.active  = false;
+    state.touchId = null;
+    state.x       = 0;
+    state.y       = 0;
 
     const knob  = document.getElementById("ecartJoystickKnob");
     const touch = document.getElementById("ecartJoystickTouch");
@@ -130,53 +145,70 @@ window.ECARTJoystick = (() => {
   }
 
   /* ─────────────────────────────
-     Handlers — phase CAPTURE sur window
+     TOUCH EVENTS — phase CAPTURE sur window
+     Pourquoi Touch Events et pas Pointer Events :
+     Unity WebGL appelle preventDefault() sur touchstart/touchmove
+     du canvas, ce qui supprime les Pointer Events sur iOS Safari.
+     Les Touch Events sont la couche native et ne peuvent pas être
+     supprimés par le système Pointer Events.
      ───────────────────────────── */
 
-  function onPointerDown(e) {
-    // On ne réagit que si le doigt est dans le joystick
-    if (!isInJoystickBounds(e.clientX, e.clientY)) return;
+  function onTouchStart(e) {
+    // Cherche un touch dans la zone joystick parmi les nouveaux contacts
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const t = e.changedTouches[i];
+      if (!isInJoystickBounds(t.clientX, t.clientY)) continue;
 
-    // Bloquer ce touch côté Unity canvas
-    e.stopPropagation();
-    e.preventDefault();
+      // Ce touch est dans le joystick — on le prend en charge
+      // stopImmediatePropagation : bloque TOUS les autres listeners
+      // sur window (y compris Unity framework.js en capture)
+      e.stopImmediatePropagation();
+      e.preventDefault();
 
-    // Si état bloqué (pointercancel manqué), reset propre
-    if (state.active) reset();
+      // Reset si état bloqué (touchcancel manqué)
+      if (state.active) reset();
 
-    const touch = document.getElementById("ecartJoystickTouch");
-    if (!touch) return;
+      const el = document.getElementById("ecartJoystickTouch");
+      if (!el) return;
 
-    const rect = touch.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0) return;
 
-    state.active    = true;
-    state.pointerId = e.pointerId;
-    state.centerX   = rect.left + rect.width  / 2;
-    state.centerY   = rect.top  + rect.height / 2;
-    state.radius    = rect.width * 0.42;
+      state.active  = true;
+      state.touchId = t.identifier;
+      state.centerX = rect.left + rect.width  / 2;
+      state.centerY = rect.top  + rect.height / 2;
+      state.radius  = rect.width * 0.42;
 
-    touch.classList.add("is-active");
-
-    // setPointerCapture optionnel — dans try/catch car peut échouer
-    // si le canvas a déjà capturé le pointer
-    try { touch.setPointerCapture(e.pointerId); }
-    catch (_) {}
-
-    updateKnob(e.clientX, e.clientY);
+      el.classList.add("is-active");
+      updateKnob(t.clientX, t.clientY);
+      break;
+    }
   }
 
-  function onPointerMove(e) {
-    if (!state.active || e.pointerId !== state.pointerId) return;
-    // Bloquer ce touch pour Unity pendant le drag joystick
-    e.stopPropagation();
-    e.preventDefault();
-    updateKnob(e.clientX, e.clientY);
+  function onTouchMove(e) {
+    if (!state.active) return;
+
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const t = e.changedTouches[i];
+      if (t.identifier !== state.touchId) continue;
+
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      updateKnob(t.clientX, t.clientY);
+      break;
+    }
   }
 
-  function onPointerUp(e) {
-    if (!state.active || e.pointerId !== state.pointerId) return;
-    reset();
+  function onTouchEnd(e) {
+    if (!state.active) return;
+
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === state.touchId) {
+        reset();
+        break;
+      }
+    }
   }
 
   /* ─────────────────────────────
@@ -199,8 +231,8 @@ window.ECARTJoystick = (() => {
         if (!anyOpen) wrap.classList.remove("is-hidden");
       }, 300);
     });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape")
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape")
         setTimeout(() => wrap.classList.remove("is-hidden"), 300);
     });
   }
@@ -218,34 +250,30 @@ window.ECARTJoystick = (() => {
       onInput    : config.onInput    ?? null
     };
 
+    // Uniquement sur appareils touch
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     if (!isTouch) {
-      console.log("[ECARTJoystick] Non-touch — joystick désactivé.");
+      console.log("[ECARTJoystick] Non-touch — désactivé.");
       return;
     }
 
-    const touch = document.getElementById("ecartJoystickTouch");
-    if (!touch) {
+    const el = document.getElementById("ecartJoystickTouch");
+    if (!el) {
       console.warn("[ECARTJoystick] #ecartJoystickTouch introuvable.");
       return;
     }
 
-    // ── FIX PRINCIPAL ─────────────────────────────────────────────
-    // On écoute sur `window` en phase de CAPTURE.
-    // Cela s'exécute AVANT que le canvas Unity ne reçoive l'event,
-    // peu importe son z-index ou ses propres listeners.
-    // { passive: false } est nécessaire pour pouvoir appeler
-    // preventDefault() et bloquer le canvas sur les touches joystick.
-    // ───────────────────────────────────────────────────────────────
-    window.addEventListener("pointerdown",   onPointerDown, { capture: true, passive: false });
-    window.addEventListener("pointermove",   onPointerMove, { capture: true, passive: false });
-    window.addEventListener("pointerup",     onPointerUp,   { capture: true });
-    window.addEventListener("pointercancel", onPointerUp,   { capture: true });
+    // Touch Events en capture, passive:false pour pouvoir appeler
+    // preventDefault() et stopImmediatePropagation()
+    window.addEventListener("touchstart",  onTouchStart, { capture: true, passive: false });
+    window.addEventListener("touchmove",   onTouchMove,  { capture: true, passive: false });
+    window.addEventListener("touchend",    onTouchEnd,   { capture: true });
+    window.addEventListener("touchcancel", onTouchEnd,   { capture: true });
 
     bindPanelEvents();
     requestAnimationFrame(loop);
 
-    console.log("[ECARTJoystick] Initialisé →", cfg.gameObject, "/", cfg.method);
+    console.log("[ECARTJoystick] v1.3 initialisé →", cfg.gameObject, "/", cfg.method);
   }
 
   return { init, getInput: () => ({ x: state.x, y: state.y }), reset };
