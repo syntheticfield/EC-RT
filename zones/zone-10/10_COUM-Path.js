@@ -4,4 +4,10 @@ window.addEventListener("load", () => {
     buildPath: "./10_COUM/Build",
     buildName: "10_COUM"
   });
+    // 2. Active le joystick HTML → Unity
+  ECARTJoystick.init({
+    gameObject: "Main Camera",
+    method: "ReceiveJoystick"
+  });
+
 });
