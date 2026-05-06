@@ -1,6 +1,6 @@
 /* =========================
    EC@RT — JOYSTICK VIRTUEL
-   Version 1.0
+   Version 1.1
 
    USAGE :
    ─────────────────────────────
@@ -21,125 +21,80 @@
      </div>
    </div>
 
-   CÔTÉ UNITY (C#) :
-   ─────────────────────────────
-   Créer un GameObject nommé "JoystickReceiver"
-   avec ce script :
-
-   using UnityEngine;
-   public class JoystickReceiver : MonoBehaviour {
-     public static Vector2 Input { get; private set; }
-
-     public void ReceiveJoystick(string data) {
-       // data = "x,y" normalisé entre -1 et 1
-       var parts = data.Split(',');
-       if (parts.Length == 2 &&
-           float.TryParse(parts[0], System.Globalization.NumberStyles.Float,
-             System.Globalization.CultureInfo.InvariantCulture, out float x) &&
-           float.TryParse(parts[1], System.Globalization.NumberStyles.Float,
-             System.Globalization.CultureInfo.InvariantCulture, out float y)) {
-         Input = new Vector2(x, y);
-       }
-     }
-   }
-
-   Puis dans ton controller de mouvement :
-   var joy = JoystickReceiver.Input;
-   transform.Translate(joy.x * speed * Time.deltaTime, 0, joy.y * speed * Time.deltaTime);
-
    OPTIONS :
    ─────────────────────────────
    ECARTJoystick.init({
-     gameObject : "JoystickReceiver",  // nom du GO Unity (défaut)
-     method     : "ReceiveJoystick",   // méthode appelée (défaut)
-     sendRate   : 60,                  // envois/sec max (défaut: 60)
-     deadzone   : 0.08,                // zone morte centrale (défaut: 0.08)
-     onInput    : (x, y) => {}        // callback JS optionnel
+     gameObject : "Main Camera",    // nom exact du GO Unity portant le script
+     method     : "ReceiveJoystick",
+     sendRate   : 60,
+     deadzone   : 0.08,
+     onInput    : (x, y) => {}
    });
    ========================= */
 
 window.ECARTJoystick = (() => {
 
-  /* ─────────────────────────────
-     État interne
-     ───────────────────────────── */
   const state = {
-    active:   false,
+    active:    false,
     pointerId: null,
-    centerX:  0,
-    centerY:  0,
-    radius:   0,
-    x:        0,   // normalisé -1 → 1
-    y:        0,   // normalisé -1 → 1
-    lastSend: 0
+    centerX:   0,
+    centerY:   0,
+    radius:    0,
+    x:         0,
+    y:         0,
+    lastSend:  0
   };
 
   let cfg = {};
 
   /* ─────────────────────────────
-     Helpers
+     Envoi Unity
      ───────────────────────────── */
-
-  function clamp(v, min, max) {
-    return Math.max(min, Math.min(max, v));
-  }
 
   function sendToUnity(x, y) {
     const instance = window.unityInstance;
     if (!instance) return;
-
     try {
       instance.SendMessage(
         cfg.gameObject,
         cfg.method,
         `${x.toFixed(4)},${y.toFixed(4)}`
       );
-    } catch (e) {
-      /* Unity pas encore prêt — silencieux */
-    }
+    } catch (_) { /* Unity pas encore prêt */ }
   }
 
   /* ─────────────────────────────
-     Mise à jour knob + envoi
+     Mise à jour knob
      ───────────────────────────── */
 
   function updateKnob(clientX, clientY) {
-    const dx = clientX - state.centerX;
-    const dy = clientY - state.centerY;
-
+    const dx      = clientX - state.centerX;
+    const dy      = clientY - state.centerY;
     const dist    = Math.hypot(dx, dy);
     const maxDist = state.radius;
 
-    const ratio   = Math.min(dist / maxDist, 1);
-    const angle   = Math.atan2(dy, dx);
+    if (maxDist <= 0) return;
 
+    const ratio    = Math.min(dist / maxDist, 1);
+    const angle    = Math.atan2(dy, dx);
     const clampedX = Math.cos(angle) * ratio * maxDist;
     const clampedY = Math.sin(angle) * ratio * maxDist;
 
-    /* Position visuelle du knob */
     const knob = document.getElementById("ecartJoystickKnob");
     if (knob) {
-      knob.style.transform = `translate(
-        calc(-50% + ${clampedX}px),
-        calc(-50% + ${clampedY}px)
-      )`;
+      knob.style.transform =
+        `translate(calc(-50% + ${clampedX}px), calc(-50% + ${clampedY}px))`;
     }
 
-    /* Valeurs normalisées avec deadzone */
     let nx = clampedX / maxDist;
     let ny = clampedY / maxDist;
-
-    const deadzone = cfg.deadzone;
-    if (Math.abs(nx) < deadzone) nx = 0;
-    if (Math.abs(ny) < deadzone) ny = 0;
+    if (Math.abs(nx) < cfg.deadzone) nx = 0;
+    if (Math.abs(ny) < cfg.deadzone) ny = 0;
 
     state.x = nx;
-    state.y = -ny; // Y inversé : haut = positif
+    state.y = -ny; // haut = positif
 
-    /* Callback JS */
-    if (typeof cfg.onInput === "function") {
-      cfg.onInput(state.x, state.y);
-    }
+    if (typeof cfg.onInput === "function") cfg.onInput(state.x, state.y);
   }
 
   /* ─────────────────────────────
@@ -148,11 +103,8 @@ window.ECARTJoystick = (() => {
 
   function loop(now) {
     requestAnimationFrame(loop);
-
     if (!state.active) return;
-
     const interval = 1000 / cfg.sendRate;
-
     if (now - state.lastSend >= interval) {
       sendToUnity(state.x, state.y);
       state.lastSend = now;
@@ -171,36 +123,39 @@ window.ECARTJoystick = (() => {
 
     const knob  = document.getElementById("ecartJoystickKnob");
     const touch = document.getElementById("ecartJoystickTouch");
-
-    if (knob)  knob.style.transform  = "translate(-50%, -50%)";
+    if (knob)  knob.style.transform = "translate(-50%, -50%)";
     if (touch) touch.classList.remove("is-active");
 
-    /* Envoie 0,0 à Unity pour stopper le mouvement */
     sendToUnity(0, 0);
-
     if (typeof cfg.onInput === "function") cfg.onInput(0, 0);
   }
 
   /* ─────────────────────────────
-     Events
+     Pointer events
      ───────────────────────────── */
 
   function onPointerDown(e) {
-    if (state.active) return;
+    // FIX : si state.active bloqué (pointercancel manqué), on repart proprement
+    if (state.active) reset();
 
     const touch = document.getElementById("ecartJoystickTouch");
     if (!touch) return;
 
     const rect = touch.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
 
     state.active    = true;
     state.pointerId = e.pointerId;
     state.centerX   = rect.left + rect.width  / 2;
     state.centerY   = rect.top  + rect.height / 2;
-    state.radius    = rect.width * 0.42; // zone de déplacement max
+    state.radius    = rect.width * 0.42;
 
     touch.classList.add("is-active");
-    touch.setPointerCapture(e.pointerId);
+
+    // FIX : setPointerCapture dans try/catch — peut échouer si le canvas
+    // Unity a déjà capturé le pointerId (race condition WebGL)
+    try { touch.setPointerCapture(e.pointerId); }
+    catch (err) { console.warn("[ECARTJoystick] setPointerCapture:", err.message); }
 
     updateKnob(e.clientX, e.clientY);
   }
@@ -216,7 +171,7 @@ window.ECARTJoystick = (() => {
   }
 
   /* ─────────────────────────────
-     Panel open → masque joystick
+     Masquage panel
      ───────────────────────────── */
 
   function bindPanelEvents() {
@@ -227,9 +182,7 @@ window.ECARTJoystick = (() => {
       wrap.classList.add("is-hidden");
       reset();
     });
-
     document.addEventListener("ecart:panel-close-others", () => {
-      /* Petit délai pour laisser la transition du panel se faire */
       setTimeout(() => {
         const anyOpen = document.querySelector(
           "#infoPanel.is-open, #soundPanel.is-open, #mobileMapOverlay.is-open"
@@ -237,12 +190,9 @@ window.ECARTJoystick = (() => {
         if (!anyOpen) wrap.classList.remove("is-hidden");
       }, 300);
     });
-
-    /* Escape remet aussi visible */
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape")
         setTimeout(() => wrap.classList.remove("is-hidden"), 300);
-      }
     });
   }
 
@@ -252,47 +202,36 @@ window.ECARTJoystick = (() => {
 
   function init(config = {}) {
     cfg = {
-      gameObject : config.gameObject  ?? "JoystickReceiver",
+      gameObject : config.gameObject  ?? "Main Camera",
       method     : config.method      ?? "ReceiveJoystick",
       sendRate   : config.sendRate    ?? 60,
       deadzone   : config.deadzone    ?? 0.08,
       onInput    : config.onInput     ?? null
     };
 
-    /* Uniquement sur touch */
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
     if (!isTouch) {
-      console.log("[ECARTJoystick] Appareil non-touch — joystick désactivé.");
+      console.log("[ECARTJoystick] Non-touch — joystick désactivé.");
       return;
     }
 
     const touch = document.getElementById("ecartJoystickTouch");
-
     if (!touch) {
       console.warn("[ECARTJoystick] #ecartJoystickTouch introuvable.");
       return;
     }
 
-    touch.addEventListener("pointerdown", onPointerDown);
-    touch.addEventListener("pointermove", onPointerMove);
-    touch.addEventListener("pointerup",   onPointerUp);
+    touch.addEventListener("pointerdown",   onPointerDown);
+    touch.addEventListener("pointermove",   onPointerMove);
+    touch.addEventListener("pointerup",     onPointerUp);
     touch.addEventListener("pointercancel", onPointerUp);
 
     bindPanelEvents();
-
-    /* Démarre la boucle d'envoi */
     requestAnimationFrame(loop);
 
     console.log("[ECARTJoystick] Initialisé →", cfg.gameObject, "/", cfg.method);
   }
 
-  /* ─────────────────────────────
-     API publique
-     ───────────────────────────── */
-  return {
-    init,
-    getInput: () => ({ x: state.x, y: state.y }),
-    reset
-  };
+  return { init, getInput: () => ({ x: state.x, y: state.y }), reset };
 
 })();
