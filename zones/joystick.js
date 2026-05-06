@@ -1,30 +1,20 @@
 /* =========================
    EC@RT — JOYSTICK VIRTUEL
-   Version 1.1
+   Version 1.2
+
+   FIX PRINCIPAL v1.2 :
+   Le canvas Unity WebGL intercepte tous les events touch/pointer
+   avant qu'ils n'atteignent les éléments HTML au-dessus (même à
+   z-index élevé). Correction : les listeners sont enregistrés sur
+   `window` en phase de CAPTURE ({ capture: true }), ce qui s'exécute
+   avant que le canvas ne reçoive quoi que ce soit. Quand le doigt est
+   dans la zone joystick, on appelle stopPropagation() + preventDefault()
+   pour bloquer Unity sur ce touch précis.
 
    USAGE :
    ─────────────────────────────
-   Ajouter dans chaque zone Unity :
-   <link rel="stylesheet" href="../ecart-joystick.css" />
-   <script src="../ecart-joystick.js"></script>
-
-   ET dans le HTML, avant </body> :
-   <div class="ecart-joystick-wrap" id="ecartJoystick">
-     <div class="ecart-joystick-touch" id="ecartJoystickTouch">
-       <div class="ecart-joystick-base">
-         <span class="ecart-joystick-label ecart-joystick-label--n">↑</span>
-         <span class="ecart-joystick-label ecart-joystick-label--s">↓</span>
-         <span class="ecart-joystick-label ecart-joystick-label--w">←</span>
-         <span class="ecart-joystick-label ecart-joystick-label--e">→</span>
-       </div>
-       <div class="ecart-joystick-knob" id="ecartJoystickKnob"></div>
-     </div>
-   </div>
-
-   OPTIONS :
-   ─────────────────────────────
    ECARTJoystick.init({
-     gameObject : "Main Camera",    // nom exact du GO Unity portant le script
+     gameObject : "Main Camera",
      method     : "ReceiveJoystick",
      sendRate   : 60,
      deadzone   : 0.08,
@@ -48,7 +38,7 @@ window.ECARTJoystick = (() => {
   let cfg = {};
 
   /* ─────────────────────────────
-     Envoi Unity
+     Helpers
      ───────────────────────────── */
 
   function sendToUnity(x, y) {
@@ -61,6 +51,15 @@ window.ECARTJoystick = (() => {
         `${x.toFixed(4)},${y.toFixed(4)}`
       );
     } catch (_) { /* Unity pas encore prêt */ }
+  }
+
+  // Retourne true si le point (clientX, clientY) est dans le joystick
+  function isInJoystickBounds(clientX, clientY) {
+    const el = document.getElementById("ecartJoystickTouch");
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return clientX >= r.left && clientX <= r.right &&
+           clientY >= r.top  && clientY <= r.bottom;
   }
 
   /* ─────────────────────────────
@@ -92,13 +91,13 @@ window.ECARTJoystick = (() => {
     if (Math.abs(ny) < cfg.deadzone) ny = 0;
 
     state.x = nx;
-    state.y = -ny; // haut = positif
+    state.y = -ny;
 
     if (typeof cfg.onInput === "function") cfg.onInput(state.x, state.y);
   }
 
   /* ─────────────────────────────
-     Boucle d'envoi (rate-limited)
+     Boucle d'envoi
      ───────────────────────────── */
 
   function loop(now) {
@@ -131,11 +130,18 @@ window.ECARTJoystick = (() => {
   }
 
   /* ─────────────────────────────
-     Pointer events
+     Handlers — phase CAPTURE sur window
      ───────────────────────────── */
 
   function onPointerDown(e) {
-    // FIX : si state.active bloqué (pointercancel manqué), on repart proprement
+    // On ne réagit que si le doigt est dans le joystick
+    if (!isInJoystickBounds(e.clientX, e.clientY)) return;
+
+    // Bloquer ce touch côté Unity canvas
+    e.stopPropagation();
+    e.preventDefault();
+
+    // Si état bloqué (pointercancel manqué), reset propre
     if (state.active) reset();
 
     const touch = document.getElementById("ecartJoystickTouch");
@@ -152,21 +158,24 @@ window.ECARTJoystick = (() => {
 
     touch.classList.add("is-active");
 
-    // FIX : setPointerCapture dans try/catch — peut échouer si le canvas
-    // Unity a déjà capturé le pointerId (race condition WebGL)
+    // setPointerCapture optionnel — dans try/catch car peut échouer
+    // si le canvas a déjà capturé le pointer
     try { touch.setPointerCapture(e.pointerId); }
-    catch (err) { console.warn("[ECARTJoystick] setPointerCapture:", err.message); }
+    catch (_) {}
 
     updateKnob(e.clientX, e.clientY);
   }
 
   function onPointerMove(e) {
     if (!state.active || e.pointerId !== state.pointerId) return;
+    // Bloquer ce touch pour Unity pendant le drag joystick
+    e.stopPropagation();
+    e.preventDefault();
     updateKnob(e.clientX, e.clientY);
   }
 
   function onPointerUp(e) {
-    if (e.pointerId !== state.pointerId) return;
+    if (!state.active || e.pointerId !== state.pointerId) return;
     reset();
   }
 
@@ -202,11 +211,11 @@ window.ECARTJoystick = (() => {
 
   function init(config = {}) {
     cfg = {
-      gameObject : config.gameObject  ?? "Main Camera",
-      method     : config.method      ?? "ReceiveJoystick",
-      sendRate   : config.sendRate    ?? 60,
-      deadzone   : config.deadzone    ?? 0.08,
-      onInput    : config.onInput     ?? null
+      gameObject : config.gameObject ?? "Main Camera",
+      method     : config.method     ?? "ReceiveJoystick",
+      sendRate   : config.sendRate   ?? 60,
+      deadzone   : config.deadzone   ?? 0.08,
+      onInput    : config.onInput    ?? null
     };
 
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
@@ -221,10 +230,17 @@ window.ECARTJoystick = (() => {
       return;
     }
 
-    touch.addEventListener("pointerdown",   onPointerDown);
-    touch.addEventListener("pointermove",   onPointerMove);
-    touch.addEventListener("pointerup",     onPointerUp);
-    touch.addEventListener("pointercancel", onPointerUp);
+    // ── FIX PRINCIPAL ─────────────────────────────────────────────
+    // On écoute sur `window` en phase de CAPTURE.
+    // Cela s'exécute AVANT que le canvas Unity ne reçoive l'event,
+    // peu importe son z-index ou ses propres listeners.
+    // { passive: false } est nécessaire pour pouvoir appeler
+    // preventDefault() et bloquer le canvas sur les touches joystick.
+    // ───────────────────────────────────────────────────────────────
+    window.addEventListener("pointerdown",   onPointerDown, { capture: true, passive: false });
+    window.addEventListener("pointermove",   onPointerMove, { capture: true, passive: false });
+    window.addEventListener("pointerup",     onPointerUp,   { capture: true });
+    window.addEventListener("pointercancel", onPointerUp,   { capture: true });
 
     bindPanelEvents();
     requestAnimationFrame(loop);
