@@ -4,4 +4,11 @@ window.addEventListener("load", () => {
     buildPath: "./03_ANT/Build",
     buildName: "03_ANT"
   });
+
+  // 2. Active le joystick HTML → Unity
+  ECARTJoystick.init({
+    gameObject: "Main Camera",
+    method: "ReceiveJoystick"
+  });
+  
 });

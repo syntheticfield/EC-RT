@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../zone-sidebar.css" />
   <link rel="stylesheet" href="../unity-loader.css" />
   <link rel="stylesheet" href="../pannel-ui.css" />
+    <link rel="stylesheet" href="../joystick.css" />
 </head>
 
 <body data-zone="3" class="has-mobile-menu">
@@ -141,6 +142,23 @@
     </div>
   </section>
 
+    <!-- ═══════════════════════════
+       JOYSTICK MOBILE
+       Bas gauche — touch uniquement
+       ═══════════════════════════ -->
+  <div class="ecart-joystick-wrap" id="ecartJoystick">
+    <div class="ecart-joystick-touch" id="ecartJoystickTouch">
+      <div class="ecart-joystick-base">
+        <span class="ecart-joystick-label ecart-joystick-label--n">↑</span>
+        <span class="ecart-joystick-label ecart-joystick-label--s">↓</span>
+        <span class="ecart-joystick-label ecart-joystick-label--w">←</span>
+        <span class="ecart-joystick-label ecart-joystick-label--e">→</span>
+      </div>
+      <div class="ecart-joystick-knob" id="ecartJoystickKnob"></div>
+    </div>
+  </div>
+
+
   <!-- ═══════════════════════════
        OVERLAY MOBILE MAP
        ═══════════════════════════ -->
@@ -187,6 +205,8 @@
   <!-- Système loader unifié -->
   <script src="../unity-mobile-fix.js"></script>
   <script src="../unity-loader.js"></script>
+    <script src="../joystick.js"></script>
+  
 
   <!-- Config spécifique zone 03 -->
   <script src="./03_ANT-Path.js"></script>
