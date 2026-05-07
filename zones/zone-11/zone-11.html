@@ -2,119 +2,161 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
   <title>Zone 11 — 491 — EC@RT</title>
 
   <link rel="stylesheet" href="../zone-core.css" />
   <link rel="stylesheet" href="../zone-sidebar.css" />
   <link rel="stylesheet" href="../pannel-ui.css" />
 
-  <style>
-    .zone-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: clamp(24px, 5vw, 52px);
-    }
-
-    .placeholder-shell {
-      width: min(100%, 860px);
-      padding: clamp(32px, 5vw, 64px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      background: rgba(0, 0, 0, 0.72);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .placeholder-kicker {
-      margin: 0;
-      font-size: 0.7rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.32);
-    }
-
-    .placeholder-title {
-      margin: 0;
-      font-size: clamp(2.4rem, 6vw, 5.5rem);
-      line-height: 0.92;
-      font-weight: 400;
-      letter-spacing: -0.04em;
-    }
-
-    .placeholder-text {
-      margin: 0;
-      max-width: 32rem;
-      font-size: 0.9rem;
-      line-height: 1.62;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .placeholder-note {
-      margin-top: 6px;
-      font-size: 0.68rem;
-      color: rgba(255, 255, 255, 0.22);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    @media (orientation: portrait) {
-      .zone-placeholder {
-        min-height: 100dvh;
-        align-items: flex-start;
-        padding-top: 96px;
-      }
-    }
-  </style>
+  <!-- TON CSS -->
+  <link rel="stylesheet" href="./491.css" />
 </head>
 
 <body data-zone="11" class="has-mobile-menu">
 
   <main class="page">
 
+    <!-- ═══════════════════════════
+         SIDEBAR
+         ═══════════════════════════ -->
+
     <aside class="sidebar">
+
       <div class="sidebar-top">
-        <a href="../../index.html" class="home-button" aria-label="Retour à l'accueil">⌂</a>
+        <a
+          href="../../index.html"
+          class="home-button"
+          aria-label="Retour à l'accueil"
+        >⌂</a>
+
         <button
           class="site-title menu-toggle"
           type="button"
           aria-expanded="false"
           aria-label="Ouvrir ou fermer le menu"
-        >EC@RT</button>
+        >
+          EC@RT
+        </button>
       </div>
 
       <nav class="zones-nav" aria-label="Zones de l'exposition">
-        <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
-        <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">Background</a>
-        <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
-        <a href="../zone-04/zone-04.html" class="zone-link" data-zone-link="4">NWMV</a>
-        <a href="../zone-05/zone-05.html" class="zone-link" data-zone-link="5">Bad publications &amp; mailers</a>
-        <a href="../zone-06/zone-06.html" class="zone-link" data-zone-link="6">VILE</a>
-        <a href="../zone-07/zone-07.html" class="zone-link" data-zone-link="7">Cazazza</a>
-        <a href="../zone-08/zone-08.html" class="zone-link" data-zone-link="8">Futurist Sound</a>
-        <a href="../zone-09/zone-09.html" class="zone-link" data-zone-link="9">Irène Dogmatic</a>
-        <a href="../zone-10/zone-10.html" class="zone-link" data-zone-link="10">COUM</a>
-        <a href="../zone-11/zone-11.html" class="zone-link" data-zone-link="11">491</a>
-        <a href="../zone-12/zone-12.html" class="zone-link" data-zone-link="12">MAD</a>
-        <a href="../zone-13/zone-13.html" class="zone-link" data-zone-link="13">Search and Destroy</a>
+
+        <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">
+          Poster
+        </a>
+
+        <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">
+          Background
+        </a>
+
+        <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">
+          Anthropomorph
+        </a>
+
+        <a href="../zone-04/zone-04.html" class="zone-link" data-zone-link="4">
+          NWMV
+        </a>
+
+        <a href="../zone-05/zone-05.html" class="zone-link" data-zone-link="5">
+          Bad publications &amp; mailers
+        </a>
+
+        <a href="../zone-06/zone-06.html" class="zone-link" data-zone-link="6">
+          VILE
+        </a>
+
+        <a href="../zone-07/zone-07.html" class="zone-link" data-zone-link="7">
+          Cazazza
+        </a>
+
+        <a href="../zone-08/zone-08.html" class="zone-link" data-zone-link="8">
+          Futurist Sound
+        </a>
+
+        <a href="../zone-09/zone-09.html" class="zone-link" data-zone-link="9">
+          Irène Dogmatic
+        </a>
+
+        <a href="../zone-10/zone-10.html" class="zone-link" data-zone-link="10">
+          COUM
+        </a>
+
+        <a
+          href="../zone-11/zone-11.html"
+          class="zone-link"
+          data-zone-link="11"
+        >
+          491
+        </a>
+
+        <a href="../zone-12/zone-12.html" class="zone-link" data-zone-link="12">
+          MAD
+        </a>
+
+        <a href="../zone-13/zone-13.html" class="zone-link" data-zone-link="13">
+          Search and Destroy
+        </a>
+
       </nav>
+
     </aside>
 
-    <section class="zone-placeholder">
-      <div class="placeholder-shell">
-        <p class="placeholder-kicker">Zone 11</p>
-        <h1 class="placeholder-title">491</h1>
-        <p class="placeholder-text">Contenu de la zone 11 — 491 à venir.</p>
-        <p class="placeholder-note">Page provisoire — structure active</p>
+    <!-- ═══════════════════════════
+         ZONE 491
+         ═══════════════════════════ -->
+
+    <section class="zone-491">
+
+      <!-- bruit -->
+      <div class="archive-noise"></div>
+
+      <!-- halo -->
+      <div class="center-glow"></div>
+
+      <!-- faux gif -->
+      <div class="gif-core">
+        <img
+          id="gifFrame"
+          src="../../assets/zone11/frame-01.jpg"
+          alt="491 archive loop"
+        />
       </div>
+
+      <!-- ecosysteme texte -->
+      <div
+        id="textEcosystem"
+        class="text-ecosystem"
+        aria-hidden="true"
+      ></div>
+
+      <!-- txt fixe -->
+      <div class="zone-overlay">
+
+        <div class="zone-kicker">
+          ZONE 11
+        </div>
+
+        <h1 class="zone-title">
+          491
+        </h1>
+
+        <div class="zone-subtitle">
+          DADA / ARCHIVE / SIGNAL / COPY
+        </div>
+
+      </div>
+
     </section>
 
   </main>
 
   <!-- ═══════════════════════════
-       BOUTONS FLOTTANTS
+       BOUTON MAP MOBILE
        ═══════════════════════════ -->
 
   <button
@@ -125,62 +167,144 @@
     aria-expanded="false"
     aria-controls="mobileMapOverlay"
   >
-    <span class="mobile-map-toggle__label mobile-map-toggle__label--open">MAP</span>
+    <span class="mobile-map-toggle__label mobile-map-toggle__label--open">
+      MAP
+    </span>
+
     <span class="mobile-map-toggle__label mobile-map-toggle__label--close">
       <span class="mobile-map-toggle__close-ring">✕</span>
     </span>
   </button>
 
-  <button id="soundToggle" type="button">SOUND</button>
+  <!-- ═══════════════════════════
+       SOUND
+       ═══════════════════════════ -->
+
+  <button id="soundToggle" type="button">
+    SOUND
+  </button>
+
   <section id="soundPanel" aria-hidden="true">
+
     <div class="sound-panel-inner">
-      <button class="sound-close" type="button">✕</button>
-      <h2 class="sound-panel-title">SOUND</h2>
+
+      <button class="sound-close" type="button">
+        ✕
+      </button>
+
+      <h2 class="sound-panel-title">
+        SOUND
+      </h2>
+
     </div>
+
   </section>
 
-  <button id="infoToggle" type="button">INFO</button>
+  <!-- ═══════════════════════════
+       INFO
+       ═══════════════════════════ -->
+
+  <button id="infoToggle" type="button">
+    INFO
+  </button>
+
   <section id="infoPanel" aria-hidden="true">
+
     <div class="info-panel-inner">
-      <button class="info-close" type="button">✕</button>
+
+      <button class="info-close" type="button">
+        ✕
+      </button>
+
       <h2 class="info-title"></h2>
+
       <div class="info-description"></div>
+
       <div class="info-ref"></div>
+
     </div>
+
   </section>
 
-  <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true">
+  <!-- ═══════════════════════════
+       MAP OVERLAY
+       ═══════════════════════════ -->
+
+  <div
+    id="mobileMapOverlay"
+    class="mobile-map-overlay"
+    aria-hidden="true"
+  >
+
     <div class="mobile-map-panel" id="mobileMapPanel">
+
       <div class="mobile-map-panel-inner">
+
         <div class="mobile-map-status-wrap">
-          <div id="mobileMapStatus" class="mobile-map-status">Sélectionne une zone.</div>
-        </div>
-        <div class="mobile-map-figure">
-          <div class="mini-map-wrap mobile-mini-map-wrap">
-            <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
-            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1"  data-mini-zone="1"  data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2"  data-mini-zone="2"  data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3"  data-mini-zone="3"  data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4"  data-mini-zone="4"  data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5"  data-mini-zone="5"  data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6"  data-mini-zone="6"  data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7"  data-mini-zone="7"  data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8"  data-mini-zone="8"  data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9"  data-mini-zone="9"  data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy"><span class="mobile-zone-hint"></span></a>
+          <div id="mobileMapStatus" class="mobile-map-status">
+            Sélectionne une zone.
           </div>
         </div>
+
+        <div class="mobile-map-figure">
+
+          <div class="mini-map-wrap mobile-mini-map-wrap">
+
+            <img
+              src="../../assets/mini.png"
+              class="mini-map-image"
+              alt="Mini-map EC@RT"
+            />
+
+            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1" data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2" data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3" data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4" data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5" data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6" data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7" data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8" data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9" data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD"><span class="mobile-zone-hint"></span></a>
+
+            <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy"><span class="mobile-zone-hint"></span></a>
+
+          </div>
+
+        </div>
+
       </div>
+
     </div>
+
   </div>
+
+  <!-- ═══════════════════════════
+       DATA
+       ═══════════════════════════ -->
 
   <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
+
+  <!-- UI -->
   <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
+
+  <!-- TON JS -->
+  <script src="./491.js"></script>
 
 </body>
 </html>
