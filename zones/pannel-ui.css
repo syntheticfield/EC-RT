@@ -283,6 +283,26 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 .info-description { font-size: 0.94rem; line-height: 1.65; }
 
+.info-gameplay {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.info-gameplay h3 {
+  margin: 0 0 8px;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.48);
+}
+
+.info-gameplay p {
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.38;
+  color: rgba(255,255,255,0.72);
+}
 .info-ref { margin-top: 24px; }
 
 .info-ref h3 {
@@ -652,4 +672,87 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 @media (min-width: 1440px) {
   :root { --ecart-ui-size: 50px; --ecart-ui-right: 24px; --ecart-ui-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
+/* ==========================================================
+   FIX — INFO compact + flou derrière les boutons
+   ========================================================== */
+
+/* Les boutons restent toujours au-dessus du flou/panel */
+.ecart-ui-cluster {
+  z-index: 100050 !important;
+}
+
+.sidebar,
+.sidebar-top,
+.site-title,
+.menu-toggle,
+.home-button {
+  z-index: 100060 !important;
+}
+
+/* Le panel passe derrière les boutons */
+#infoPanel,
+#mobileMapOverlay {
+  z-index: 100000 !important;
+}
+
+/* Quand INFO est ouvert : texte plus petit, plus dense */
+#infoPanel.is-open .info-panel-inner {
+  width: min(100%, 520px) !important;
+  padding: 18px !important;
+  border-radius: 18px !important;
+}
+
+#infoPanel.is-open .info-title {
+  margin-bottom: 12px !important;
+  font-size: 0.68rem !important;
+  letter-spacing: 0.16em !important;
+  line-height: 1.15 !important;
+}
+
+#infoPanel.is-open .info-description {
+  font-size: 0.72rem !important;
+  line-height: 1.42 !important;
+  letter-spacing: 0.01em !important;
+}
+
+#infoPanel.is-open .info-description p {
+  margin: 0 !important;
+}
+
+#infoPanel.is-open .info-ref {
+  margin-top: 16px !important;
+}
+
+#infoPanel.is-open .info-ref h3 {
+  font-size: 0.58rem !important;
+  margin-bottom: 8px !important;
+}
+
+#infoPanel.is-open .info-ref-item {
+  font-size: 0.66rem !important;
+  line-height: 1.35 !important;
+  margin-bottom: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+/* Mobile : encore plus condensé */
+@media (pointer: coarse) {
+  #infoPanel.is-open .info-panel-inner {
+    padding: 14px !important;
+    max-height: calc(100dvh - 110px) !important;
+  }
+
+  #infoPanel.is-open .info-title {
+    font-size: 0.62rem !important;
+  }
+
+  #infoPanel.is-open .info-description {
+    font-size: 0.66rem !important;
+    line-height: 1.36 !important;
+  }
+
+  #infoPanel.is-open .info-ref-item {
+    font-size: 0.61rem !important;
+  }
 }

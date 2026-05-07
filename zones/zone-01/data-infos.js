@@ -1,5 +1,5 @@
 window.ECART_INFO = {
-  title: "Zone 09 — Irène Dogmatic",
+  title: "Info",
 
   description: `
     Cette zone propose une entrée dans les documents,
@@ -7,6 +7,11 @@ window.ECART_INFO = {
 
     Le contenu évoluera selon les recherches,
     intégrations et développements du projet EC@RT.
+  `,
+
+  gameplay: `
+    Double tap ou clic maintenu pour conserver des mémoires.
+    Dézoomer pour hybrider les mémoires.
   `,
 
   references: [

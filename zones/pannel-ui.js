@@ -283,7 +283,14 @@
       const text = data.description || "";
       description.innerHTML = `<p>${text.replace(/\n/g, "<br><br>")}</p>`;
     }
-
+if (data.gameplay && description) {
+  description.innerHTML += `
+    <div class="info-gameplay">
+      <h3>Gameplay</h3>
+      <p>${data.gameplay.replace(/\n/g, "<br><br>")}</p>
+    </div>
+  `;
+}
     if (refBox && Array.isArray(data.references) && data.references.length) {
       refBox.innerHTML =
         "<h3>Références</h3>" +
