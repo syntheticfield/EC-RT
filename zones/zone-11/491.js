@@ -1,88 +1,268 @@
+/* ═══════════════════════════
+   GIF IMAGES
+   ═══════════════════════════ */
+
 const frames = [
   "./img/ART_01.jpeg",
   "./img/ART_02.jpeg",
-  "./img/ART_03.jpeg",
+  "./img/ART_03.jpeg"
 ];
+
+const gifFrame =
+  document.getElementById("gifFrame");
+
+let frameIndex = 0;
+
+/* faux gif */
+
+setInterval(() => {
+
+  frameIndex =
+    (frameIndex + 1) % frames.length;
+
+  gifFrame.src =
+    frames[frameIndex];
+
+}, 950);
+
+/* ═══════════════════════════
+   ARCHIVE TEXTS
+   ═══════════════════════════ */
+
 const archiveTexts = [
+
   "DADA",
   "491",
   "4.49.91",
   "NO.6",
-  "1973",
-  "1977",
-  "1978",
-  "ASSUME POWER",
-  "ARE WE NOT MEN?",
+  "the system is the solution",
+   "THE LAST SHEET OF THE WINTER!",
+  "THAT'S THE DOORBELL!",
+  "QUACK",
+  "WOOF! 1965! LAMP",
+   "the system is the solution",
+
+  "OONK OONK PHSSST PHSSST OOOONK",
+  "the system is the solution",
+
+  "OH... I WAS TOO LATE!!",
+
+  "IT'S NOTHING BUT A CHAIN FROM A DIME STORE NECKLACE.",
+
+  "COMMUNISTS!!",
+
+  "GYAK",
+
+  "DDDDDDDDDDDDD",
+
+  "PLUS! YOU GET A FROG THAT HUMS A THREE NOTE DOODLE!",
+
+  "FORSOOTH!",
+
+  "IF I PULL INTO A TRUCK STOP I'LL WASTE TIME SWAPPIN LIES WITH OTHER DRIVERS",
+
+  "TELL HIM IT'S TABASCO!",
+
+  "MMM! THAT AROMA TELLS ME AN ARTIST IS IN THERE!",
+
+  "LOOK, WHEN I USE LIVE BAIT, THEY BITE MORE!",
+
+  "ARE YOU DEAD?",
+
+  "THAT'S A STRANGE REQUEST",
+
+  "HEY! THIS WOULD MAKE A SWELL SPACESHIP!",
+
+  "TWINKLE, TWINKLE ENORMOUS COSMIC FURNACE!",
+
+  "IN THIS ISSUE:",
+  "DADADAY",
+
+  "SPECIAL OUTDOOR EMBALMING ISSUE",
+
+  "CHUCK STAKE VISIT 491",
+
+  "SLUJ INTERNATIONAL 75",
+
+  "THE BODY CAVITIES RUPTURE",
+
+  "THE LAST SHEET OF THE WINTER!",
+
+  "COMMUNISTS!!",
+
+  "IT'S NOTHING BUT A CHAIN FROM A DIME STORE NECKLACE.",
+
   "THE SYSTEM IS THE SOLUTION",
+
+  "ARE WE NOT MEN?",
+
   "SPECIAL OUTDOOR EMISSARY",
-  "ARCHIVE / SIGNAL / NOISE",
+
   "TEXTE SUR LES SCREENS DES ARCHIVES",
+
+  "TWINKLE TWINKLE ENORMOUS COSMIC FURNACE!",
+
+  "LOOK WHEN I USE LIVE BAIT THEY BITE MORE!",
+
+  "CASEY",
+
+  "ON NEW YEAR'S DAY OF JANUARY 1975",
+
   "CIRCULATION",
-  "FRAGMENT",
-  "SCAN",
-  "COPY",
-  "EMERGENCE NUMERIQUE"
+
+
 ];
 
-const ecosystem = document.getElementById("textEcosystem");
+/* ═══════════════════════════
+   TEXT ECOSYSTEM
+   ═══════════════════════════ */
 
-let cursorX = 24;
-let cursorY = 28;
+const ecosystem =
+  document.getElementById(
+    "textEcosystem"
+  );
 
-const lineHeight = 34;
-const marginX = 24;
-const marginY = 28;
+/* ═══════════════════════════
+   CREATE TEXT
+   ═══════════════════════════ */
 
-function writeArchiveText() {
-  const el = document.createElement("span");
-  const text = archiveTexts[Math.floor(Math.random() * archiveTexts.length)];
+function launchText() {
 
-  el.className = "written-fragment";
-  el.textContent = text;
+  const vertical =
+    Math.random() > 0.62;
+
+  const text =
+    archiveTexts[
+      Math.floor(
+        Math.random()
+        * archiveTexts.length
+      )
+    ];
+
+  const el =
+    document.createElement("div");
+
+  el.className =
+    vertical
+      ? "soft-text vertical-text"
+      : "soft-text horizontal-text";
+
+  /* positions fixes */
+
+  el.style.left =
+    `${random(4, 88)}vw`;
+
+  el.style.top =
+    `${random(6, 84)}vh`;
+
+  /* aucune rotation */
+
+  el.style.transform =
+    "rotate(0deg)";
 
   ecosystem.appendChild(el);
 
-  el.style.left = `${cursorX}px`;
-  el.style.top = `${cursorY}px`;
+  /* écriture */
 
-  const width = el.offsetWidth + 28;
+  typeLetters(el, text, vertical);
 
-  cursorX += width;
+  /* disparition */
 
-  if (cursorX > window.innerWidth - 220) {
-    cursorX = marginX;
-    cursorY += lineHeight;
-  }
+  setTimeout(() => {
 
-  if (cursorY > window.innerHeight - 80) {
-    cursorX = marginX;
-    cursorY = marginY;
-    ecosystem.innerHTML = "";
-  }
+    el.classList.add("fade-out");
+
+    setTimeout(() => {
+      el.remove();
+    }, 2400);
+
+  }, random(9000, 18000));
 }
 
-setInterval(writeArchiveText, 180);
+/* ═══════════════════════════
+   TYPE LETTERS
+   ═══════════════════════════ */
 
-/* rythme irrégulier, pas mécanique */
-setInterval(() => {
-  spawnText();
+function typeLetters(
+  el,
+  text,
+  vertical
+) {
 
-  if (Math.random() > 0.65) {
-    setTimeout(spawnText, random(80, 420));
+  const letters =
+    text.split("");
+
+  let i = 0;
+
+  function write() {
+
+    if (i >= letters.length)
+      return;
+
+    const span =
+      document.createElement("span");
+
+    span.textContent =
+      letters[i] === " "
+        ? "\u00A0"
+        : letters[i];
+
+    el.appendChild(span);
+
+    i++;
+
+    /* rapide */
+
+    setTimeout(
+
+      write,
+
+      random(
+        vertical ? 35 : 25,
+        vertical ? 90 : 70
+      )
+
+    );
   }
 
-  if (Math.random() > 0.9) {
-    burst();
-  }
-}, 520);
-
-function burst() {
-  const amount = Math.floor(random(6, 16));
-  for (let i = 0; i < amount; i++) {
-    setTimeout(spawnText, i * random(25, 90));
-  }
+  write();
 }
+
+/* ═══════════════════════════
+   ORGANIC LOOP
+   ═══════════════════════════ */
+
+function organicLoop() {
+
+  const active =
+    document.querySelectorAll(
+      ".soft-text"
+    ).length;
+
+  if (active < 12) {
+    launchText();
+  }
+
+  setTimeout(
+
+    organicLoop,
+
+    random(800, 2400)
+
+  );
+}
+
+organicLoop();
+
+/* ═══════════════════════════
+   RANDOM
+   ═══════════════════════════ */
 
 function random(min, max) {
-  return Math.random() * (max - min) + min;
+
+  return (
+    Math.random()
+    * (max - min)
+    + min
+  );
 }

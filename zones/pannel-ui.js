@@ -17,24 +17,6 @@
 
 
   /* ──────────────────────────────────────────────────────
-     SIDEBAR — largeur dynamique pour décaler les overlays
-     ────────────────────────────────────────────────────── */
-
-  function initSidebarVar() {
-    function update() {
-      /* Sur mobile (≤ 780 px) la sidebar est hors-écran → 0 */
-      const sidebar = qs(".sidebar");
-      const w = (sidebar && window.innerWidth > 780)
-        ? Math.round(sidebar.getBoundingClientRect().width)
-        : 0;
-      document.documentElement.style.setProperty("--ecart-sidebar-w", `${w}px`);
-    }
-    update();
-    window.addEventListener("resize", update, { passive: true });
-  }
-
-
-  /* ──────────────────────────────────────────────────────
      ZONES VISITÉES
      ────────────────────────────────────────────────────── */
 
@@ -494,7 +476,6 @@
      ────────────────────────────────────────────────────── */
 
   document.addEventListener("DOMContentLoaded", () => {
-    initSidebarVar();     /* 0. CSS var --ecart-sidebar-w */
     initCluster();        /* 1. DOM reorganization + MENU toggle */
     initSoundDirect();    /* 2. Lecture directe + barre audio */
     initInfoPanel();      /* 3. Panneau INFO */

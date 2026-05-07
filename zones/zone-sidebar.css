@@ -270,17 +270,29 @@ body.menu-open .sections {
 /* =========================
    DESKTOP
    pointer: fine = souris uniquement
-   Sidebar grille 200px, nav toujours visible
+   Sidebar grille 200px, toggle possible
    ========================= */
 
 @media (pointer: fine) {
 
+  /* Variable CSS contrôlant la largeur de la colonne sidebar */
+  :root {
+    --ecart-sidebar-col: 200px;
+  }
+
+  /* Sidebar fermée → repliée sur 48 px */
+  body.desktop-sidebar-closed {
+    --ecart-sidebar-col: 48px;
+  }
+
   .page {
     display: grid !important;
-    grid-template-columns: 200px 1fr !important;
+    grid-template-columns: var(--ecart-sidebar-col, 200px) 1fr !important;
     width: 100vw !important;
     height: 100vh !important;
     overflow: hidden !important;
+    /* Transition fluide à l'ouverture / fermeture */
+    transition: grid-template-columns 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   .sidebar {
@@ -299,6 +311,16 @@ body.menu-open .sections {
     grid-template-columns: 48px 1fr !important;
     align-items: stretch !important;
     z-index: 20 !important;
+    overflow: hidden !important;
+    /* Suit la variable de largeur */
+    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* Sidebar fermée → largeur 48 px */
+  body.desktop-sidebar-closed .sidebar {
+    width: 48px !important;
+    min-width: 48px !important;
   }
 
   .sidebar-top {
@@ -341,14 +363,35 @@ body.menu-open .sections {
     letter-spacing: 0.04em !important;
     font-weight: 600 !important;
     color: rgba(255,255,255,0.82) !important;
-    cursor: default !important;
+    /* Cliquable sur desktop pour toggle */
+    cursor: pointer !important;
     pointer-events: auto !important;
     text-shadow: 0 0 12px rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.6) !important;
+    transition: color 180ms ease, text-shadow 180ms ease !important;
   }
 
-  /* Nav toujours visible sur desktop — pas de toggle */
+  .menu-toggle:hover {
+    color: rgba(255,255,255,0.96) !important;
+    text-shadow:
+      0 0 16px rgba(255,255,255,0.22),
+      0 2px 6px rgba(0,0,0,0.6) !important;
+  }
+
+  /* Léger indicateur visuel sur EC@RT quand sidebar fermée */
+  body.desktop-sidebar-closed .menu-toggle {
+    color: rgba(255,255,255,0.55) !important;
+    text-shadow: none !important;
+  }
+
+  body.desktop-sidebar-closed .menu-toggle:hover {
+    color: rgba(255,255,255,0.92) !important;
+    text-shadow: 0 0 14px rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.6) !important;
+  }
+
+  /* Pas de +/- indicator sur desktop */
   .menu-toggle::after { display: none !important; }
 
+  /* Nav — transition opacity + décalage */
   .zones-nav,
   .sections {
     grid-row: 1 / -1 !important;
@@ -370,7 +413,16 @@ body.menu-open .sections {
     opacity: 1 !important;
     pointer-events: auto !important;
     transform: none !important;
-    transition: none !important;
+    /* Transition à la fermeture */
+    transition: opacity 0.20s ease, transform 0.20s ease !important;
+  }
+
+  /* Nav masquée quand sidebar fermée */
+  body.desktop-sidebar-closed .zones-nav,
+  body.desktop-sidebar-closed .sections {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-6px) !important;
   }
 
   .zone-link,

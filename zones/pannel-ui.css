@@ -9,7 +9,7 @@
   --ecart-ui-bottom:  calc(20px + env(safe-area-inset-bottom, 0px));
 
   --ecart-audio-bar-h: 59px;
-  --ecart-sidebar-w:   0px;   /* mis à jour dynamiquement par JS */
+  /* --ecart-sidebar-col est défini par zone-sidebar.css (pointer:fine) */
 
   --ecart-z-title:    100020;
   --ecart-z-button:   100010;
@@ -214,7 +214,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   top:    0 !important;
   right:  0 !important;
   bottom: 0 !important;
-  left:   var(--ecart-sidebar-w, 0px) !important;
+  left:   var(--ecart-sidebar-col, 0px) !important;
 
   display: flex !important;
   align-items: center !important;
@@ -453,7 +453,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 #ecartAudioBar {
   position: fixed;
   bottom: 0;
-  left:  var(--ecart-sidebar-w, 0px);
+  left:  var(--ecart-sidebar-col, 0px);
   right: 0;
   z-index: var(--ecart-z-audiobar);
   display: flex;
@@ -612,7 +612,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
     --ecart-ui-right:    12px;
     --ecart-ui-bottom:   calc(14px + env(safe-area-inset-bottom, 0px));
     --ecart-audio-bar-h: 55px;
-    --ecart-sidebar-w:    0px;
   }
   .ecart-ui-cluster > button,
   .ecart-ui-menu-btn { font-size: 0.44rem !important; }
