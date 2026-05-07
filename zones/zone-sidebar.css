@@ -608,40 +608,95 @@ body,
     left: 64px;
   }
 }
-/* =========================
-   HOME BUTTON — alignement propre
-   ========================= */
+/* ═══════════════════════════
+   CORRECTION SIDEBAR EC@RT
+   noir + menu flou transparent
+   ═══════════════════════════ */
 
-@media (pointer: fine) {
-  .sidebar-top {
-    padding-top: 14px !important;
-    gap: 18px !important;
-  }
+/* barre EC@RT toujours noire */
+.sidebar {
+  background: #000 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
 
-  .home-button {
-    width: 34px !important;
-    height: 34px !important;
-    margin-bottom: 18px !important;
+/* zone du haut : Home + EC@RT */
+.sidebar-top {
+  background: #000 !important;
+  border: none !important;
+  box-shadow: none !important;
 
-    font-size: 0.9rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
 
-    border-color: rgba(255,255,255,0.18) !important;
-    background: rgba(0,0,0,0.28) !important;
+  padding: 18px 20px !important;
+}
 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+/* bouton home + EC@RT alignés proprement */
+.home-button,
+.site-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 
-    transform: translateX(0);
-  }
+  height: 34px !important;
 
-  .site-title,
-  .menu-toggle {
-    margin-top: 0 !important;
-  }
+  margin: 0 !important;
+  padding: 0 !important;
 
-  .zone-identity {
-    top: 22px !important;
-    left: 76px !important;
-  }
+  line-height: 1 !important;
+}
+
+/* EC@RT */
+.site-title {
+  color: white !important;
+  background: transparent !important;
+  border: none !important;
+
+  font-size: 1rem !important;
+  letter-spacing: 0.12em !important;
+}
+
+/* menu déplié : flou transparent qui assombrit */
+.zones-nav {
+  background: rgba(0, 0, 0, 0.68) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+
+  border: none !important;
+  box-shadow: none !important;
+
+  padding: 22px 20px 28px 20px !important;
+}
+
+/* textes alignés sur une ligne verticale imaginaire */
+.zone-link {
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 7px 0 7px 0 !important;
+
+  text-align: left !important;
+  line-height: 1.15 !important;
+
+  color: rgba(255, 255, 255, 0.78) !important;
+
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* aucun trait horizontal parasite */
+.sidebar::before,
+.sidebar::after,
+.sidebar-top::before,
+.sidebar-top::after,
+.zones-nav::before,
+.zones-nav::after,
+.zone-link::before,
+.zone-link::after {
+  display: none !important;
+  content: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
