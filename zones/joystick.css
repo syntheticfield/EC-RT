@@ -4,22 +4,33 @@
    Position : bas gauche
    ========================= */
 
-/* Caché par défaut — affiché uniquement sur touch */
+/* Caché par défaut */
 .ecart-joystick-wrap {
   display: none;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
 }
 
 @media (pointer: coarse) {
 
-  .ecart-joystick-wrap {
+  body.unity-ready .ecart-joystick-wrap {
     display: block;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+  }
+
+  .ecart-joystick-wrap {
     position: fixed;
     left: clamp(18px, 4vw, 32px);
     bottom: clamp(18px, 4vw, 32px);
     z-index: 100005;
 
-    /* Hors du flux — ne perturbe pas Unity */
     pointer-events: none;
+
   }
 
   /* =========================
@@ -141,21 +152,6 @@
       width: clamp(88px, 16vw, 118px);
       height: clamp(88px, 16vw, 118px);
     }
-  }
-
-  /* =========================
-     MASQUÉ si un panel est ouvert
-     ========================= */
-
-  .ecart-joystick-wrap.is-hidden {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.22s ease;
-  }
-
-  .ecart-joystick-wrap:not(.is-hidden) {
-    opacity: 1;
-    transition: opacity 0.22s ease;
   }
 
 }

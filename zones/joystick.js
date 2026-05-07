@@ -211,31 +211,6 @@ window.ECARTJoystick = (() => {
     }
   }
 
-  /* ─────────────────────────────
-     Masquage panel
-     ───────────────────────────── */
-
-  function bindPanelEvents() {
-    const wrap = document.getElementById("ecartJoystick");
-    if (!wrap) return;
-
-    document.addEventListener("ecart:panel-open", () => {
-      wrap.classList.add("is-hidden");
-      reset();
-    });
-    document.addEventListener("ecart:panel-close-others", () => {
-      setTimeout(() => {
-        const anyOpen = document.querySelector(
-          "#infoPanel.is-open, #soundPanel.is-open, #mobileMapOverlay.is-open"
-        );
-        if (!anyOpen) wrap.classList.remove("is-hidden");
-      }, 300);
-    });
-    document.addEventListener("keydown", (ev) => {
-      if (ev.key === "Escape")
-        setTimeout(() => wrap.classList.remove("is-hidden"), 300);
-    });
-  }
 
   /* ─────────────────────────────
      Init
@@ -270,12 +245,29 @@ window.ECARTJoystick = (() => {
     window.addEventListener("touchend",    onTouchEnd,   { capture: true });
     window.addEventListener("touchcancel", onTouchEnd,   { capture: true });
 
-    bindPanelEvents();
-    requestAnimationFrame(loop);
+    waitForUnityReady();
+requestAnimationFrame(loop);
 
     console.log("[ECARTJoystick] v1.3 initialisé →", cfg.gameObject, "/", cfg.method);
   }
+function waitForUnityReady() {
 
+  const check = () => {
+
+    if (window.unityInstance) {
+
+      document.body.classList.add("unity-ready");
+
+      console.log("[ECARTJoystick] Unity ready");
+
+      return;
+    }
+
+    requestAnimationFrame(check);
+  };
+
+  check();
+}
   return { init, getInput: () => ({ x: state.x, y: state.y }), reset };
 
 })();

@@ -1,40 +1,20 @@
 /* =========================
-   EC@RT — SIDEBAR UNIFIÉE v2
-   
-   Détection par TYPE DE POINTEUR uniquement :
-   pointer: fine  → souris → DESKTOP
-   pointer: coarse → touch → MOBILE + TABLETTE
-   
-   L'orientation n'est plus utilisée pour distinguer
-   desktop vs mobile — une tablette paysage reste mobile.
-   ========================= */
-
-/* =========================
-   RESET
+   EC@RT — SIDEBAR UNIFIÉE CLEAN
+   Desktop : barre noire + menu transparent flou
+   Mobile/tablette : menu flou plein côté
    ========================= */
 
 body.has-mobile-menu .page {
   display: block;
 }
 
-/* =========================
-   BASE — partagée tous devices
-   ========================= */
+/* BASE */
 
 .sidebar {
   position: fixed;
   top: 14px;
   left: 14px;
   z-index: 99990;
-  width: auto;
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   pointer-events: none;
 }
 
@@ -43,25 +23,43 @@ body.has-mobile-menu .page {
   z-index: 99992;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   pointer-events: auto;
 }
 
 .home-button {
-  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
-  border: 1px solid rgba(255,255,255,0.16);
+
   border-radius: 999px;
-  color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.16);
+
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.94);
+
   text-decoration: none;
-  background: rgba(0,0,0,0.42);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  line-height: 1;
+
+  backdrop-filter: blur(14px) saturate(150%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+
   pointer-events: auto;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.home-button:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.32);
+  transform: scale(1.04);
 }
 
 .menu-toggle,
@@ -71,36 +69,55 @@ body.has-mobile-menu .page {
   background: transparent;
   margin: 0;
   padding: 0;
-  color: #fff;
+
+  color: rgba(255,255,255,0.9);
   font-weight: 600;
-  letter-spacing: 0;
+  line-height: 1;
   cursor: pointer;
+
   pointer-events: auto;
+
   text-shadow:
-    0 0 8px rgba(255,255,255,0.12),
+    0 0 10px rgba(255,255,255,0.08),
     0 2px 6px rgba(0,0,0,0.6);
 }
 
-/* Nav fermée par défaut */
+/* NAV COMMUNE */
+
 .zones-nav,
 .sections {
   position: fixed;
   z-index: 99970;
+
   display: flex;
   flex-direction: column;
+
   opacity: 0;
   pointer-events: none;
-  background: rgba(0,0,0,0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
-  transition: opacity 240ms ease, transform 300ms ease;
+
+  background: rgba(0,0,0,0.42);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+
+  border-right: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    18px 0 50px rgba(0,0,0,0.24),
+    inset 1px 0 0 rgba(255,255,255,0.035);
+
+  transition:
+    opacity 240ms ease,
+    transform 300ms ease;
 }
 
 .zones-nav::-webkit-scrollbar,
-.sections::-webkit-scrollbar { display: none; }
+.sections::-webkit-scrollbar {
+  display: none;
+}
 
 body.menu-open .zones-nav,
 body.menu-open .sections {
@@ -115,7 +132,9 @@ body.menu-open .sections {
   text-decoration: none;
   white-space: normal;
   transform: none;
-  transition: color 180ms ease;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
 }
 
 .zone-link:hover,
@@ -123,22 +142,25 @@ body.menu-open .sections {
 .zone-link.active,
 .section-link.active {
   color: #fff;
-  text-shadow: 0 0 10px rgba(255,255,255,0.18);
+  text-shadow: 0 0 10px rgba(255,255,255,0.16);
 }
 
 .zone-link::before,
-.section-link::before { display: none; }
+.section-link::before {
+  display: none;
+}
 
-/* =========================
-   MOBILE + TABLETTE PORTRAIT
-   pointer: coarse + portrait
-   ========================= */
+/* MOBILE / TABLETTE PORTRAIT */
 
 @media (pointer: coarse) and (orientation: portrait) {
 
+  .sidebar {
+    top: 18px;
+    left: 18px;
+  }
+
   .sidebar-top {
     flex-direction: row;
-    align-items: center;
   }
 
   .site-title,
@@ -157,23 +179,30 @@ body.menu-open .sections {
     opacity: 0.72;
   }
 
-  body.menu-open .menu-toggle::after { content: "−"; }
+  body.menu-open .menu-toggle::after {
+    content: "−";
+  }
 
   .zones-nav,
   .sections {
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: min(300px, 82vw);
     height: 100dvh;
+
     justify-content: center;
     align-items: flex-start;
     gap: 8px;
+
     padding: 80px 22px 28px 22px;
-    border-right: 1px solid rgba(255,255,255,0.12);
+
     transform: translateX(-100%);
   }
 
   body.menu-open .zones-nav,
-  body.menu-open .sections { transform: translateX(0); }
+  body.menu-open .sections {
+    transform: translateX(0);
+  }
 
   .zone-link,
   .section-link {
@@ -182,18 +211,14 @@ body.menu-open .sections {
   }
 }
 
-/* =========================
-   MOBILE + TABLETTE PAYSAGE
-   pointer: coarse + landscape
-   EC@RT vertical, sidebar flottante fine
-   ========================= */
+/* MOBILE / TABLETTE PAYSAGE */
 
 @media (pointer: coarse) and (orientation: landscape) {
 
   .sidebar {
-    display: block;
+    top: 14px;
+    left: 14px;
     width: 48px;
-    pointer-events: none;
   }
 
   .sidebar-top {
@@ -201,7 +226,6 @@ body.menu-open .sections {
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    pointer-events: auto;
   }
 
   .site-title,
@@ -209,39 +233,40 @@ body.menu-open .sections {
     writing-mode: vertical-rl;
     text-orientation: upright;
     font-size: 1.5rem;
-    line-height: 1;
     letter-spacing: 0.02em;
   }
 
   .menu-toggle::after {
     content: "+";
     display: block;
-    margin-left: 0;
     margin-top: 0.45em;
     font-size: 0.7em;
     opacity: 0.72;
   }
 
-  body.menu-open .menu-toggle::after { content: "−"; }
+  body.menu-open .menu-toggle::after {
+    content: "−";
+  }
 
   .zones-nav,
   .sections {
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: min(280px, 44vw);
     height: 100dvh;
+
     justify-content: center;
     align-items: flex-start;
     gap: 8px;
+
     padding: 24px 22px 24px 80px;
-    border-right: 1px solid rgba(255,255,255,0.12);
+
     transform: translateX(-100%);
-    pointer-events: none;
   }
 
   body.menu-open .zones-nav,
   body.menu-open .sections {
     transform: translateX(0);
-    pointer-events: auto;
   }
 
   .zone-link,
@@ -250,7 +275,6 @@ body.menu-open .sections {
     line-height: 1.2;
   }
 
-  /* Contenu plein écran derrière la sidebar flottante */
   .zone-main,
   .viewer,
   .zone-content-unity,
@@ -267,184 +291,131 @@ body.menu-open .sections {
   }
 }
 
-/* =========================
-   DESKTOP
-   pointer: fine = souris uniquement
-   Sidebar grille 200px, toggle possible
-   ========================= */
+/* DESKTOP */
 
 @media (pointer: fine) {
 
-  /* Variable CSS contrôlant la largeur de la colonne sidebar */
   :root {
     --ecart-sidebar-col: 200px;
   }
 
-  /* Sidebar fermée → repliée sur 48 px */
   body.desktop-sidebar-closed {
     --ecart-sidebar-col: 48px;
   }
 
   .page {
     display: grid !important;
-    grid-template-columns: var(--ecart-sidebar-col, 200px) 1fr !important;
+    grid-template-columns: var(--ecart-sidebar-col) 1fr !important;
     width: 100vw !important;
     height: 100vh !important;
     overflow: hidden !important;
-    /* Transition fluide à l'ouverture / fermeture */
     transition: grid-template-columns 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   .sidebar {
     position: relative !important;
     grid-column: 1 !important;
-    top: auto !important; left: auto !important;
-    width: 200px !important;
-    min-width: 200px !important;
-    height: 100vh !important;
-    padding: 0 !important;
-    pointer-events: auto !important;
-    background: #000 !important;
-    border-right: 1px solid rgba(255,255,255,0.07) !important;
-    display: grid !important;
-    grid-template-rows: auto 1fr !important;
-    grid-template-columns: 48px 1fr !important;
-    align-items: stretch !important;
-    z-index: 20 !important;
-    overflow: hidden !important;
-    /* Suit la variable de largeur */
-    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-                min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
 
-  /* Sidebar fermée → largeur 48 px */
-  body.desktop-sidebar-closed .sidebar {
-    width: 48px !important;
-    min-width: 48px !important;
+    top: auto !important;
+    left: auto !important;
+
+    width: var(--ecart-sidebar-col) !important;
+    min-width: var(--ecart-sidebar-col) !important;
+    height: 100vh !important;
+
+    display: grid !important;
+    grid-template-columns: 48px 1fr !important;
+    grid-template-rows: 1fr !important;
+
+    background: transparent !important;
+    border: none !important;
+
+    overflow: hidden !important;
+    pointer-events: auto !important;
+    z-index: 20 !important;
   }
 
   .sidebar-top {
-    grid-row: 1 / -1 !important;
     grid-column: 1 !important;
     width: 48px !important;
-    height: 100% !important;
-    display: flex !important;
+    height: 100vh !important;
+
     flex-direction: column !important;
     align-items: center !important;
     gap: 14px !important;
-    padding: 20px 0 !important;
-    background: rgba(255,255,255,0.025) !important;
-    border-right: 1px solid rgba(255,255,255,0.06) !important;
-    pointer-events: auto !important;
+
+    padding: 18px 0 !important;
+
+    background: #000 !important;
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
   }
 
   .home-button {
-    width: 30px !important;
-    height: 30px !important;
-    flex: 0 0 30px !important;
-    font-size: 0.9rem !important;
-    background: transparent !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
-    backdrop-filter: none !important;
-    transition: border-color 180ms ease, background 180ms ease !important;
-  }
-
-  .home-button:hover {
-    background: rgba(255,255,255,0.06) !important;
-    border-color: rgba(255,255,255,0.32) !important;
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
   }
 
   .site-title,
   .menu-toggle {
     writing-mode: vertical-rl !important;
     text-orientation: upright !important;
-    font-size: 1.4rem !important;
-    line-height: 1 !important;
+
+    font-size: 1.42rem !important;
     letter-spacing: 0.04em !important;
-    font-weight: 600 !important;
-    color: rgba(255,255,255,0.82) !important;
-    /* Cliquable sur desktop pour toggle */
-    cursor: pointer !important;
-    pointer-events: auto !important;
-    text-shadow: 0 0 12px rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.6) !important;
-    transition: color 180ms ease, text-shadow 180ms ease !important;
   }
 
-  .menu-toggle:hover {
-    color: rgba(255,255,255,0.96) !important;
-    text-shadow:
-      0 0 16px rgba(255,255,255,0.22),
-      0 2px 6px rgba(0,0,0,0.6) !important;
+  .menu-toggle::after {
+    display: none !important;
   }
 
-  /* Léger indicateur visuel sur EC@RT quand sidebar fermée */
-  body.desktop-sidebar-closed .menu-toggle {
-    color: rgba(255,255,255,0.55) !important;
-    text-shadow: none !important;
-  }
-
-  body.desktop-sidebar-closed .menu-toggle:hover {
-    color: rgba(255,255,255,0.92) !important;
-    text-shadow: 0 0 14px rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.6) !important;
-  }
-
-  /* Pas de +/- indicator sur desktop */
-  .menu-toggle::after { display: none !important; }
-
-  /* Nav — transition opacity + décalage */
   .zones-nav,
   .sections {
-    grid-row: 1 / -1 !important;
     grid-column: 2 !important;
+
     position: relative !important;
-    top: auto !important; left: auto !important;
+    top: auto !important;
+    left: auto !important;
+
     width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
+    height: 100vh !important;
+
     padding: 72px 0 28px 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
+
     justify-content: flex-start !important;
     align-items: flex-start !important;
     gap: 0 !important;
-    overflow-y: auto !important;
-    background: transparent !important;
-    border: none !important;
+
     opacity: 1 !important;
-    pointer-events: auto !important;
     transform: none !important;
-    /* Transition à la fermeture */
-    transition: opacity 0.20s ease, transform 0.20s ease !important;
+    pointer-events: auto !important;
   }
 
-  /* Nav masquée quand sidebar fermée */
   body.desktop-sidebar-closed .zones-nav,
   body.desktop-sidebar-closed .sections {
     opacity: 0 !important;
     pointer-events: none !important;
-    transform: translateX(-6px) !important;
+    transform: translateX(-8px) !important;
   }
 
   .zone-link,
   .section-link {
-    position: relative !important;
-    display: block !important;
     width: 100% !important;
     padding: 7px 14px !important;
+
     font-size: 0.78rem !important;
     line-height: 1.25 !important;
-    color: rgba(255,255,255,0.32) !important;
-    text-decoration: none !important;
-    transform: none !important;
+
+    color: rgba(255,255,255,0.36) !important;
+
     border-left: 2px solid transparent !important;
-    transition: color 160ms ease, border-color 160ms ease, background 160ms ease !important;
   }
 
   .zone-link:hover,
   .section-link:hover {
     color: rgba(255,255,255,0.78) !important;
     border-left-color: rgba(255,255,255,0.22) !important;
-    background: rgba(255,255,255,0.03) !important;
+    background: rgba(255,255,255,0.035) !important;
     text-shadow: none !important;
   }
 
@@ -452,22 +423,9 @@ body.menu-open .sections {
   .section-link.active {
     color: #fff !important;
     border-left-color: #fff !important;
-    background: rgba(255,255,255,0.05) !important;
-    text-shadow: 0 0 10px rgba(255,255,255,0.12) !important;
+    background: rgba(255,255,255,0.055) !important;
   }
 
-  .zone-link.is-hovered,
-  .section-link.is-hovered {
-    color: rgba(255,255,255,0.62) !important;
-    border-left-color: rgba(255,255,255,0.14) !important;
-    background: rgba(255,255,255,0.02) !important;
-    text-shadow: none !important;
-  }
-
-  .zone-link::before,
-  .section-link::before { display: none !important; }
-
-  /* Contenu dans la colonne grille */
   .zone-main,
   .viewer,
   .zone-content,
@@ -485,57 +443,7 @@ body.menu-open .sections {
   }
 }
 
-/* =========================
-   NO SELECT
-   ========================= */
-
-.sidebar, .sidebar *,
-.zones-nav, .zones-nav *,
-.sections, .sections *,
-.home-button, .menu-toggle, .site-title {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-touch-callout: none !important;
-}
-/* =========================
-   FIX — supprime uniquement les lignes/espaces parasites en haut
-   sans modifier la sidebar
-   ========================= */
-
-html,
-body,
-.page,
-.sidebar,
-.sidebar-top,
-.zone-main,
-.zone-content,
-.zone-content-unity,
-.zone-content-image,
-.viewer,
-.image-viewer,
-.unity-container,
-#unity-container {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-  border-top: none !important;
-  box-shadow: none !important;
-}
-
-.sidebar::before,
-.sidebar::after,
-.sidebar-top::before,
-.sidebar-top::after,
-.page::before,
-.page::after,
-.zone-main::before,
-.zone-main::after {
-  border-top: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-/* =========================
-   TITRE ZONE — libre
-   ========================= */
+/* TITRE ZONE */
 
 .zone-identity {
   position: fixed;
@@ -550,7 +458,6 @@ body,
   z-index: 99991;
 }
 
-/* titre principal */
 .zone-identity-title {
   font-size: clamp(0.9rem, 1.2vw, 1.1rem);
   line-height: 1;
@@ -565,7 +472,6 @@ body,
     0 2px 8px rgba(0,0,0,0.7);
 }
 
-/* description */
 .zone-identity-desc {
   margin-top: 5px;
 
@@ -582,11 +488,9 @@ body,
     0 2px 6px rgba(0,0,0,0.6);
 }
 
-/* mobile portrait */
 @media (pointer: coarse) and (orientation: portrait) {
-
   .zone-identity {
-    top: 18px;
+    top: 72px;
     left: 18px;
   }
 
@@ -600,93 +504,36 @@ body,
   }
 }
 
-/* mobile/tablette paysage */
 @media (pointer: coarse) and (orientation: landscape) {
-
   .zone-identity {
     top: 14px;
     left: 64px;
   }
 }
-/* ═══════════════════════════
-   CORRECTION SIDEBAR EC@RT
-   noir + menu flou transparent
-   ═══════════════════════════ */
 
-/* barre EC@RT toujours noire */
-.sidebar {
-  background: #000 !important;
-  border: none !important;
-  box-shadow: none !important;
-}
+/* CLEAN GLOBAL */
 
-/* zone du haut : Home + EC@RT */
-.sidebar-top {
-  background: #000 !important;
-  border: none !important;
-  box-shadow: none !important;
-
-  display: flex !important;
-  align-items: center !important;
-  gap: 14px !important;
-
-  padding: 18px 20px !important;
-}
-
-/* bouton home + EC@RT alignés proprement */
-.home-button,
-.site-title {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  height: 34px !important;
-
+html,
+body,
+.page {
   margin: 0 !important;
   padding: 0 !important;
-
-  line-height: 1 !important;
 }
 
-/* EC@RT */
+.sidebar,
+.sidebar *,
+.zones-nav,
+.zones-nav *,
+.sections,
+.sections *,
+.home-button,
+.menu-toggle,
 .site-title {
-  color: white !important;
-  background: transparent !important;
-  border: none !important;
-
-  font-size: 1rem !important;
-  letter-spacing: 0.12em !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
 }
 
-/* menu déplié : flou transparent qui assombrit */
-.zones-nav {
-  background: rgba(0, 0, 0, 0.68) !important;
-  backdrop-filter: blur(18px) !important;
-  -webkit-backdrop-filter: blur(18px) !important;
-
-  border: none !important;
-  box-shadow: none !important;
-
-  padding: 22px 20px 28px 20px !important;
-}
-
-/* textes alignés sur une ligne verticale imaginaire */
-.zone-link {
-  display: block !important;
-
-  margin: 0 !important;
-  padding: 7px 0 7px 0 !important;
-
-  text-align: left !important;
-  line-height: 1.15 !important;
-
-  color: rgba(255, 255, 255, 0.78) !important;
-
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* aucun trait horizontal parasite */
 .sidebar::before,
 .sidebar::after,
 .sidebar-top::before,
@@ -697,6 +544,263 @@ body,
 .zone-link::after {
   display: none !important;
   content: none !important;
-  border: 0 !important;
-  box-shadow: none !important;
+}
+/* =========================
+   EC@RT — STRUCTURE FINALE
+   Mobile/tablette : aucune barre noire
+   Desktop : fine marge noire 48px
+   Menu : transparent/flou
+   ========================= */
+
+/* MOBILE + TABLETTE : aucune barre noire */
+@media (pointer: coarse) {
+
+  .sidebar {
+    position: fixed !important;
+    top: 14px !important;
+    left: 14px !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    pointer-events: none !important;
+    z-index: 99990 !important;
+  }
+
+  .sidebar-top {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    pointer-events: auto !important;
+  }
+
+  .home-button {
+    background: rgba(0,0,0,0.34) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+
+  .zones-nav,
+  .sections {
+    background: rgba(0,0,0,0.46) !important;
+    backdrop-filter: blur(24px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(145%) !important;
+
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
+    box-shadow: 18px 0 50px rgba(0,0,0,0.22) !important;
+  }
+}
+
+/* DESKTOP : overlay + fine barre noire */
+@media (pointer: fine) {
+
+  .page {
+    display: block !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  .zone-main,
+  .viewer,
+  .zone-content,
+  .zone-content-unity,
+  .zone-content-image,
+  .bad-zone,
+  .zone-glb-content,
+  #unity-container,
+  #unity-canvas {
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 200px !important;
+    height: 100vh !important;
+
+    display: grid !important;
+    grid-template-columns: 48px 152px !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    pointer-events: none !important;
+    z-index: 99990 !important;
+  }
+
+  .sidebar-top {
+    grid-column: 1 !important;
+
+    width: 48px !important;
+    height: 100vh !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+
+    gap: 14px !important;
+    padding: 18px 0 !important;
+
+    background: #000 !important;
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
+
+    pointer-events: auto !important;
+  }
+
+  .zones-nav,
+  .sections {
+    grid-column: 2 !important;
+
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+
+    width: 152px !important;
+    height: 100vh !important;
+
+    padding: 72px 0 28px 0 !important;
+
+    background: rgba(0,0,0,0.38) !important;
+    backdrop-filter: blur(24px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(145%) !important;
+
+    border-right: 1px solid rgba(255,255,255,0.08) !important;
+
+    box-shadow:
+      18px 0 50px rgba(0,0,0,0.22),
+      inset 1px 0 0 rgba(255,255,255,0.035) !important;
+
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  body.desktop-sidebar-closed .sidebar {
+    width: 48px !important;
+    grid-template-columns: 48px 0 !important;
+  }
+
+  body.desktop-sidebar-closed .zones-nav,
+  body.desktop-sidebar-closed .sections {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-8px) !important;
+  }
+}
+/* =========================
+   FIX MOBILE/TABLETTE — anti-chevauchement UI
+   ========================= */
+
+@media (pointer: coarse) and (orientation: portrait) {
+
+  .sidebar {
+    top: max(14px, env(safe-area-inset-top)) !important;
+    left: 14px !important;
+  }
+
+  .sidebar-top {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .home-button {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: clamp(1.65rem, 6.5vw, 2.45rem) !important;
+    line-height: 1 !important;
+  }
+
+  .zone-identity {
+    top: calc(max(14px, env(safe-area-inset-top)) + 54px) !important;
+    left: 14px !important;
+    max-width: calc(100vw - 28px) !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.72rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.48rem !important;
+    max-width: 76vw !important;
+  }
+
+  .zones-nav,
+  .sections {
+    padding-top: 132px !important;
+    justify-content: flex-start !important;
+  }
+}
+
+/* tablette / mobile paysage */
+@media (pointer: coarse) and (orientation: landscape) {
+
+  .sidebar {
+    top: 12px !important;
+    left: 12px !important;
+    width: 44px !important;
+  }
+
+  .sidebar-top {
+    width: 44px !important;
+    gap: 10px !important;
+  }
+
+  .home-button {
+    width: 32px !important;
+    height: 32px !important;
+    flex: 0 0 32px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: 1.28rem !important;
+  }
+
+  .zone-identity {
+    top: 14px !important;
+    left: 64px !important;
+    max-width: 42vw !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.72rem !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.48rem !important;
+    max-width: 42vw !important;
+  }
+
+  .zones-nav,
+  .sections {
+    padding-left: 74px !important;
+    padding-top: 22px !important;
+    width: min(300px, 52vw) !important;
+    justify-content: center !important;
+  }
 }
