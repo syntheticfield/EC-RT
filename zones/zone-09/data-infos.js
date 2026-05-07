@@ -1,17 +1,20 @@
 window.ECART_INFO = {
-  title: "Zone 09 — Irène Dogmatic",
+  title: "Irène Dogmatic",
+
+  subtitle: "Voice / Archive / Persona",
 
   description: `
-    Cette zone propose une entrée dans les documents,
-    archives, traces et matières liées à Irène Dogmatic.
+    Une zone consacrée à Irène Dogmatic comme présence vocale, archive et figure médiatique.
+    Le contenu oscille entre documentation, fiction, identité et transmission.
+  `,
 
-    Le contenu évoluera selon les recherches,
-    intégrations et développements du projet EC@RT.
+  gameplay: `
+    Lire, écouter, ouvrir les panneaux d’information et de son.
   `,
 
   references: [
-    "Irène Dogmatic, archive imprimée, date inconnue.",
-    "MAMCO, fonds ECART.",
-    "Documentation EC@RT, 2026."
+    "Irène Dogmatic.",
+    "Archives imprimées et sonores.",
+    "MAMCO, fonds ECART."
   ]
 };
