@@ -497,3 +497,151 @@ body.menu-open .sections {
   -webkit-user-select: none !important;
   -webkit-touch-callout: none !important;
 }
+/* =========================
+   FIX — supprime uniquement les lignes/espaces parasites en haut
+   sans modifier la sidebar
+   ========================= */
+
+html,
+body,
+.page,
+.sidebar,
+.sidebar-top,
+.zone-main,
+.zone-content,
+.zone-content-unity,
+.zone-content-image,
+.viewer,
+.image-viewer,
+.unity-container,
+#unity-container {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+.sidebar::before,
+.sidebar::after,
+.sidebar-top::before,
+.sidebar-top::after,
+.page::before,
+.page::after,
+.zone-main::before,
+.zone-main::after {
+  border-top: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+/* =========================
+   TITRE ZONE — libre
+   ========================= */
+
+.zone-identity {
+  position: fixed;
+  top: 14px;
+  left: 72px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  pointer-events: none;
+  z-index: 99991;
+}
+
+/* titre principal */
+.zone-identity-title {
+  font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+  line-height: 1;
+
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+
+  color: rgba(255,255,255,0.96);
+
+  text-shadow:
+    0 0 12px rgba(255,255,255,0.08),
+    0 2px 8px rgba(0,0,0,0.7);
+}
+
+/* description */
+.zone-identity-desc {
+  margin-top: 5px;
+
+  font-size: clamp(0.52rem, 0.7vw, 0.62rem);
+  line-height: 1.2;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: rgba(255,255,255,0.42);
+
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.05),
+    0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* mobile portrait */
+@media (pointer: coarse) and (orientation: portrait) {
+
+  .zone-identity {
+    top: 18px;
+    left: 18px;
+  }
+
+  .zone-identity-title {
+    font-size: 0.78rem;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.5rem;
+    max-width: 68vw;
+  }
+}
+
+/* mobile/tablette paysage */
+@media (pointer: coarse) and (orientation: landscape) {
+
+  .zone-identity {
+    top: 14px;
+    left: 64px;
+  }
+}
+/* =========================
+   HOME BUTTON — alignement propre
+   ========================= */
+
+@media (pointer: fine) {
+  .sidebar-top {
+    padding-top: 14px !important;
+    gap: 18px !important;
+  }
+
+  .home-button {
+    width: 34px !important;
+    height: 34px !important;
+    margin-bottom: 18px !important;
+
+    font-size: 0.9rem !important;
+
+    border-color: rgba(255,255,255,0.18) !important;
+    background: rgba(0,0,0,0.28) !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    transform: translateX(0);
+  }
+
+  .site-title,
+  .menu-toggle {
+    margin-top: 0 !important;
+  }
+
+  .zone-identity {
+    top: 22px !important;
+    left: 76px !important;
+  }
+}
