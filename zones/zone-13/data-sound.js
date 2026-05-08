@@ -1,11 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description",
-    file: "./audio/SD_01.wav"
+    title: "Audio Description (fr)",
+    file: "../../assets/son/FR/SD.mp3"
   },
-
   {
-    title: "krrrr",
-    file: "./audio/SD_02.wav"
-  }
+    title: "Audio Description (eng)",
+    file: "../../assets/son/EN/SD2.mp3"
+  },
 ];

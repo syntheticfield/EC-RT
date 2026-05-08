@@ -1,11 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description 01",
-    file: "../../assets/son/AD_MC_Star.wav"
+    title: "Audio Description (fr)",
+    file: "../../assets/son/FR/MC.mp3"
   },
-
   {
-    title: "Audio Description 02",
-    file: "../../assets/son/AD_MC_BayAreaDada.wav"
-  }
+    title: "Audio Description (eng)",
+    file: "../../assets/son/EN/MC_2.mp3"
+  },
 ];

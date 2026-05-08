@@ -156,35 +156,148 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   0%,100% { box-shadow: 0 0 0  0px rgba(255,255,255,0.06); }
       50% { box-shadow: 0 0 0  5px rgba(255,255,255,0.04); }
 }
-
-
 /* ==========================================================
-   SOUS-BOUTONS — masqués / animés à l'ouverture
+   SOUND PANEL — ZONE 491
    ========================================================== */
+#ecartAudioPanel {
+  position: fixed;
+  top: calc(18px + env(safe-area-inset-top, 0px));
+  right: calc(18px + env(safe-area-inset-right, 0px));
+  z-index: 100040;
 
-#soundToggle, #mobileMapToggle, #infoToggle {
-  position: static !important;
-  bottom: unset !important;
-  right:  unset !important;
+  width: min(300px, calc(100vw - 36px));
+  padding: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  background: rgba(0,0,0,0.62);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  color: #fff;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px) scale(0.80);
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-/* Stagger : INFO sort en 1er (plus proche du MENU) */
-.ecart-ui-cluster.is-open #infoToggle {
-  opacity: 1; pointer-events: auto; transform: none;
-  transition-delay: 0.04s;
-}
-.ecart-ui-cluster.is-open #mobileMapToggle {
-  opacity: 1; pointer-events: auto; transform: none;
-  transition-delay: 0.10s;
-}
-.ecart-ui-cluster.is-open #soundToggle {
-  opacity: 1; pointer-events: auto; transform: none;
-  transition-delay: 0.16s;
+#ecartAudioPanel.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
 }
 
+.ecart-audio-main {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.ecart-audio-playpause {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.88);
+
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.ecart-audio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ecart-audio-now {
+  margin-bottom: 6px;
+  font-size: 0.66rem;
+  line-height: 1.1;
+  color: rgba(255,255,255,0.84);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ecart-audio-progress-strip {
+  position: relative;
+  height: 3px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.14);
+  cursor: pointer;
+}
+
+.ecart-audio-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: #fff;
+}
+
+.ecart-audio-tracklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.ecart-audio-track {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+
+  padding: 6px 7px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: rgba(255,255,255,0.48);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ecart-audio-track:hover,
+.ecart-audio-track.is-active {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.92);
+}
+
+.ecart-audio-track-index {
+  font-size: 0.52rem;
+  opacity: 0.45;
+}
+
+.ecart-audio-track-title {
+  min-width: 0;
+  font-size: 0.62rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ecart-audio-track-meta {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  #ecartAudioPanel {
+    top: calc(68px + env(safe-area-inset-top, 0px));
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+}
 
 /* ==========================================================
    SOUND — état lecture

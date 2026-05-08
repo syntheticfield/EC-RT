@@ -1,11 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description",
-    file: "../../assets/son/02_BackGround.wav"
+    title: "Audio Description (fr)",
+    file: "../../assets/son/FR/ROLEMODELS.mp3"
   },
-
   {
-    title: "Texture ambiante",
-    file: "./audio/zone09-room.mp3"
-  }
+    title: "Audio Description (eng)",
+    file: "../../assets/son/EN/ROLEMODELS.mp3"
+  },
 ];

@@ -1,11 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description",
-    file: "../../assets/son/AD_Irene_Dogmatic.wav"
+    title: "Audio Description (fr)",
+    file: "../../assets/son/FR/ID.mp3"
   },
-
   {
-    title: "Texture ambiante",
-    file: "./audio/zone09-room.mp3"
-  }
+    title: "Audio Description (eng)",
+    file: "../../assets/son/EN/ID2.mp3"
+  },
 ];

@@ -1,11 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description",
-    file: "../../assets/son/AD_COUM.wav"
+    title: "Audio Description (fr)",
+    file: "../../assets/son/FR/491.mp3"
   },
-
   {
-    title: "Texture ambiante",
-    file: "../../assets/son/AD_Poster"
-  }
+    title: "Audio Description (eng)",
+    file: "../../assets/son/EN/4912.mp3"
+  },
 ];
