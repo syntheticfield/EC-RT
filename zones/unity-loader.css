@@ -23,39 +23,20 @@ body {
 
 /* =========================
    ZONE UNITY — CONTENEUR PRINCIPAL
-   zone-sidebar.css gère déjà :
-   - desktop paysage : grid-column: 2, height: 100vh
-   - portrait mobile  : position: fixed, inset: 0
-   On ajoute ici uniquement ce qui manque.
+
+   Position toujours fixed, quelle que soit l'orientation.
+   On évite ainsi le changement de stacking context au passage
+   paysage ↔ portrait, qui provoquait une perte du contexte WebGL
+   et un rechargement de la scène Unity sur iPad/iPhone.
    ========================= */
 
 .zone-content-unity {
-  position: relative;
-  width: 100%;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
   overflow: hidden;
   background: #000;
-}
-
-/* Portrait : Unity plein écran derrière la sidebar flottante */
-@media (orientation: portrait) {
-  .zone-content-unity {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    padding: 0 !important;
-  }
-}
-
-/* Landscape mobile (sidebar fine verticale) */
-@media (orientation: landscape) and (max-width: 980px) {
-  .zone-content-unity {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100dvh;
-  }
 }
 
 /* =========================

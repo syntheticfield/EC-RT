@@ -1,6 +1,6 @@
 /* =========================
    EC@RT — LOADER UNITY UNIFIÉ
-   Version 1.0
+   Version 1.1
 
    USAGE dans chaque zone Unity :
    ─────────────────────────────
@@ -104,7 +104,7 @@ window.ECARTLoader = (() => {
     /* ── Helpers DOM ── */
 
     function setBar(v) {
-      if (bar)     bar.style.width    = `${Math.round(v * 100)}%`;
+      if (bar)     bar.style.width     = `${Math.round(v * 100)}%`;
       if (percent) percent.textContent = `${Math.round(v * 100)}%`;
       if (status)  status.textContent  = resolveStatus(Math.round(v * 100));
     }
@@ -190,6 +190,18 @@ window.ECARTLoader = (() => {
         return;
       }
 
+      /* ── Garde WebGL contre les pertes de contexte au changement d'orientation ──
+         e.preventDefault() signale au navigateur que l'app gère la récupération
+         elle-même, ce qui évite à Unity d'interpréter la perte comme fatale. */
+      canvas.addEventListener("webglcontextlost", (e) => {
+        e.preventDefault();
+        console.warn("[ECARTLoader] WebGL context lost — récupération en cours…");
+      }, false);
+
+      canvas.addEventListener("webglcontextrestored", () => {
+        console.log("[ECARTLoader] WebGL context restored.");
+      }, false);
+
       createUnityInstance(canvas, unityConfig, onProgress)
         .then(onUnityReady)
         .catch(onUnityError);
@@ -212,7 +224,7 @@ window.ECARTLoader = (() => {
       /* Laisse la barre atteindre 100% visuellement, puis cache */
       setTimeout(hideLoader, 500);
 
-      /* Input mobile — on appelle ici (après Unity ready) et nulle part ailleurs */
+      /* Input mobile — appelé ici (après Unity ready) et nulle part ailleurs */
       if (typeof window.ECARTUnityMobileFix === "function") {
         window.ECARTUnityMobileFix(canvas);
       }
@@ -233,8 +245,15 @@ window.ECARTLoader = (() => {
     ensureCanvasSize();
     startProgressLoop();
 
-    window.addEventListener("resize",            ensureCanvasSize);
-    window.addEventListener("orientationchange", ensureCanvasSize);
+    /* ── Resize dédoublonné ──
+       Sur iOS/iPadOS, orientationchange déclenche toujours un resize quelques ms
+       après. Un seul listener sur resize avec debounce suffit et évite les appels
+       en rafale avec des dimensions intermédiaires incohérentes. */
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(ensureCanvasSize, 120);
+    });
 
     loadScript();
   }
