@@ -259,3 +259,282 @@ body {
     transform: scale(1.15);
   }
 }
+/* ===== ZONE 13 — AJOUTS CSS =====
+   Ajouter à la fin de zone-13.css
+   ================================ */
+
+/* ─── ARCHIVES DÉPLAÇABLES ─── */
+
+.zone13-archive {
+  /* pointer-events géré inline par zone-13.js (auto pendant le drag) */
+  /* cursor: grab défini dynamiquement via makeDraggable() */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none; /* nécessaire pour pointer events sur mobile */
+}
+
+.zone13-archive:active {
+  cursor: grabbing;
+}
+
+/* ─── SOUND PANEL — TRACKS ─── */
+
+.z13-track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.z13-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    border-color 0.2s ease,
+    background   0.2s ease,
+    opacity      0.2s ease;
+}
+
+.z13-track:hover {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.03);
+}
+
+.z13-track.is-on {
+  border-color: rgba(255,255,255,0.32);
+  background: rgba(255,255,255,0.04);
+}
+
+.z13-track:not(.is-on) {
+  opacity: 0.42;
+}
+
+/* Indicateur d'état (dot) */
+.z13-track-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+  transition: background 0.2s ease;
+}
+
+.z13-track.is-on .z13-track-dot {
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255,255,255,0.55);
+}
+
+/* Label */
+.z13-track-label {
+  flex: 1;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* VU-mètre */
+.z13-track-meter {
+  width: 56px;
+  height: 2px;
+  background: rgba(255,255,255,0.07);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.z13-track-meter-bar {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  width: 0%;
+  background: rgba(255,255,255,0.72);
+  transition: width 0.07s linear;
+}
+/* ===================================================
+   ZONE 13 — ADDITIONS CSS
+   Ajouter à la fin de zone-13.css
+   =================================================== */
+
+/* ─── ARCHIVES — DRAG ─────────────────────────────── */
+
+.zone13-archive {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;     /* indispensable pour pointer events mobile */
+}
+
+/* ─── SOUND PANEL — GRAIN ENGINE ─────────────────── */
+
+.z13-grain-engine {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Label titre engine */
+.z13-engine-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+/* ─── SOURCES ────────────────────────────────────── */
+
+.z13-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.z13-source {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Bouton toggle source */
+.z13-src-btn {
+  min-width: 60px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  flex-shrink: 0;
+}
+
+.z13-src-btn.is-on {
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
+}
+
+.z13-src-btn:hover {
+  border-color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.75);
+}
+
+/* Dots d'activité grain */
+.z13-src-grains {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.z13-grain-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  transition: background 0.08s ease, transform 0.08s ease;
+}
+
+.z13-grain-dot.is-active {
+  background: #fff;
+  transform: scale(1.5);
+}
+
+/* Pulse flash (barre de feu grain) */
+.z13-src-pulse {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.z13-src-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.06s ease;
+}
+
+.z13-src-pulse.is-firing::after {
+  transform: scaleX(1);
+  transition: none;
+}
+
+/* ─── SLIDERS PARAMÈTRES ────────────────────────── */
+
+.z13-params {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.z13-param {
+  display: grid;
+  grid-template-columns: 82px 1fr 34px;
+  align-items: center;
+  gap: 10px;
+}
+
+.z13-param-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.z13-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  outline: none;
+  cursor: pointer;
+}
+
+.z13-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.z13-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.4);
+}
+
+.z13-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+}
+
+.z13-param-val {
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  opacity: 0.45;
+  text-align: right;
+}
