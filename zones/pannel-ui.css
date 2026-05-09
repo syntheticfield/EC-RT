@@ -99,11 +99,74 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 
 /* ==========================================================
-   BOUTON ŒIL — focus mode, injecté dans .sidebar-top
-   Même style que .home-button
+   CONTENEUR TOP-RIGHT — boutons ŒIL + LIGHT
+   Aligné sur le même right que le cluster (--ecart-ui-right)
    ========================================================== */
 
-.ecart-focus-btn {
+#ecartTopRight {
+  position: fixed;
+  top:   calc(18px + env(safe-area-inset-top, 0px));
+  right: var(--ecart-ui-right);
+  z-index: 100060;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ecart-ui-gap);
+  pointer-events: auto;
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+  #ecartTopRight { right: 12px; }
+}
+
+
+/* ==========================================================
+   TOAST — "SURFACE PHOTOSENSIBLE : ON / OFF"
+   Haut-droite sous les boutons œil + light, disparaît après ~2.6s
+   Calcul : 18px (top #ecartTopRight) + 34px (œil) + 8px (gap) + 34px (soleil) + 10px
+   ========================================================== */
+
+.ecart-toast {
+  position: fixed;
+  top:   calc(104px + env(safe-area-inset-top, 0px));
+  right: var(--ecart-ui-right);
+  left:  auto;
+  transform: none;
+  text-align: right;
+  z-index: 100200;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(0.62rem, 2vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+
+  color: rgba(255,255,255,0.92);
+  text-shadow:
+    0 0 18px rgba(255,255,255,0.36),
+    0 0 40px rgba(255,255,255,0.16);
+
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+
+  animation: ecartToastAnim 2.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes ecartToastAnim {
+  0%   { opacity: 0; letter-spacing: 0.40em; }
+  14%  { opacity: 1; letter-spacing: 0.30em; }
+  70%  { opacity: 1; letter-spacing: 0.30em; }
+  100% { opacity: 0; letter-spacing: 0.22em; }
+}
+
+
+/* ==========================================================
+   BOUTONS ŒIL + LIGHT — style unifié (même que home-button)
+   ========================================================== */
+
+.ecart-focus-btn,
+.ecart-light-btn {
   width: 34px;
   height: 34px;
   flex-shrink: 0;
@@ -128,15 +191,17 @@ body.ecart-audio-active .ecart-ui-cluster {
   pointer-events: auto;
 }
 
-.ecart-focus-btn:hover {
+.ecart-focus-btn:hover,
+.ecart-light-btn:hover {
   background:   rgba(255,255,255,0.13);
   border-color: rgba(255,255,255,0.36);
 }
 
-.ecart-focus-btn:active { transform: scale(0.90); }
+.ecart-focus-btn:active,
+.ecart-light-btn:active { transform: scale(0.90); }
 
-/* Actif : fond blanc comme home-button sélectionné */
-.ecart-focus-btn.is-active {
+.ecart-focus-btn.is-active,
+.ecart-light-btn.is-active {
   background:   rgba(255,255,255,0.92);
   border-color: transparent;
   color:        #000;
@@ -151,51 +216,112 @@ body.ecart-focus-mode .ecart-focus-btn .eye-closed { display: block; }
 
 
 /* ==========================================================
-   MODE FOCUS — cache le cluster (SOUND / MAP / INFO / LIGHT)
-   La sidebar, le logo et le nom de zone restent accessibles
+   MODE FOCUS — immersion totale
+   Cache : sidebar, zone-identity, MAP, INFO
+   Garde : #ecartTopRight (œil + light), SOUND + son panel
    ========================================================== */
 
-body.ecart-focus-mode .ecart-ui-cluster {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(6px);
-  transition:
-    opacity   0.22s ease,
-    transform 0.22s ease,
-    bottom    0.30s cubic-bezier(0.4, 0, 0.2, 1);
+/* Sidebar et identité de zone disparaissent */
+body.ecart-focus-mode .sidebar,
+body.ecart-focus-mode .zone-identity {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.28s ease;
 }
 
-/* Ferme aussi les panels si ouverts */
-body.ecart-focus-mode #infoPanel,
+/* MAP et INFO cachés dans le cluster — SOUND reste visible */
+body.ecart-focus-mode #mobileMapToggle,
+body.ecart-focus-mode #infoToggle {
+  display: none !important;
+}
+
+/* Panels MAP et INFO fermés */
 body.ecart-focus-mode #mobileMapOverlay,
-body.ecart-focus-mode #ecartAudioPanel {
+body.ecart-focus-mode #infoPanel {
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
 }
+/* Le panel SOUND (#ecartAudioPanel) reste accessible en mode focus */
+
+/* #ecartTopRight toujours visible */
+body.ecart-focus-mode #ecartTopRight {
+  z-index: 100200;
+}
+
+/* Bouton SOUND repositionné seul dans le cluster (pas besoin de CSS spécial,
+   MAP et INFO sont display:none, SOUND s'affiche seul) */
 
 
 /* ==========================================================
-   MODE JOUR (LIGHT) — inversion colorimétrique globale
-   Les images/canvas/vidéos sont ré-inversées pour rester lisibles
+   MODE JOUR (LIGHT) — filtre accessibilité visuelle
+   Inversion partielle (0.88) : fond noir → gris-blanc doux,
+   pas de blanc pur → moins d'éblouissement.
+   Contraste réduit (0.90) → atténue l'effet d'empâtement
+   sur les textes causé par l'inversion des halos d'anti-aliasing.
+   canvas/iframe non ré-inversés → scènes 3D affectées.
    ========================================================== */
 
 html.ecart-light-mode {
-  filter: invert(1);
+  filter: invert(0.88) brightness(1.04) contrast(0.90);
 }
 
 html.ecart-light-mode img,
-html.ecart-light-mode video,
-html.ecart-light-mode canvas,
-html.ecart-light-mode iframe,
-html.ecart-light-mode .mini-map-image {
-  filter: invert(1);
+html.ecart-light-mode video {
+  filter: invert(0.88) brightness(1.04) contrast(0.90);
 }
 
-/* Bouton LIGHT actif dans le cluster */
-#ecartLightToggle.is-active {
-  background:   rgba(255,255,255,0.96) !important;
-  color:        #000 !important;
+html.ecart-light-mode .mini-map-image {
+  filter: invert(0.88) grayscale(1) contrast(1.00) brightness(0.96);
+}
+
+
+
+/* ==========================================================
+   MODE JOUR — boutons lisibles après invert(0.88)
+   On donne aux boutons fond sombre + texte blanc AVANT filtre,
+   ce qui produit fond clair + texte sombre APRÈS inversion.
+   ========================================================== */
+
+html.ecart-light-mode .ecart-ui-cluster > button {
+  background:   rgba(0,0,0,0.80) !important;
+  color:        rgba(255,255,255,0.96) !important;
+  border-color: rgba(0,0,0,0.40) !important;
+  box-shadow:   0 1px 8px rgba(0,0,0,0.36) !important;
+}
+
+html.ecart-light-mode .ecart-ui-cluster > button:hover {
+  background:   rgba(0,0,0,0.92) !important;
+  border-color: rgba(0,0,0,0.60) !important;
+  color:        #fff !important;
+}
+
+html.ecart-light-mode .ecart-ui-cluster > button.is-open,
+html.ecart-light-mode .ecart-ui-cluster > button.is-playing {
+  background:   #000 !important;
+  color:        #fff !important;
+  border-color: transparent !important;
+  box-shadow:   0 2px 12px rgba(0,0,0,0.30) !important;
+}
+
+/* Boutons œil + light (top-right) idem */
+html.ecart-light-mode .ecart-focus-btn,
+html.ecart-light-mode .ecart-light-btn {
+  background:   rgba(0,0,0,0.80) !important;
+  border-color: rgba(0,0,0,0.40) !important;
+  color:        rgba(255,255,255,0.96) !important;
+}
+
+html.ecart-light-mode .ecart-focus-btn:hover,
+html.ecart-light-mode .ecart-light-btn:hover {
+  background:   rgba(0,0,0,0.92) !important;
+  border-color: rgba(0,0,0,0.60) !important;
+}
+
+html.ecart-light-mode .ecart-focus-btn.is-active,
+html.ecart-light-mode .ecart-light-btn.is-active {
+  background:   #000 !important;
+  color:        #fff !important;
   border-color: transparent !important;
 }
 

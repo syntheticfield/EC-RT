@@ -88,12 +88,41 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     MODE FOCUS — bouton ŒIL injecté dans .sidebar-top
+     TOAST — "SURFACE PHOTOSENSIBLE : ON / OFF"
+     ────────────────────────────────────────────────────── */
+
+  function showToast(message) {
+    const existing = qs(".ecart-toast");
+    if (existing) existing.remove();
+
+    const toast = document.createElement("div");
+    toast.className   = "ecart-toast";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 2700);
+  }
+
+  /* ──────────────────────────────────────────────────────
+     CONTENEUR TOP-RIGHT — crée #ecartTopRight une seule fois
+     ────────────────────────────────────────────────────── */
+
+  function getOrCreateTopRight() {
+    let el = qs("#ecartTopRight");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "ecartTopRight";
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  /* ──────────────────────────────────────────────────────
+     MODE FOCUS — bouton ŒIL (top-right)
      ────────────────────────────────────────────────────── */
 
   function initFocusMode() {
-    const sidebarTop = qs(".sidebar-top");
-    if (!sidebarTop) return;
+    const container = getOrCreateTopRight();
 
     const btn = document.createElement("button");
     btn.id        = "ecartFocusToggle";
@@ -102,9 +131,8 @@
     btn.setAttribute("aria-label", "Mode immersif");
     btn.innerHTML = SVG_EYE_OPEN + SVG_EYE_CLOSED;
 
-    sidebarTop.appendChild(btn);
+    container.appendChild(btn);
 
-    /* Restaure l'état depuis localStorage */
     let isActive = localStorage.getItem(FOCUS_KEY) === "1";
 
     function applyFocus(active) {
@@ -112,35 +140,34 @@
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-label", active ? "Quitter le mode immersif" : "Mode immersif");
       localStorage.setItem(FOCUS_KEY, active ? "1" : "0");
-      if (active) closeAllPanelsExcept("__none__");
+      if (active) {
+        /* Ferme MAP et INFO — le panel SOUND reste accessible */
+        closeAllPanelsExcept("sound");
+      }
     }
 
     if (isActive) applyFocus(true);
-
-    btn.addEventListener("click", () => {
-      isActive = !isActive;
-      applyFocus(isActive);
-    });
+    btn.addEventListener("click", () => { isActive = !isActive; applyFocus(isActive); });
   }
 
   /* ──────────────────────────────────────────────────────
-     MODE JOUR (LIGHT) — bouton dans le cluster
-     filter: invert(1) sur <html>
+     MODE JOUR (LIGHT) — bouton ☀ (top-right, sous l'œil)
+     filter: invert(0.88)… sur <html>
+     canvas non ré-inversé → scènes 3D affectées
      ────────────────────────────────────────────────────── */
 
   function initLightMode() {
-    const cluster = qs("#ecartUiCluster");
-    if (!cluster) return;
+    const container = getOrCreateTopRight();
 
     const btn = document.createElement("button");
     btn.id        = "ecartLightToggle";
+    btn.className = "ecart-light-btn";
     btn.type      = "button";
     btn.setAttribute("aria-label", "Mode jour");
     btn.innerHTML = SVG_SUN;
 
-    cluster.insertBefore(btn, cluster.firstChild);
+    container.appendChild(btn);
 
-    /* Restaure l'état depuis localStorage */
     let isLight = localStorage.getItem(LIGHT_KEY) === "1";
 
     function applyLight(on) {
@@ -148,14 +175,14 @@
       btn.classList.toggle("is-active", on);
       btn.setAttribute("aria-label", on ? "Mode nuit" : "Mode jour");
       localStorage.setItem(LIGHT_KEY, on ? "1" : "0");
+      /* Toast affiché APRÈS le toggle pour hériter du bon mode visuel */
+      requestAnimationFrame(() => {
+        showToast(on ? "SURFACE PHOTOSENSIBLE : ON" : "SURFACE PHOTOSENSIBLE : OFF");
+      });
     }
 
     if (isLight) applyLight(true);
-
-    btn.addEventListener("click", () => {
-      isLight = !isLight;
-      applyLight(isLight);
-    });
+    btn.addEventListener("click", () => { isLight = !isLight; applyLight(isLight); });
   }
 
   /* ──────────────────────────────────────────────────────
@@ -576,8 +603,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initCluster();
-    initLightMode();   /* ← bouton ☀ dans le cluster */
-    initFocusMode();   /* ← bouton œil dans sidebar-top */
+    initFocusMode();   /* œil en haut dans #ecartTopRight */
+    initLightMode();   /* ☀ en dessous dans #ecartTopRight */
     initSoundDirect();
     initInfoPanel();
     initMapPanel();
