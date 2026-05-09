@@ -1,67 +1,80 @@
-const links = document.querySelectorAll('.section-link');
-const zones = document.querySelectorAll('.hover-zone');
-const locators = document.querySelectorAll('.locator');
+/* =========================
+   EC@RT — HOME SCRIPT
+   Plan interactif : hover zones ↔ sidebar links ↔ locators
+   Compatible zone-link / data-zone-link (même structure que les zones)
+   ========================= */
+
+const links    = document.querySelectorAll('.zone-link[data-zone-link]');
+const zones    = document.querySelectorAll('.hover-zone[data-section]');
+const locators = document.querySelectorAll('.locator[data-section]');
+const glow     = document.getElementById('zoneGlow');
+
+/* ── Active state ───────────────────────────────────── */
 
 function clearActive() {
-  links.forEach(link => link.classList.remove('active'));
-  zones.forEach(zone => zone.classList.remove('active'));
-  locators.forEach(locator => locator.classList.remove('active'));
+  links.forEach(l    => l.classList.remove('active', 'is-hovered'));
+  zones.forEach(z    => z.classList.remove('active'));
+  locators.forEach(l => l.classList.remove('active'));
+  if (glow) glow.classList.remove('active');
 }
 
-function setActive(id) {
+function setActive(sectionId) {
   clearActive();
 
-  const link = document.querySelector(`.section-link[data-section="${id}"]`);
-  const zone = document.querySelector(`.hover-zone[data-section="${id}"]`);
-  const locator = document.querySelector(`.locator[data-section="${id}"]`);
-
+  /* sidebar : data-zone-link */
+  const link = document.querySelector(`.zone-link[data-zone-link="${sectionId}"]`);
   if (link) link.classList.add('active');
-  if (zone) zone.classList.add('active');
+
+  /* hover-zone + locator : data-section */
+  const zone    = document.querySelector(`.hover-zone[data-section="${sectionId}"]`);
+  const locator = document.querySelector(`.locator[data-section="${sectionId}"]`);
+  if (zone)    zone.classList.add('active');
   if (locator) locator.classList.add('active');
+
+  /* glow positionné sur la hover-zone */
+  if (glow && zone) {
+    const z = zone;
+    glow.style.left   = z.style.left   || '';
+    glow.style.top    = z.style.top    || '';
+    glow.style.width  = z.style.width  || '';
+    glow.style.height = z.style.height || '';
+    glow.classList.add('active');
+  }
 }
 
-function goToZone(id) {
-  const link = document.querySelector(`.section-link[data-section="${id}"]`);
+/* ── Navigation vers une zone ───────────────────────── */
+
+function goToZone(sectionId) {
+  const link = document.querySelector(`.zone-link[data-zone-link="${sectionId}"]`);
   if (link && link.getAttribute('href')) {
     window.location.href = link.getAttribute('href');
   }
 }
 
-function bindHover(el) {
-  const id = el.dataset.section;
+/* ── Bind hover — sidebar links ─────────────────────── */
+
+links.forEach(link => {
+  const id = link.dataset.zoneLink;
   if (!id) return;
+  link.addEventListener('mouseenter', () => setActive(id));
+  link.addEventListener('focus',      () => setActive(id));
+  link.addEventListener('mouseleave', clearActive);
+  link.addEventListener('blur',       clearActive);
+});
 
-  el.addEventListener('mouseenter', () => setActive(id));
-  el.addEventListener('focus', () => setActive(id));
-  el.addEventListener('mouseleave', clearActive);
-  el.addEventListener('blur', clearActive);
-}
+/* ── Bind hover + click — hover-zones ──────────────── */
 
-function bindZoneClick(zone) {
+zones.forEach(zone => {
   const id = zone.dataset.section;
   if (!id) return;
 
-  zone.addEventListener('click', (event) => {
-    event.preventDefault();
+  zone.addEventListener('mouseenter', () => setActive(id));
+  zone.addEventListener('focus',      () => setActive(id));
+  zone.addEventListener('mouseleave', clearActive);
+  zone.addEventListener('blur',       clearActive);
+
+  zone.addEventListener('click', e => {
+    e.preventDefault();
     goToZone(id);
   });
-}
-
-links.forEach(bindHover);
-zones.forEach(bindHover);
-zones.forEach(bindZoneClick);
-
-/* mobile menu */
-const menuToggle = document.querySelector('.menu-toggle');
-
-if (menuToggle) {
-  menuToggle.addEventListener('click', () => {
-    if (window.innerWidth <= 768 && document.body.classList.contains('has-mobile-menu')) {
-      document.body.classList.toggle('menu-open');
-      menuToggle.setAttribute(
-        'aria-expanded',
-        document.body.classList.contains('menu-open') ? 'true' : 'false'
-      );
-    }
-  });
-}
+});

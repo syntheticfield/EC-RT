@@ -1,10 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description (fr)",
+    title: "MAMCO Entry Mediation(fr)",
     file: "../../assets/son/FR/ENTRY.mp3"
   },
   {
-    title: "Audio Description (eng)",
+    title: "MAMCO Entry Mediation (eng)",
     file: "../../assets/son/EN/ENTRY2.mp3"
   },
 ];
