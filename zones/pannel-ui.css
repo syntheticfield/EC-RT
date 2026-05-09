@@ -1090,3 +1090,27 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   #infoPanel.is-open .info-description { font-size: 0.66rem !important; line-height: 1.36 !important; }
   #infoPanel.is-open .info-ref-item { font-size: 0.61rem !important; }
 }
+@media (pointer: coarse) {
+
+  :root {
+    --ecart-ui-size: 68px;
+  }
+
+  .ecart-ui-cluster > button {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.14em;
+    border-width: 1.4px;
+  }
+
+  .map-nav-btn {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1rem !important;
+  }
+
+  .ecart-focus-btn,
+  .ecart-light-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
