@@ -1,5 +1,5 @@
 /* ==========================================================
-   EC@RT — PANEL UI  v7
+   EC@RT — PANEL UI  v8
    ========================================================== */
 
 :root {
@@ -7,9 +7,7 @@
   --ecart-ui-gap:     8px;
   --ecart-ui-right:   18px;
   --ecart-ui-bottom:  calc(20px + env(safe-area-inset-bottom, 0px));
-
   --ecart-audio-bar-h: 59px;
-
   --ecart-z-title:    100020;
   --ecart-z-button:   100050;
   --ecart-z-panel:    100015;
@@ -27,8 +25,8 @@
 
 
 /* ==========================================================
-   CLUSTER — SOUND MAP INFO cachés tant que fermé,
-   révélés en éventail à l'ouverture
+   CLUSTER — SOUND / MAP / INFO + LIGHT
+   Pas de bouton MENU, boutons toujours visibles
    ========================================================== */
 
 .ecart-ui-cluster {
@@ -49,11 +47,10 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 
 /* ==========================================================
-   BASE BOUTON
+   BASE BOUTON — lisible, contraste suffisant
    ========================================================== */
 
-.ecart-ui-cluster > button,
-.ecart-ui-menu-btn {
+.ecart-ui-cluster > button {
   width:  var(--ecart-ui-size);
   height: var(--ecart-ui-size);
   flex-shrink: 0;
@@ -61,17 +58,17 @@ body.ecart-audio-active .ecart-ui-cluster {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.13);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.50);
+  border: 1px solid rgba(255,255,255,0.30);
+  background: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.86);
   font-size:      0.50rem;
   font-weight:    700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.30);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -79,32 +76,15 @@ body.ecart-audio-active .ecart-ui-cluster {
     background   0.18s ease,
     color        0.18s ease,
     border-color 0.18s ease,
-    transform    0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity      0.16s ease;
+    box-shadow   0.18s ease,
+    transform    0.14s ease;
 }
 
-/* ▼ SOUND / MAP / INFO : cachés (opacity 0) quand cluster fermé */
-.ecart-ui-cluster > button:not(.ecart-ui-menu-btn) {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(8px) scale(0.82);
-}
-
-/* Révélation avec stagger (ordre DOM : sound=1, map=2, info=3) */
-.ecart-ui-cluster.is-open > button:not(.ecart-ui-menu-btn) {
-  opacity: 1;
-  pointer-events: auto;
-  transform: none;
-}
-.ecart-ui-cluster.is-open > button:nth-child(3) { transition-delay: 0.00s; }
-.ecart-ui-cluster.is-open > button:nth-child(2) { transition-delay: 0.05s; }
-.ecart-ui-cluster.is-open > button:nth-child(1) { transition-delay: 0.10s; }
-
-.ecart-ui-cluster > button:hover,
-.ecart-ui-menu-btn:hover {
-  background:   rgba(255,255,255,0.13);
-  color:        rgba(255,255,255,0.82);
-  border-color: rgba(255,255,255,0.22);
+.ecart-ui-cluster > button:hover {
+  background:   rgba(255,255,255,0.24);
+  color:        rgba(255,255,255,1);
+  border-color: rgba(255,255,255,0.48);
+  box-shadow:   0 2px 14px rgba(0,0,0,0.34);
 }
 
 .ecart-ui-cluster > button.is-open,
@@ -112,64 +92,116 @@ body.ecart-audio-active .ecart-ui-cluster {
   background:   rgba(255,255,255,0.96);
   color:        #000;
   border-color: transparent;
-  box-shadow:   0 2px 12px rgba(255,255,255,0.12);
+  box-shadow:   0 2px 12px rgba(255,255,255,0.16);
 }
 
-.ecart-ui-cluster > button:active,
-.ecart-ui-menu-btn:active { transform: scale(0.90); }
+.ecart-ui-cluster > button:active { transform: scale(0.90); }
 
 
 /* ==========================================================
-   BOUTON MENU
+   BOUTON ŒIL — focus mode, injecté dans .sidebar-top
+   Même style que .home-button
    ========================================================== */
 
-.ecart-ui-menu-btn { position: relative; }
-
-.ecart-menu-label {
-  position: absolute;
-  inset: 0;
+.ecart-focus-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.16s ease, transform 0.16s ease;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.82);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition:
+    background   0.18s ease,
+    border-color 0.18s ease,
+    color        0.18s ease,
+    transform    0.14s ease;
+  pointer-events: auto;
 }
 
-.ecart-menu-label--open {
-  opacity: 0;
-  transform: rotate(-45deg) scale(0.6);
-  font-size: 1rem;
-  font-weight: 300;
+.ecart-focus-btn:hover {
+  background:   rgba(255,255,255,0.13);
+  border-color: rgba(255,255,255,0.36);
 }
 
-.ecart-ui-cluster.is-open .ecart-ui-menu-btn {
-  background:   rgba(255,255,255,0.96);
-  color:        #000;
+.ecart-focus-btn:active { transform: scale(0.90); }
+
+/* Actif : fond blanc comme home-button sélectionné */
+.ecart-focus-btn.is-active {
+  background:   rgba(255,255,255,0.92);
   border-color: transparent;
+  color:        #000;
 }
-.ecart-ui-cluster.is-open .ecart-menu-label--closed {
+
+/* Bascule icône œil ouvert / fermé */
+.ecart-focus-btn .eye-open  { display: block; }
+.ecart-focus-btn .eye-closed { display: none; }
+
+body.ecart-focus-mode .ecart-focus-btn .eye-open  { display: none; }
+body.ecart-focus-mode .ecart-focus-btn .eye-closed { display: block; }
+
+
+/* ==========================================================
+   MODE FOCUS — cache le cluster (SOUND / MAP / INFO / LIGHT)
+   La sidebar, le logo et le nom de zone restent accessibles
+   ========================================================== */
+
+body.ecart-focus-mode .ecart-ui-cluster {
   opacity: 0;
-  transform: rotate(45deg) scale(0.6);
-}
-.ecart-ui-cluster.is-open .ecart-menu-label--open {
-  opacity: 1;
-  transform: none;
-}
-
-body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
-  animation: ecartMenuPulse 3s ease-in-out infinite;
-  border-color: rgba(255,255,255,0.22);
-  color: rgba(255,255,255,0.70);
+  pointer-events: none;
+  transform: translateY(6px);
+  transition:
+    opacity   0.22s ease,
+    transform 0.22s ease,
+    bottom    0.30s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes ecartMenuPulse {
-  0%,100% { box-shadow: 0 0 0  0px rgba(255,255,255,0.06); }
-      50% { box-shadow: 0 0 0  5px rgba(255,255,255,0.04); }
+/* Ferme aussi les panels si ouverts */
+body.ecart-focus-mode #infoPanel,
+body.ecart-focus-mode #mobileMapOverlay,
+body.ecart-focus-mode #ecartAudioPanel {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 
 /* ==========================================================
-   OVERLAYS — INFO + MAP + SOUND : structure identique
-   fixed plein écran, card centrée
+   MODE JOUR (LIGHT) — inversion colorimétrique globale
+   Les images/canvas/vidéos sont ré-inversées pour rester lisibles
+   ========================================================== */
+
+html.ecart-light-mode {
+  filter: invert(1);
+}
+
+html.ecart-light-mode img,
+html.ecart-light-mode video,
+html.ecart-light-mode canvas,
+html.ecart-light-mode iframe,
+html.ecart-light-mode .mini-map-image {
+  filter: invert(1);
+}
+
+/* Bouton LIGHT actif dans le cluster */
+#ecartLightToggle.is-active {
+  background:   rgba(255,255,255,0.96) !important;
+  color:        #000 !important;
+  border-color: transparent !important;
+}
+
+
+/* ==========================================================
+   OVERLAYS — INFO + MAP + SOUND (structure identique)
    ========================================================== */
 
 #infoPanel,
@@ -205,7 +237,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   visibility: hidden;
   transition: opacity 0.22s ease, visibility 0s linear 0.22s;
 
-  /* reset les anciens styles "small card" ecartAudioPanel */
   width:  auto !important;
   height: auto !important;
   border: none !important;
@@ -251,7 +282,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 
 /* ==========================================================
-   TITRE PANEL — unifié (INFO .info-title, SOUND .ecart-audio-panel-title)
+   TITRE PANEL — unifié
    ========================================================== */
 
 .info-title,
@@ -316,7 +347,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   width: min(100%, 480px) !important;
 }
 
-/* Bloc lecteur en cours */
 .ecart-audio-main {
   display: flex;
   align-items: center;
@@ -379,7 +409,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   transition: width 0.25s linear;
 }
 
-/* Tracklist */
 .ecart-audio-tracklist {
   display: flex;
   flex-direction: column;
@@ -444,7 +473,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 
 /* ==========================================================
-   MAP — panneau intérieur (full-height, flex)
+   MAP — panneau intérieur
    ========================================================== */
 
 .mobile-map-panel {
@@ -473,7 +502,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 
 /* ==========================================================
-   MAP — barre de navigation flèches
+   MAP — barre nav flèches
    ========================================================== */
 
 .mobile-map-status-wrap {
@@ -497,9 +526,9 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.60);
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.72);
   font-size: 0.80rem;
   cursor: pointer;
   touch-action: manipulation;
@@ -512,18 +541,10 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
     transform    0.12s ease;
 }
 
-/* Flèche armée (1er tap) — s'allume */
-.map-nav-btn.is-armed {
-  background:   rgba(255,255,255,0.20) !important;
-  color:        rgba(255,255,255,0.96) !important;
-  border-color: rgba(255,255,255,0.50) !important;
-  box-shadow:   0 0 8px rgba(255,255,255,0.18) !important;
-}
-
 .map-nav-btn:hover {
-  background:   rgba(255,255,255,0.12);
-  color:        rgba(255,255,255,0.90);
-  border-color: rgba(255,255,255,0.26);
+  background:   rgba(255,255,255,0.16);
+  color:        rgba(255,255,255,0.96);
+  border-color: rgba(255,255,255,0.34);
 }
 .map-nav-btn:active { transform: scale(0.88); }
 
@@ -570,7 +591,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   background: #000;
   border: 1px solid rgba(255,255,255,0.07);
   overflow: hidden;
-  /* Corrige le dépassement sur iOS */
   clip-path: inset(0 round 0px);
 }
 
@@ -590,10 +610,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 /* ==========================================================
    MINI-ZONES — états visuels
-   (animation idle supprimée → perf tablette)
-
-   Hiérarchie lumineuse :
-   base → visited → hover → armed → current
    ========================================================== */
 
 .mobile-mini-map-wrap .mini-zone {
@@ -601,7 +617,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   z-index: 2;
   display: block;
   border-radius: 8px;
-  /* border transparent par défaut, présent pour éviter le layout shift */
   border: 1.5px solid transparent;
   background: rgba(255,255,255,0.16);
   opacity: 0.38;
@@ -614,7 +629,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Touch target étendu — ne dépasse pas visuellement grâce à overflow:hidden */
 .mobile-mini-map-wrap .mini-zone::before {
   content: "";
   position: absolute;
@@ -622,13 +636,9 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   pointer-events: auto;
 }
 
-/* ▼ Corrections overlap :
-   Zone-11 est imbriquée dans zone-10 → z-index supérieur
-   Zone-9  est adjacente à zone-8    → légèrement au-dessus */
 .mobile-mini-map-wrap .mini-zone-11 { z-index: 6 !important; }
 .mobile-mini-map-wrap .mini-zone-9  { z-index: 4 !important; }
 
-/* HOVER */
 .mobile-mini-map-wrap .mini-zone:hover,
 .mobile-mini-map-wrap .mini-zone.is-hovered {
   animation: none !important;
@@ -639,7 +649,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   transform: scale(1.04) !important;
 }
 
-/* ▼ VISITÉE — contour blanc léger signalant la présence */
 .mobile-mini-map-wrap .mini-zone.is-visited {
   opacity: 0.58;
   background: rgba(255,255,255,0.26);
@@ -647,7 +656,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   box-shadow: 0 0 8px rgba(255,255,255,0.10);
 }
 
-/* ▼ ARMÉE (1er tap zone ou flèche) — lumineux + contour blanc */
 .mobile-mini-map-wrap .mini-zone.is-armed {
   animation: miniZoneArmedBreath 2.4s ease-in-out infinite !important;
   opacity: 0.94 !important;
@@ -656,7 +664,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   box-shadow: 0 0 0 1px rgba(255,255,255,0.5) !important;
 }
 
-/* ▼ ZONE COURANTE — le plus lumineux, glow max + contour plein */
 .mobile-mini-map-wrap .mini-zone.is-current,
 .mobile-mini-map-wrap .mini-zone.active {
   animation: miniZoneCurrentBreath 3.0s ease-in-out infinite !important;
@@ -708,11 +715,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
-
-#ecartAudioBar.is-visible {
-  transform: translateY(0);
-  pointer-events: auto;
-}
+#ecartAudioBar.is-visible { transform: translateY(0); pointer-events: auto; }
 
 .ecart-audio-body {
   display: flex;
@@ -795,18 +798,18 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   0%,100% {
     transform: scale(1.022);
     box-shadow:
-      0 0 0   1.5px rgba(255,255,255,0.92),
-      0 0 20px     rgba(255,255,255,0.90),
-      0 0 40px     rgba(255,255,255,0.58),
-      0 0 64px     rgba(255,255,255,0.34);
+      0 0 0 1.5px rgba(255,255,255,0.92),
+      0 0 20px    rgba(255,255,255,0.90),
+      0 0 40px    rgba(255,255,255,0.58),
+      0 0 64px    rgba(255,255,255,0.34);
   }
   50% {
     transform: scale(1.075);
     box-shadow:
-      0 0 0   2px  rgba(255,255,255,1),
-      0 0 30px     rgba(255,255,255,1),
-      0 0 58px     rgba(255,255,255,0.84),
-      0 0 92px     rgba(255,255,255,0.52);
+      0 0 0 2px   rgba(255,255,255,1),
+      0 0 30px    rgba(255,255,255,1),
+      0 0 58px    rgba(255,255,255,0.84),
+      0 0 92px    rgba(255,255,255,0.52);
   }
 }
 
@@ -819,7 +822,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
   :root { --ecart-ui-size: 48px; }
 }
 
-/* ▼ PORTRAIT MOBILE */
 @media (max-width: 480px) and (orientation: portrait) {
   :root {
     --ecart-ui-size:     48px;
@@ -829,8 +831,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
     --ecart-audio-bar-h: 55px;
   }
 
-  .ecart-ui-cluster > button,
-  .ecart-ui-menu-btn { font-size: 0.44rem !important; }
+  .ecart-ui-cluster > button { font-size: 0.44rem !important; }
 
   #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
     left: 0 !important;
@@ -855,26 +856,17 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
     padding: 14px !important;
   }
 
-  .mobile-map-panel {
-    width: 100% !important;
-    height: calc(100dvh - 102px) !important;
-  }
+  .mobile-map-panel { width: 100% !important; height: calc(100dvh - 102px) !important; }
 
-  /* ▼ Minimap contrainte en hauteur → plus grande en portrait */
   .mobile-mini-map-wrap {
     width: auto !important;
     height: min(66dvh, 78vw) !important;
     max-height: min(66dvh, 78vw) !important;
   }
 
-  .map-nav-btn {
-    width: 34px !important;
-    height: 34px !important;
-    font-size: 0.88rem !important;
-  }
+  .map-nav-btn { width: 34px !important; height: 34px !important; font-size: 0.88rem !important; }
 }
 
-/* ▼ PAYSAGE compact */
 @media (max-height: 620px) and (orientation: landscape) {
   :root {
     --ecart-ui-size:     44px;
@@ -924,7 +916,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 
 .ecart-ui-cluster { z-index: 100050 !important; }
 
-.sidebar, .sidebar-top, .site-title, .menu-toggle, .home-button {
+.sidebar, .sidebar-top, .site-title, .menu-toggle, .home-button, .ecart-focus-btn {
   z-index: 100060 !important;
 }
 
@@ -955,10 +947,7 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
 }
 #infoPanel.is-open .info-description p { margin: 0 !important; }
 #infoPanel.is-open .info-ref { margin-top: 16px !important; }
-#infoPanel.is-open .info-ref h3 {
-  font-size: 0.58rem !important;
-  margin-bottom: 8px !important;
-}
+#infoPanel.is-open .info-ref h3 { font-size: 0.58rem !important; margin-bottom: 8px !important; }
 #infoPanel.is-open .info-ref-item {
   font-size: 0.66rem !important;
   line-height: 1.35 !important;
@@ -972,9 +961,6 @@ body.ecart-audio-active .ecart-ui-cluster:not(.is-open) .ecart-ui-menu-btn {
     max-height: calc(100dvh - 110px) !important;
   }
   #infoPanel.is-open .info-title { font-size: 0.62rem !important; }
-  #infoPanel.is-open .info-description {
-    font-size: 0.66rem !important;
-    line-height: 1.36 !important;
-  }
+  #infoPanel.is-open .info-description { font-size: 0.66rem !important; line-height: 1.36 !important; }
   #infoPanel.is-open .info-ref-item { font-size: 0.61rem !important; }
 }

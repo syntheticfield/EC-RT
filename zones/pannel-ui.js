@@ -1,12 +1,18 @@
 /* ==========================================================
-   EC@RT — INTERFACE UNIFIÉE v7
-   SOUND panel = overlay identique à MAP / INFO
-   MAP — flèches 2 temps (arm → navigate)
-   MENU — ferme les panels sans couper le son
+   EC@RT — INTERFACE UNIFIÉE v8
    ========================================================== */
 
 (function () {
-  const STORAGE_KEY = "ecart_visited_zones";
+  const STORAGE_KEY       = "ecart_visited_zones";
+  const LIGHT_KEY         = "ecart_light_mode";
+  const FOCUS_KEY         = "ecart_focus_mode";
+
+  /* SVG inline */
+  const SVG_EYE_OPEN = `<svg class="eye-open" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+
+  const SVG_EYE_CLOSED = `<svg class="eye-closed" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
+  const SVG_SUN = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>`;
 
   function qs(sel, root)  { return (root || document).querySelector(sel); }
   function qsa(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
@@ -17,8 +23,6 @@
     );
   }
 
-  /* Ferme tous les panels SAUF `name`.
-     Passer "__none__" ferme tout sans exception. */
   function closeAllPanelsExcept(name) {
     document.dispatchEvent(
       new CustomEvent("ecart:panel-close-others", { detail: { panel: name } })
@@ -55,7 +59,9 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     CLUSTER — MENU / SOUND / MAP / INFO
+     CLUSTER — SOUND / MAP / INFO / LIGHT
+     Pas de bouton MENU, boutons toujours visibles
+     La sidebar (EC@RT toggle) n'interagit PLUS avec le cluster
      ────────────────────────────────────────────────────── */
 
   function initCluster() {
@@ -69,74 +75,92 @@
     cluster.className = "ecart-ui-cluster";
     cluster.id = "ecartUiCluster";
 
-    const menuBtn = document.createElement("button");
-    menuBtn.type = "button";
-    menuBtn.className = "ecart-ui-menu-btn";
-    menuBtn.setAttribute("aria-label", "Ouvrir les contrôles");
-    menuBtn.setAttribute("aria-expanded", "false");
-    menuBtn.innerHTML =
-      '<span class="ecart-menu-label ecart-menu-label--closed">MENU</span>' +
-      '<span class="ecart-menu-label ecart-menu-label--open">✕</span>';
-
     if (soundBtn) cluster.appendChild(soundBtn);
     if (mapBtn)   cluster.appendChild(mapBtn);
     if (infoBtn)  cluster.appendChild(infoBtn);
 
-    cluster.appendChild(menuBtn);
     document.body.appendChild(cluster);
 
-    let isOpen = false;
-
-    function openCluster() {
-      isOpen = true;
-      cluster.classList.add("is-open");
-      menuBtn.setAttribute("aria-expanded", "true");
-      menuBtn.setAttribute("aria-label", "Fermer les contrôles");
-    }
-
-    function closeCluster() {
-      isOpen = false;
-      cluster.classList.remove("is-open");
-      menuBtn.setAttribute("aria-expanded", "false");
-      menuBtn.setAttribute("aria-label", "Ouvrir les contrôles");
-      /*
-       * ▼ Ferme les panels (cache les UI) SANS couper le son.
-       *   Les handlers sound/map/info écoutent cet event et appellent
-       *   setPanelVisible(false) / closeMap() / closePanel() qui
-       *   cachent l'interface mais ne touchent pas à l'audio.
-       */
-      closeAllPanelsExcept("__none__");
-    }
-
-    menuBtn.addEventListener("click", e => {
-      e.stopPropagation();
-      isOpen ? closeCluster() : openCluster();
-    });
-
-    /* Escape ferme le cluster + les panels */
+    /* Escape ferme tous les panels ouverts */
     document.addEventListener("keydown", e => {
-      if (e.key === "Escape") closeCluster();
+      if (e.key === "Escape") closeAllPanelsExcept("__none__");
     });
-
-    /* ▼ Le bouton sidebar (EC@RT) ferme aussi les panels et le cluster */
-    const sidebarToggle = qs(".menu-toggle");
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener("click", () => {
-        closeAllPanelsExcept("__sidebar__");
-        if (isOpen) {
-          isOpen = false;
-          cluster.classList.remove("is-open");
-          menuBtn.setAttribute("aria-expanded", "false");
-          menuBtn.setAttribute("aria-label", "Ouvrir les contrôles");
-        }
-      });
-    }
-
-    window._ecartCluster = { open: openCluster, close: closeCluster };
   }
 
   /* ──────────────────────────────────────────────────────
-     SOUND — overlay identique à MAP / INFO
+     MODE FOCUS — bouton ŒIL injecté dans .sidebar-top
+     ────────────────────────────────────────────────────── */
+
+  function initFocusMode() {
+    const sidebarTop = qs(".sidebar-top");
+    if (!sidebarTop) return;
+
+    const btn = document.createElement("button");
+    btn.id        = "ecartFocusToggle";
+    btn.className = "ecart-focus-btn";
+    btn.type      = "button";
+    btn.setAttribute("aria-label", "Mode immersif");
+    btn.innerHTML = SVG_EYE_OPEN + SVG_EYE_CLOSED;
+
+    sidebarTop.appendChild(btn);
+
+    /* Restaure l'état depuis localStorage */
+    let isActive = localStorage.getItem(FOCUS_KEY) === "1";
+
+    function applyFocus(active) {
+      document.body.classList.toggle("ecart-focus-mode", active);
+      btn.classList.toggle("is-active", active);
+      btn.setAttribute("aria-label", active ? "Quitter le mode immersif" : "Mode immersif");
+      localStorage.setItem(FOCUS_KEY, active ? "1" : "0");
+      if (active) closeAllPanelsExcept("__none__");
+    }
+
+    if (isActive) applyFocus(true);
+
+    btn.addEventListener("click", () => {
+      isActive = !isActive;
+      applyFocus(isActive);
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────
+     MODE JOUR (LIGHT) — bouton dans le cluster
+     filter: invert(1) sur <html>
+     ────────────────────────────────────────────────────── */
+
+  function initLightMode() {
+    const cluster = qs("#ecartUiCluster");
+    if (!cluster) return;
+
+    const btn = document.createElement("button");
+    btn.id        = "ecartLightToggle";
+    btn.type      = "button";
+    btn.setAttribute("aria-label", "Mode jour");
+    btn.innerHTML = SVG_SUN;
+
+    cluster.insertBefore(btn, cluster.firstChild);
+
+    /* Restaure l'état depuis localStorage */
+    let isLight = localStorage.getItem(LIGHT_KEY) === "1";
+
+    function applyLight(on) {
+      document.documentElement.classList.toggle("ecart-light-mode", on);
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-label", on ? "Mode nuit" : "Mode jour");
+      localStorage.setItem(LIGHT_KEY, on ? "1" : "0");
+    }
+
+    if (isLight) applyLight(true);
+
+    btn.addEventListener("click", () => {
+      isLight = !isLight;
+      applyLight(isLight);
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────
+     SOUND — overlay fullscreen (même structure que MAP/INFO)
+     Fermeture du panel ne coupe PAS le son
      ────────────────────────────────────────────────────── */
 
   function initSoundDirect() {
@@ -145,10 +169,8 @@
 
     let sounds = Array.isArray(window.ECART_SOUND) ? [...window.ECART_SOUND] : [];
 
-    const hasVoiceAlready = sounds.some(s => s.type === "voice");
-    if (!hasVoiceAlready) {
-      sounds.push({ title: "Voix de l'écran", type: "voice" });
-    }
+    const hasVoice = sounds.some(s => s.type === "voice");
+    if (!hasVoice) sounds.push({ title: "Voix de l'écran", type: "voice" });
 
     if (!sounds.length) {
       btn.disabled = true;
@@ -163,10 +185,6 @@
     const audio = new Audio();
     audio.preload = "metadata";
 
-    /*
-     * ▼ Panel = overlay fullscreen (même structure que #infoPanel)
-     *   .ecart-audio-panel-inner = la card centrée
-     */
     const panel = document.createElement("div");
     panel.id = "ecartAudioPanel";
     panel.setAttribute("aria-hidden", "true");
@@ -174,28 +192,15 @@
     panel.innerHTML = `
       <div class="ecart-audio-panel-inner">
         <h2 class="ecart-audio-panel-title">SOUND</h2>
-
         <div class="ecart-audio-main">
-          <button
-            class="ecart-audio-playpause"
-            id="ecartAudioPP"
-            type="button"
-            aria-label="Lecture / Pause"
-          >▶</button>
-
+          <button class="ecart-audio-playpause" id="ecartAudioPP" type="button" aria-label="Lecture / Pause">▶</button>
           <div class="ecart-audio-info">
             <div class="ecart-audio-now" id="ecartAudioNow">Audio</div>
-            <div
-              class="ecart-audio-progress-strip"
-              id="ecartAudioStrip"
-              role="progressbar"
-              aria-valuenow="0"
-            >
+            <div class="ecart-audio-progress-strip" id="ecartAudioStrip" role="progressbar" aria-valuenow="0">
               <div class="ecart-audio-progress-fill" id="ecartAudioFill"></div>
             </div>
           </div>
         </div>
-
         <div class="ecart-audio-tracklist" id="ecartAudioTracklist"></div>
       </div>
     `;
@@ -208,7 +213,7 @@
     const strip     = qs("#ecartAudioStrip",       panel);
     const ppBtn     = qs("#ecartAudioPP",          panel);
 
-    /* ── Visibilité panel (NE TOUCHE PAS À L'AUDIO) ────── */
+    /* ▼ setPanelVisible cache/montre l'UI sans toucher à l'audio */
     function setPanelVisible(on) {
       panel.classList.toggle("is-visible", on);
       panel.setAttribute("aria-hidden", on ? "false" : "true");
@@ -226,7 +231,6 @@
       strip.setAttribute("aria-valuenow", "0");
     }
 
-    /* Arrête le son et la voix */
     function stopAll() {
       audio.pause();
       window.speechSynthesis.cancel();
@@ -248,24 +252,15 @@
       if (info.gameplay)    texts.push(info.gameplay);
       if (Array.isArray(info.references)) texts.push(...info.references);
       const clean = texts.map(t => String(t).replace(/\s+/g, " ").trim()).filter(Boolean);
-      return clean.length ? clean.join(". ") : "Aucune information disponible pour cette zone.";
+      return clean.length ? clean.join(". ") : "Aucune information disponible.";
     }
 
     function speakText(text) {
-      const content = text?.trim() || "Aucun texte lisible détecté dans cette zone.";
+      const content = text?.trim() || "Aucun texte lisible détecté.";
       const utterance = new SpeechSynthesisUtterance(content);
-      utterance.lang   = "fr-FR";
-      utterance.rate   = 0.88;
-      utterance.pitch  = 0.92;
-      utterance.volume = 1;
-      utterance.onstart = () => {
-        currentMode = "voice";
-        setPlaying(true);
-        fill.style.width = "100%";
-        strip.setAttribute("aria-valuenow", "100");
-      };
-      utterance.onend   = () => { setPlaying(false); resetProgress(); };
-      utterance.onerror = () => { setPlaying(false); resetProgress(); };
+      utterance.lang = "fr-FR"; utterance.rate = 0.88; utterance.pitch = 0.92; utterance.volume = 1;
+      utterance.onstart = () => { currentMode = "voice"; setPlaying(true); fill.style.width = "100%"; strip.setAttribute("aria-valuenow", "100"); };
+      utterance.onend = utterance.onerror = () => { setPlaying(false); resetProgress(); };
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     }
@@ -273,26 +268,20 @@
     function loadTrack(index, autoplay = false) {
       currentIndex = index;
       const sound = sounds[currentIndex];
-      stopAll();
-      resetProgress();
+      stopAll(); resetProgress();
       nowEl.textContent = sound.title || `Piste ${currentIndex + 1}`;
       updateActiveTrack();
       setPanelVisible(true);
-
       if (sound.type === "voice") {
         currentMode = "voice";
         audio.removeAttribute("src");
         if (autoplay) speakText(collectScreenText());
         return;
       }
-
       currentMode = "audio";
       if (!sound.file) { console.warn("[EC@RT] Piste sans fichier :", sound); setPlaying(false); return; }
-      audio.src = sound.file;
-      audio.currentTime = 0;
-      audio.load();
-      if (autoplay) play();
-      else setPlaying(false);
+      audio.src = sound.file; audio.currentTime = 0; audio.load();
+      if (autoplay) play(); else setPlaying(false);
     }
 
     function play() {
@@ -317,30 +306,21 @@
       audio.paused ? play() : pause();
     }
 
-    /* Tracklist */
     sounds.forEach((sound, index) => {
       const item = document.createElement("button");
-      item.type = "button";
-      item.className = "ecart-audio-track";
-      item.innerHTML = `
-        <span class="ecart-audio-track-index">${String(index + 1).padStart(2, "0")}</span>
-        <span class="ecart-audio-track-title">${sound.title || `Piste ${index + 1}`}</span>
-        <span class="ecart-audio-track-meta">${sound.date || sound.year || ""}</span>
-      `;
+      item.type = "button"; item.className = "ecart-audio-track";
+      item.innerHTML = `<span class="ecart-audio-track-index">${String(index + 1).padStart(2, "0")}</span><span class="ecart-audio-track-title">${sound.title || `Piste ${index + 1}`}</span><span class="ecart-audio-track-meta">${sound.date || sound.year || ""}</span>`;
       item.addEventListener("click", () => loadTrack(index, true));
       tracklist.appendChild(item);
     });
 
-    /* Progression audio */
     audio.addEventListener("loadedmetadata", resetProgress);
-
     audio.addEventListener("timeupdate", () => {
       if (!audio.duration) return;
       const pct = (audio.currentTime / audio.duration) * 100;
       fill.style.width = `${pct}%`;
       strip.setAttribute("aria-valuenow", Math.round(pct));
     });
-
     audio.addEventListener("ended",  () => { setPlaying(false); resetProgress(); audio.currentTime = 0; });
     audio.addEventListener("error",  () => { console.warn("[EC@RT] Erreur audio :", audio.src); setPlaying(false); resetProgress(); });
 
@@ -349,42 +329,28 @@
       const rect = strip.getBoundingClientRect();
       audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * audio.duration;
     });
-
     strip.addEventListener("touchend", e => {
       if (currentMode === "voice" || !audio.duration) return;
-      const rect  = strip.getBoundingClientRect();
+      const rect = strip.getBoundingClientRect();
       const touch = e.changedTouches[0];
       audio.currentTime = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width)) * audio.duration;
     }, { passive: true });
 
-    /* Bouton SOUND dans le cluster */
     btn.addEventListener("click", () => {
-      const isOpen = panel.classList.contains("is-visible");
-      if (isOpen) {
-        setPanelVisible(false);
-      } else {
-        closeAllPanelsExcept("sound");
-        setPanelVisible(true);
-        updateActiveTrack();
-        emitPanelOpen("sound");
-      }
+      panel.classList.contains("is-visible")
+        ? setPanelVisible(false)
+        : (closeAllPanelsExcept("sound"), setPanelVisible(true), updateActiveTrack(), emitPanelOpen("sound"));
     });
 
     ppBtn.addEventListener("click", togglePlay);
 
-    /* Clic sur l'overlay (hors card) → ferme le panel (pas le son) */
-    panel.addEventListener("click", e => {
-      if (e.target === panel) setPanelVisible(false);
-    });
+    panel.addEventListener("click", e => { if (e.target === panel) setPanelVisible(false); });
 
-    /* ▼ Ferme le panel quand un autre ouvre — NE COUPE PAS LE SON */
+    /* ▼ Ferme le panel UI mais NE COUPE PAS le son */
     document.addEventListener("ecart:panel-close-others", e => {
       if (e.detail?.panel !== "sound") setPanelVisible(false);
     });
-
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape") setPanelVisible(false);
-    });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") setPanelVisible(false); });
 
     loadTrack(0, false);
     setPanelVisible(false);
@@ -408,65 +374,42 @@
     btn.setAttribute("aria-controls", "infoPanel");
 
     if (title) title.textContent = data.title || "Information";
-
     if (description) {
-      const text = data.description || "";
-      description.innerHTML = `<p>${text.replace(/\n/g, "<br><br>")}</p>`;
+      description.innerHTML = `<p>${(data.description || "").replace(/\n/g, "<br><br>")}</p>`;
+      if (data.gameplay) {
+        description.innerHTML += `<div class="info-gameplay"><h3>Gameplay</h3><p>${data.gameplay.replace(/\n/g, "<br><br>")}</p></div>`;
+      }
     }
-
-    if (data.gameplay && description) {
-      description.innerHTML += `
-        <div class="info-gameplay">
-          <h3>Gameplay</h3>
-          <p>${data.gameplay.replace(/\n/g, "<br><br>")}</p>
-        </div>
-      `;
-    }
-
     if (refBox && Array.isArray(data.references) && data.references.length) {
-      refBox.innerHTML =
-        "<h3>Références</h3>" +
-        data.references.map(r => `<div class="info-ref-item">${r}</div>`).join("");
+      refBox.innerHTML = "<h3>Références</h3>" + data.references.map(r => `<div class="info-ref-item">${r}</div>`).join("");
     }
 
-    function openPanel() {
+    function openPanel()  {
       closeAllPanelsExcept("info");
-      panel.classList.add("is-open");
-      btn.classList.add("is-open");
-      panel.setAttribute("aria-hidden", "false");
-      btn.setAttribute("aria-expanded", "true");
+      panel.classList.add("is-open");    btn.classList.add("is-open");
+      panel.setAttribute("aria-hidden", "false"); btn.setAttribute("aria-expanded", "true");
       emitPanelOpen("info");
     }
-
     function closePanel() {
-      panel.classList.remove("is-open");
-      btn.classList.remove("is-open");
-      panel.setAttribute("aria-hidden", "true");
-      btn.setAttribute("aria-expanded", "false");
+      panel.classList.remove("is-open"); btn.classList.remove("is-open");
+      panel.setAttribute("aria-hidden", "true");  btn.setAttribute("aria-expanded", "false");
     }
 
-    btn.addEventListener("click", () => {
-      panel.classList.contains("is-open") ? closePanel() : openPanel();
-    });
-
+    btn.addEventListener("click", () => { panel.classList.contains("is-open") ? closePanel() : openPanel(); });
     panel.addEventListener("click", e => { if (e.target === panel) closePanel(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
-    document.addEventListener("ecart:panel-close-others", e => {
-      if (e.detail?.panel !== "info") closePanel();
-    });
+    document.addEventListener("ecart:panel-close-others", e => { if (e.detail?.panel !== "info") closePanel(); });
   }
 
   /* ──────────────────────────────────────────────────────
-     MAP — flèches 2 temps (arm → navigate)
-     Corrections : e.stopPropagation() sur les zones,
-                   z-index géré en CSS pour les overlaps
+     MAP — flèches navigation directe (1 tap)
+     Zones sur minimap : 2 taps (arm → navigate)
      ────────────────────────────────────────────────────── */
 
   function initMapPanel() {
     const toggle  = qs("#mobileMapToggle");
     const overlay = qs("#mobileMapOverlay");
     const panel   = qs("#mobileMapPanel");
-
     if (!toggle || !overlay || !panel) return;
 
     const zones       = qsa(".mini-zone", overlay);
@@ -475,22 +418,16 @@
 
     if (currentZone) addVisitedZone(currentZone);
 
-    /* ── Liste triée des zones depuis les mini-zones ─────── */
     const zoneList = [...zones]
-      .map(z => ({
-        id:   z.dataset.miniZone,
-        name: z.dataset.zoneName || `Zone ${z.dataset.miniZone}`,
-        href: z.getAttribute("href")
-      }))
+      .map(z => ({ id: z.dataset.miniZone, name: z.dataset.zoneName || `Zone ${z.dataset.miniZone}`, href: z.getAttribute("href") }))
       .filter(z => z.id && z.href)
       .sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-    const curIdx     = zoneList.findIndex(z => z.id === currentZone);
+    const curIdx      = zoneList.findIndex(z => z.id === currentZone);
     const defaultLabel = curIdx >= 0 ? zoneList[curIdx].name : "Sélectionne une zone.";
 
-    /* ── Construction de la barre nav ────────────────────── */
+    /* Barre nav */
     const statusWrap = qs(".mobile-map-status-wrap", overlay);
-
     if (statusWrap) {
       statusWrap.innerHTML = `
         <div class="map-nav-bar">
@@ -505,83 +442,22 @@
     const navPrev = qs("#mapNavPrev");
     const navNext = qs("#mapNavNext");
 
-    /*
-     * ── Système flèches 2 temps ──────────────────────────
-     *
-     * armedByArrow = null                → aucune zone armée par flèche
-     * armedByArrow = { idx, dir, el }    → zone armée, en attente 2e tap
-     *
-     * 1er tap flèche → arm la zone cible sur la minimap + affiche son nom
-     * 2e tap MÊME flèche → navigue vers cette zone
-     * Tap flèche opposée → désarme et re-arm l'autre côté
-     */
-    let armedByArrow = null;
-
-    function clearArrow() {
-      if (armedByArrow?.el) {
-        armedByArrow.el.classList.remove("is-armed");
-        armedByArrow.el.dataset.armed = "false";
-      }
-      if (navPrev) navPrev.classList.remove("is-armed");
-      if (navNext) navNext.classList.remove("is-armed");
-      armedByArrow = null;
-    }
-
-    function armByArrow(idx, dir) {
-      /* Désarme les zones armées manuellement */
-      zones.forEach(z => { z.dataset.armed = "false"; z.classList.remove("is-armed"); });
-      clearArrow();
-
-      const target = zoneList[idx];
-      if (!target) return;
-
-      /* Trouve l'élément minizone correspondant */
-      const el = qs(`.mini-zone[data-mini-zone="${target.id}"]`, overlay);
-
-      if (el) {
-        el.dataset.armed = "true";
-        el.classList.add("is-armed");
-      }
-
-      /* Met en valeur la flèche active */
-      const btn = dir === "prev" ? navPrev : navNext;
-      if (btn) btn.classList.add("is-armed");
-
-      /* Écrit le nom */
-      if (status) typeText(status, `vers ${target.name}…`);
-
-      armedByArrow = { idx, dir, el: el || null };
-    }
-
-    function navigateArmed() {
-      if (!armedByArrow) return;
-      addVisitedZone(zoneList[armedByArrow.idx].id);
-      window.location.href = zoneList[armedByArrow.idx].href;
-    }
-
-    /* Flèche gauche */
+    /* ── Flèches — navigation directe (1 tap) ──────────── */
     if (navPrev && zoneList.length > 1) {
       navPrev.addEventListener("click", e => {
         e.stopPropagation();
         const idx = (curIdx - 1 + zoneList.length) % zoneList.length;
-        if (armedByArrow && armedByArrow.dir === "prev" && armedByArrow.idx === idx) {
-          navigateArmed();
-        } else {
-          armByArrow(idx, "prev");
-        }
+        addVisitedZone(zoneList[idx].id);
+        window.location.href = zoneList[idx].href;
       });
     }
 
-    /* Flèche droite */
     if (navNext && zoneList.length > 1) {
       navNext.addEventListener("click", e => {
         e.stopPropagation();
         const idx = (curIdx + 1) % zoneList.length;
-        if (armedByArrow && armedByArrow.dir === "next" && armedByArrow.idx === idx) {
-          navigateArmed();
-        } else {
-          armByArrow(idx, "next");
-        }
+        addVisitedZone(zoneList[idx].id);
+        window.location.href = zoneList[idx].href;
       });
     }
 
@@ -589,35 +465,24 @@
 
     function setToggleState(isMapOpen) {
       toggle.classList.toggle("is-open", isMapOpen);
-      toggle.setAttribute("aria-expanded",  isMapOpen ? "true"           : "false");
+      toggle.setAttribute("aria-expanded",  isMapOpen ? "true" : "false");
       toggle.setAttribute("aria-label",     isMapOpen ? "Fermer la carte" : "Ouvrir la carte");
-      overlay.setAttribute("aria-hidden",   isMapOpen ? "false"          : "true");
+      overlay.setAttribute("aria-hidden",   isMapOpen ? "false" : "true");
     }
 
-    function stopTyping() {
-      if (typingTimer) { clearInterval(typingTimer); typingTimer = null; }
-    }
+    function stopTyping() { if (typingTimer) { clearInterval(typingTimer); typingTimer = null; } }
 
     function typeText(el, text, speed) {
       if (!el) return;
-      stopTyping();
-      el.textContent = "";
+      stopTyping(); el.textContent = "";
       let i = 0;
-      typingTimer = setInterval(() => {
-        el.textContent = text.slice(0, ++i);
-        if (i >= text.length) stopTyping();
-      }, speed || 24);
+      typingTimer = setInterval(() => { el.textContent = text.slice(0, ++i); if (i >= text.length) stopTyping(); }, speed || 24);
     }
 
-    /* Remet le label au nom de la zone courante */
-    function resetStatus() {
-      stopTyping();
-      if (status) status.textContent = defaultLabel;
-    }
+    function resetStatus() { stopTyping(); if (status) status.textContent = defaultLabel; }
 
     function resetZones() {
       stopTyping();
-      clearArrow(); /* ← réinitialise l'état des flèches */
       zones.forEach(zone => {
         zone.dataset.armed = "false";
         zone.classList.remove("is-armed", "is-hovered");
@@ -642,8 +507,7 @@
       closeAllPanelsExcept("map");
       overlay.classList.add("is-open");
       setToggleState(true);
-      resetZones();
-      resetStatus();
+      resetZones(); resetStatus();
       applyVisitedZones(zones, currentZone);
       emitPanelOpen("map");
     }
@@ -651,23 +515,15 @@
     function closeMap() {
       overlay.classList.remove("is-open");
       setToggleState(false);
-      resetZones();
-      resetStatus();
-      clearHoveredZone();
+      resetZones(); resetStatus(); clearHoveredZone();
     }
 
-    toggle.addEventListener("click", () => {
-      overlay.classList.contains("is-open") ? closeMap() : openMap();
-    });
-
+    toggle.addEventListener("click", () => { overlay.classList.contains("is-open") ? closeMap() : openMap(); });
     overlay.addEventListener("click", e => { if (e.target === overlay) closeMap(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") closeMap(); });
-    document.addEventListener("ecart:panel-close-others", e => {
-      if (e.detail?.panel !== "map") closeMap();
-    });
+    document.addEventListener("ecart:panel-close-others", e => { if (e.detail?.panel !== "map") closeMap(); });
 
-    /* ── Interactions zones minimap ─────────────────────── */
-
+    /* ── Zones minimap — 2 taps (arm → navigate) ─────── */
     zones.forEach(zone => {
       zone.dataset.armed = "false";
 
@@ -680,34 +536,24 @@
 
       zone.addEventListener("mouseleave", () => {
         clearHoveredZone();
-        if (!zones.some(z => z.dataset.armed === "true") && !armedByArrow) resetStatus();
+        if (!zones.some(z => z.dataset.armed === "true")) resetStatus();
       });
 
       zone.addEventListener("click", e => {
-        /*
-         * ▼ stopPropagation corrige le problème de récursivité :
-         *   zone-11 est positionnée DANS zone-10 dans la map.
-         *   Sans stopPropagation, le clic pourrait atteindre une zone parente.
-         */
-        e.stopPropagation();
-
+        e.stopPropagation(); /* corrige l'overlap zone-10/zone-11 */
         const name    = zone.dataset.zoneName || "zone";
         const isArmed = zone.dataset.armed === "true";
 
         if (!isArmed) {
-          /* 1er tap → arm */
           zones.forEach(other => {
             if (other !== zone) { other.dataset.armed = "false"; other.classList.remove("is-armed"); }
           });
-          clearArrow(); /* désarme les flèches si une zone armée manuellement */
-
           zone.dataset.armed = "true";
           zone.classList.add("is-armed");
           if (status) typeText(status, `vers ${name}…`);
           return;
         }
 
-        /* 2e tap → navigue */
         addVisitedZone(zone.dataset.miniZone);
       });
     });
@@ -730,6 +576,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initCluster();
+    initLightMode();   /* ← bouton ☀ dans le cluster */
+    initFocusMode();   /* ← bouton œil dans sidebar-top */
     initSoundDirect();
     initInfoPanel();
     initMapPanel();
