@@ -497,7 +497,9 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     MAP
+     MAP — navigation simplifiée
+     · Flèches SVG grand angle (prev / next)
+     · 1 tap sur une zone = navigation directe
      ────────────────────────────────────────────────────── */
 
   function initMapPanel() {
@@ -508,7 +510,6 @@
 
     const zones       = qsa(".mini-zone", overlay);
     const currentZone = document.body.dataset.zone || "";
-    const zoneLinks   = qsa(".zone-link, .section-link");
 
     if (currentZone) addVisitedZone(currentZone);
 
@@ -518,15 +519,19 @@
       .sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
     const curIdx       = zoneList.findIndex(z => z.id === currentZone);
-    const defaultLabel = curIdx >= 0 ? zoneList[curIdx].name : "Sélectionne une zone.";
+    const defaultLabel = curIdx >= 0 ? zoneList[curIdx].name : "—";
+
+    /* Flèches grand angle */
+    const SVG_PREV = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 3 L4 12 L20 21"/></svg>`;
+    const SVG_NEXT = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3 L20 12 L4 21"/></svg>`;
 
     const statusWrap = qs(".mobile-map-status-wrap", overlay);
     if (statusWrap) {
       statusWrap.innerHTML = `
         <div class="map-nav-bar">
-          <button class="map-nav-btn" id="mapNavPrev" type="button" aria-label="Zone précédente">&#8592;</button>
-          <span class="mobile-map-status map-nav-label" id="mobileMapStatus">${defaultLabel}</span>
-          <button class="map-nav-btn" id="mapNavNext" type="button" aria-label="Zone suivante">&#8594;</button>
+          <button class="map-nav-btn" id="mapNavPrev" type="button" aria-label="Zone précédente">${SVG_PREV}</button>
+          <span class="map-nav-label" id="mobileMapStatus">${defaultLabel}</span>
+          <button class="map-nav-btn" id="mapNavNext" type="button" aria-label="Zone suivante">${SVG_NEXT}</button>
         </div>
       `;
     }
@@ -535,126 +540,107 @@
     const navPrev = qs("#mapNavPrev");
     const navNext = qs("#mapNavNext");
 
+    /* Index de la zone actuellement sélectionnée dans la map */
+    let selectedIdx = curIdx; /* −1 si page hors zones */
+
+    /* Met à jour le label + surligne la zone sur la minimap */
+    function selectZone(idx) {
+      selectedIdx = idx;
+      if (status) status.textContent = zoneList[idx]?.name || defaultLabel;
+      zones.forEach(z => z.classList.remove("is-selected"));
+      const targetId = zoneList[idx]?.id;
+      if (targetId) {
+        const el = [...zones].find(z => z.dataset.miniZone === targetId);
+        if (el) el.classList.add("is-selected");
+      }
+    }
+
+    /* Flèches — cyclent la sélection, ne naviguent PAS */
     if (navPrev && zoneList.length > 1) {
       navPrev.addEventListener("click", e => {
         e.stopPropagation();
-        const idx = (curIdx - 1 + zoneList.length) % zoneList.length;
-        addVisitedZone(zoneList[idx].id);
-        window.location.href = zoneList[idx].href;
+        const base = selectedIdx >= 0 ? selectedIdx : 0;
+        selectZone((base - 1 + zoneList.length) % zoneList.length);
       });
     }
 
     if (navNext && zoneList.length > 1) {
       navNext.addEventListener("click", e => {
         e.stopPropagation();
-        const idx = (curIdx + 1) % zoneList.length;
-        addVisitedZone(zoneList[idx].id);
-        window.location.href = zoneList[idx].href;
+        const base = selectedIdx >= 0 ? selectedIdx : zoneList.length - 1;
+        selectZone((base + 1) % zoneList.length);
       });
     }
 
-    let typingTimer = null;
-
-    function setToggleState(isMapOpen) {
-      toggle.classList.toggle("is-open", isMapOpen);
-      toggle.setAttribute("aria-expanded",  isMapOpen ? "true" : "false");
-      toggle.setAttribute("aria-label",     isMapOpen ? "Fermer la carte" : "Ouvrir la carte");
-      overlay.setAttribute("aria-hidden",   isMapOpen ? "false" : "true");
-    }
-
-    function stopTyping() { if (typingTimer) { clearInterval(typingTimer); typingTimer = null; } }
-
-    function typeText(el, text, speed) {
-      if (!el) return;
-      stopTyping(); el.textContent = "";
-      let i = 0;
-      typingTimer = setInterval(() => { el.textContent = text.slice(0, ++i); if (i >= text.length) stopTyping(); }, speed || 24);
-    }
-
-    function resetStatus() { stopTyping(); if (status) status.textContent = defaultLabel; }
-
-    function resetZones() {
-      stopTyping();
-      zones.forEach(zone => {
-        zone.dataset.armed = "false";
-        zone.classList.remove("is-armed", "is-hovered");
-        const hint = qs(".mobile-zone-hint", zone);
-        if (hint) hint.textContent = "";
-      });
-    }
-
-    function setHoveredZone(id) {
-      zoneLinks.forEach(l => l.classList.remove("is-hovered"));
-      zones.forEach(z => z.classList.remove("is-hovered"));
-      qsa(`[data-zone-link="${id}"], [data-section="${id}"]`).forEach(l => l.classList.add("is-hovered"));
-      qsa(`.mini-zone[data-mini-zone="${id}"]`, overlay).forEach(z => z.classList.add("is-hovered"));
-    }
-
-    function clearHoveredZone() {
-      zoneLinks.forEach(l => l.classList.remove("is-hovered"));
-      zones.forEach(z => z.classList.remove("is-hovered"));
+    function setToggleState(isOpen) {
+      toggle.classList.toggle("is-open", isOpen);
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      toggle.setAttribute("aria-label",    isOpen ? "Fermer la carte" : "Ouvrir la carte");
+      overlay.setAttribute("aria-hidden",  isOpen ? "false" : "true");
     }
 
     function openMap() {
       closeAllPanelsExcept("map");
       overlay.classList.add("is-open");
       setToggleState(true);
-      resetZones(); resetStatus();
       applyVisitedZones(zones, currentZone);
+      /* Remet la sélection sur la zone courante à l'ouverture */
+      selectedIdx = curIdx;
+      zones.forEach(z => z.classList.remove("is-selected"));
+      if (curIdx >= 0) selectZone(curIdx);
+      else if (status) status.textContent = defaultLabel;
       emitPanelOpen("map");
     }
 
     function closeMap() {
       overlay.classList.remove("is-open");
       setToggleState(false);
-      resetZones(); resetStatus(); clearHoveredZone();
+      zones.forEach(z => z.classList.remove("is-selected"));
+      if (status) status.textContent = defaultLabel;
     }
 
-    toggle.addEventListener("click", () => { overlay.classList.contains("is-open") ? closeMap() : openMap(); });
+    toggle.addEventListener("click", () => {
+      overlay.classList.contains("is-open") ? closeMap() : openMap();
+    });
     overlay.addEventListener("click", e => { if (e.target === overlay) closeMap(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") closeMap(); });
-    document.addEventListener("ecart:panel-close-others", e => { if (e.detail?.panel !== "map") closeMap(); });
+    document.addEventListener("ecart:panel-close-others", e => {
+      if (e.detail?.panel !== "map") closeMap();
+    });
 
+    /* Zones — 1er tap = sélectionner, 2ème tap = naviguer */
     zones.forEach(zone => {
-      zone.dataset.armed = "false";
-
       zone.addEventListener("mouseenter", () => {
-        const id   = zone.dataset.miniZone;
-        const name = zone.dataset.zoneName || `Zone ${id}`;
-        if (id) setHoveredZone(id);
-        if (status) typeText(status, `vers ${name}…`);
+        if (status) status.textContent = zone.dataset.zoneName || `Zone ${zone.dataset.miniZone}`;
       });
-
       zone.addEventListener("mouseleave", () => {
-        clearHoveredZone();
-        if (!zones.some(z => z.dataset.armed === "true")) resetStatus();
+        /* Reaffiche la zone sélectionnée ou le label par défaut */
+        if (status) status.textContent = selectedIdx >= 0
+          ? (zoneList[selectedIdx]?.name || defaultLabel)
+          : defaultLabel;
       });
-
       zone.addEventListener("click", e => {
         e.stopPropagation();
-        const name    = zone.dataset.zoneName || "zone";
-        const isArmed = zone.dataset.armed === "true";
+        const id  = zone.dataset.miniZone;
+        const idx = zoneList.findIndex(z => z.id === id);
+        if (idx < 0) return;
 
-        if (!isArmed) {
-          zones.forEach(other => {
-            if (other !== zone) { other.dataset.armed = "false"; other.classList.remove("is-armed"); }
-          });
-          zone.dataset.armed = "true";
-          zone.classList.add("is-armed");
-          if (status) typeText(status, `vers ${name}…`);
-          return;
+        if (idx !== selectedIdx) {
+          /* 1er tap : sélectionner — bloquer le lien <a> par défaut */
+          e.preventDefault();
+          selectZone(idx);
+        } else {
+          /* 2ème tap : naviguer */
+          addVisitedZone(id);
+          window.location.href = zoneList[idx].href;
         }
-
-        addVisitedZone(zone.dataset.miniZone);
       });
     });
 
-    zoneLinks.forEach(link => {
+    /* Sidebar — état actif uniquement */
+    qsa(".zone-link, .section-link").forEach(link => {
       const id = link.dataset.zoneLink || link.dataset.section;
-      if (!id) return;
-      link.classList.toggle("active", id === currentZone);
-      link.addEventListener("mouseenter", () => setHoveredZone(id));
-      link.addEventListener("mouseleave", clearHoveredZone);
+      if (id) link.classList.toggle("active", id === currentZone);
     });
 
     applyVisitedZones(zones, currentZone);

@@ -641,23 +641,22 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 .map-nav-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 30px;
+  gap: 10px;
+  min-height: 48px;
 }
 
+/* Grosses flèches grand angle */
 .map-nav-btn {
-  width: 30px;
-  height: 30px;
+  width:  56px;
+  height: 56px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
   background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.72);
-  font-size: 0.88rem;
+  color: rgba(255,255,255,0.80);
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -670,19 +669,21 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 
 .map-nav-btn:hover {
-  background:   rgba(255,255,255,0.16);
-  color:        rgba(255,255,255,0.96);
-  border-color: rgba(255,255,255,0.34);
+  background:   rgba(255,255,255,0.15);
+  color:        rgba(255,255,255,1);
+  border-color: rgba(255,255,255,0.36);
 }
 .map-nav-btn:active { transform: scale(0.88); }
 
+/* Label zone — grand, lisible */
 .map-nav-label {
   flex: 1;
   min-width: 0;
   text-align: center;
-  color: rgba(255,255,255,0.80);
-  font-size: clamp(0.68rem, 1.6vw, 0.82rem) !important;  /* [1] agrandi */
-  letter-spacing: 0.10em;
+  color: rgba(255,255,255,0.92);
+  font-size: clamp(0.88rem, 2.2vw, 1.10rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -690,9 +691,10 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 
 .mobile-map-status {
-  color: rgba(255,255,255,0.80);
-  font-size: clamp(0.68rem, 1.6vw, 0.82rem) !important;  /* [1] agrandi */
-  letter-spacing: 0.10em;
+  color: rgba(255,255,255,0.92);
+  font-size: clamp(0.88rem, 2.2vw, 1.10rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: center;
 }
@@ -767,37 +769,27 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 .mobile-mini-map-wrap .mini-zone-11 { z-index: 6 !important; }
 .mobile-mini-map-wrap .mini-zone-9  { z-index: 4 !important; }
 
-.mobile-mini-map-wrap .mini-zone:hover,
-.mobile-mini-map-wrap .mini-zone.is-hovered {
-  animation: none !important;
-  opacity: 0.78 !important;
-  background: rgba(255,255,255,0.60) !important;
-  border-color: rgba(255,255,255,0.38) !important;
-  box-shadow: 0 0 12px rgba(255,255,255,0.28), 0 0 24px rgba(255,255,255,0.14) !important;
-  transform: scale(1.04) !important;
+/* Survol souris — léger */
+.mobile-mini-map-wrap .mini-zone:hover {
+  opacity: 0.72 !important;
+  background: rgba(255,255,255,0.44) !important;
+  border-color: rgba(255,255,255,0.28) !important;
+  transform: scale(1.03) !important;
 }
 
 .mobile-mini-map-wrap .mini-zone.is-visited {
-  opacity: 0.58;
-  background: rgba(255,255,255,0.26);
-  border-color: rgba(255,255,255,0.35);
-  box-shadow: 0 0 8px rgba(255,255,255,0.10);
+  opacity: 0.52;
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.28);
 }
 
-.mobile-mini-map-wrap .mini-zone.is-armed {
-  animation: miniZoneArmedBreath 2.4s ease-in-out infinite !important;
-  opacity: 0.94 !important;
-  background: rgba(255,255,255,0.86) !important;
-  border-color: rgba(255,255,255,0.80) !important;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.5) !important;
-}
-
+/* Zone courante — halo réduit */
 .mobile-mini-map-wrap .mini-zone.is-current,
 .mobile-mini-map-wrap .mini-zone.active {
-  animation: miniZoneCurrentBreath 3.0s ease-in-out infinite !important;
+  animation: miniZoneCurrentBreath 3.2s ease-in-out infinite !important;
   opacity: 1 !important;
-  background: rgba(255,255,255,1) !important;
-  border-color: rgba(255,255,255,1) !important;
+  background: rgba(255,255,255,0.92) !important;
+  border-color: rgba(255,255,255,0.70) !important;
 }
 
 .mobile-zone-hint { display: none !important; }
@@ -911,33 +903,24 @@ html.ecart-light-mode .ecart-light-btn.is-active {
    ANIMATIONS
    ========================================================== */
 
-@keyframes miniZoneArmedBreath {
-  0%,100% {
-    transform: scale(1.018);
-    box-shadow: 0 0 14px rgba(255,255,255,0.44), 0 0 28px rgba(255,255,255,0.22);
-  }
-  50% {
-    transform: scale(1.055);
-    box-shadow: 0 0 24px rgba(255,255,255,0.68), 0 0 48px rgba(255,255,255,0.36);
-  }
+/* Zone sélectionnée (1er tap / flèche) — en attente de confirmation */
+.mobile-mini-map-wrap .mini-zone.is-selected {
+  opacity: 0.90 !important;
+  background: rgba(255,255,255,0.66) !important;
+  border-color: rgba(255,255,255,0.55) !important;
+  transform: scale(1.06) !important;
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,0.38) !important;
 }
 
+/* Zone courante — pulsation douce, halo réduit */
 @keyframes miniZoneCurrentBreath {
   0%,100% {
-    transform: scale(1.022);
-    box-shadow:
-      0 0 0 1.5px rgba(255,255,255,0.92),
-      0 0 20px    rgba(255,255,255,0.90),
-      0 0 40px    rgba(255,255,255,0.58),
-      0 0 64px    rgba(255,255,255,0.34);
+    transform: scale(1.010);
+    box-shadow: 0 0 0 1.5px rgba(255,255,255,0.55), 0 0 8px rgba(255,255,255,0.22);
   }
   50% {
-    transform: scale(1.075);
-    box-shadow:
-      0 0 0 2px   rgba(255,255,255,1),
-      0 0 30px    rgba(255,255,255,1),
-      0 0 58px    rgba(255,255,255,0.84),
-      0 0 92px    rgba(255,255,255,0.52);
+    transform: scale(1.030);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.75), 0 0 14px rgba(255,255,255,0.32);
   }
 }
 
@@ -1143,9 +1126,9 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   .ecart-audio-track { padding: 12px 14px !important; }
 
   .map-nav-btn {
-    width: 42px !important;
-    height: 42px !important;
-    font-size: 1rem !important;
+    width:  64px !important;
+    height: 64px !important;
+    border-radius: 16px !important;
   }
 
   #infoPanel.is-open .info-panel-inner {
