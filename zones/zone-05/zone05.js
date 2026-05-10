@@ -1,290 +1,459 @@
-(() => {
-  const zone = document.querySelector(".bad-zone");
-  const blurTable = document.getElementById("badBlurTable");
-  const lens = document.getElementById("badLens");
-  const lensTable = document.getElementById("badLensTable");
+'use strict';
 
-  if (!zone || !blurTable || !lens || !lensTable) return;
+/* ═══════════════════════════════════════════════════════════
+   EC@RT — Zone 05 BAD
+   Table d’archives vivante — version optimisée anti-lag
+   ═══════════════════════════════════════════════════════════ */
 
-  const SCANS = [
-    "./BAD-img/BAD_01.png",
-    "./BAD-img/BAD_02.png",
-    "./BAD-img/BAD_03.png",
-    "./BAD-img/BAD_04.png",
-  ];
+const BAD_ARCHIVES = [
+  './BAD-img/BAD_01.png',
+  './BAD-img/BAD_02.png',
+  './BAD-img/BAD_03.png',
+  './BAD-img/BAD_04.png',
+  './BAD-img/BAD_05.png',
+  './BAD-img/BAD_06.png',
+  './BAD-img/BAD_07.png',
+   './BAD-img/BAD_08.png',
+  './BAD-img/BAD_09.png',
+  './BAD-img/BAD_10.png',
+  './BAD-img/BAD_11.png',
+   './BAD-img/BAD_12.png',
+  './BAD-img/BAD_13.png',
+  './BAD-img/BAD_14.png',
+  './BAD-img/BAD_15.png',
+    './BAD-img/BAD_16.png'
+];
 
-  let zoom = 1;
-  const minZoom = 1;
-  const maxZoom = 3;
+const BAD_CONFIG = {
+  storageKey: 'ecart_zone05_bad_archive_surface_v2',
 
-  let lensZoom = 1;
+  fragmentsPerImage: 3,
+  minSize: 120,
+  maxSize: 280,
 
-  let originX = 50;
-  let originY = 50;
+  proximityDistance: 135,
+  energyDecay: 0.972,
+  instabilityDecay: 0.985,
 
-  let panX = 0;
-  let panY = 0;
+  driftStrength: 0.035,
+  breathStrength: 0.006,
 
-  let lensX = 0;
-  let lensY = 0;
+  maxVisibleLines: 14,
+  saveDebounceMs: 160
+};
 
-  let isDragging = false;
-  let dragStartX = 0;
-  let dragStartY = 0;
-  let panStartX = 0;
-  let panStartY = 0;
+const surface = document.getElementById('badArchiveSurface');
+const threadsSvg = document.getElementById('badThreads');
+const resetButton = document.getElementById('badReset');
 
-  let lastTapTime = 0;
-  let touchMode = null;
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchPanStartX = 0;
-  let touchPanStartY = 0;
+let fragments = [];
+let surfaceW = 0;
+let surfaceH = 0;
+let saveTimer = null;
+let linePool = [];
 
-  function rand(min, max) {
-    return Math.random() * (max - min) + min;
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function measure() {
+  if (!surface || !threadsSvg) return;
+
+  const r = surface.getBoundingClientRect();
+  surfaceW = r.width || window.innerWidth;
+  surfaceH = r.height || window.innerHeight;
+
+  threadsSvg.setAttribute('viewBox', `0 0 ${surfaceW} ${surfaceH}`);
+}
+
+function jaggedPolygon() {
+  return {
+    '--p1x': `${rand(0, 6).toFixed(2)}%`,
+    '--p1y': `${rand(3, 18).toFixed(2)}%`,
+
+    '--p2x': `${rand(12, 22).toFixed(2)}%`,
+    '--p2y': `${rand(-8, 8).toFixed(2)}%`,
+
+    '--p3x': `${rand(30, 44).toFixed(2)}%`,
+    '--p3y': `${rand(0, 13).toFixed(2)}%`,
+
+    '--p4x': `${rand(58, 72).toFixed(2)}%`,
+    '--p4y': `${rand(-8, 10).toFixed(2)}%`,
+
+    '--p5x': `${rand(88, 100).toFixed(2)}%`,
+    '--p5y': `${rand(8, 25).toFixed(2)}%`,
+
+    '--p6x': `${rand(94, 104).toFixed(2)}%`,
+    '--p6y': `${rand(35, 52).toFixed(2)}%`,
+
+    '--p7x': `${rand(86, 100).toFixed(2)}%`,
+    '--p7y': `${rand(72, 96).toFixed(2)}%`,
+
+    '--p8x': `${rand(64, 78).toFixed(2)}%`,
+    '--p8y': `${rand(88, 106).toFixed(2)}%`,
+
+    '--p9x': `${rand(42, 54).toFixed(2)}%`,
+    '--p9y': `${rand(92, 104).toFixed(2)}%`,
+
+    '--p10x': `${rand(18, 32).toFixed(2)}%`,
+    '--p10y': `${rand(86, 102).toFixed(2)}%`,
+
+    '--p11x': `${rand(-4, 10).toFixed(2)}%`,
+    '--p11y': `${rand(62, 82).toFixed(2)}%`,
+
+    '--p12x': `${rand(-6, 9).toFixed(2)}%`,
+    '--p12y': `${rand(28, 48).toFixed(2)}%`
+  };
+}
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem(BAD_CONFIG.storageKey) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveStateSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, BAD_CONFIG.saveDebounceMs);
+}
+
+function saveState() {
+  const state = {};
+
+  fragments.forEach(f => {
+    state[f.id] = {
+      x: Math.round(f.x),
+      y: Math.round(f.y),
+      rot: Number(f.rot.toFixed(2)),
+      energy: Number(f.energy.toFixed(3)),
+      instability: Number(f.instability.toFixed(3)),
+      age: Number(f.age.toFixed(2)),
+      z: f.z
+    };
+  });
+
+  try {
+    localStorage.setItem(BAD_CONFIG.storageKey, JSON.stringify(state));
+  } catch (_) {}
+}
+
+function clearState() {
+  try {
+    localStorage.removeItem(BAD_CONFIG.storageKey);
+  } catch (_) {}
+
+  fragments.forEach(f => f.destroy());
+  fragments = [];
+
+  linePool.forEach(l => l.remove());
+  linePool = [];
+
+  spawn();
+}
+
+class BadFragment {
+  constructor({ id, src, saved }) {
+    this.id = id;
+    this.src = src;
+
+    this.w = rand(BAD_CONFIG.minSize, BAD_CONFIG.maxSize);
+    this.h = this.w * rand(0.65, 1.25);
+
+    this.x = rand(20, Math.max(30, surfaceW - this.w - 20));
+    this.y = rand(20, Math.max(30, surfaceH - this.h - 20));
+    this.rot = rand(-24, 24);
+    this.z = Math.floor(rand(2, 24));
+
+    this.energy = rand(0.04, 0.14);
+    this.porosity = rand(0.35, 1);
+    this.instability = rand(0.05, 0.28);
+    this.age = rand(0, 100);
+    this.proximity = 0;
+
+    this.seed = rand(0, 9999);
+    this.phase = rand(0, Math.PI * 2);
+    this.breathSpeed = rand(0.00012, 0.00028);
+
+    this.dragging = false;
+    this.pointerId = null;
+    this.offsetX = 0;
+    this.offsetY = 0;
+
+    if (saved) {
+      this.x = saved.x ?? this.x;
+      this.y = saved.y ?? this.y;
+      this.rot = saved.rot ?? this.rot;
+      this.energy = saved.energy ?? this.energy;
+      this.instability = saved.instability ?? this.instability;
+      this.age = saved.age ?? this.age;
+      this.z = saved.z ?? this.z;
+    }
+
+    this.el = this.build();
+    this.bind();
   }
 
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
+  build() {
+    const el = document.createElement('article');
+    el.className = 'bad-fragment';
+    el.style.zIndex = String(this.z);
 
-  function isTouchDevice() {
-    return window.matchMedia("(pointer: coarse)").matches;
-  }
+    const halo = document.createElement('div');
+    halo.className = 'bad-fragment__halo';
 
-  function createPaper(src, data) {
-    const img = document.createElement("img");
-    img.src = src;
-    img.className = "bad-paper";
+    const paper = document.createElement('div');
+    paper.className = 'bad-fragment__paper';
 
-    img.style.left = `${data.x}%`;
-    img.style.top = `${data.y}%`;
-    img.style.zIndex = data.z;
-    img.style.opacity = data.opacity;
-    img.style.transform = `rotate(${data.rot}deg) scale(${data.scale})`;
+    el.appendChild(halo);
+    el.appendChild(paper);
+    surface.appendChild(el);
 
-    return img;
-  }
+    const bgScale = rand(1.2, 2.1);
+    const bgW = this.w * bgScale;
+    const bgH = this.h * bgScale;
 
-  function createScene() {
-    blurTable.innerHTML = "";
-    lensTable.innerHTML = "";
+    const vars = {
+      '--w': `${this.w}px`,
+      '--h': `${this.h}px`,
+      '--img': `url("${this.src}")`,
+      '--bgw': `${bgW}px`,
+      '--bgh': `${bgH}px`,
+      '--bgx': `${rand(-bgW * 0.48, 0).toFixed(1)}px`,
+      '--bgy': `${rand(-bgH * 0.48, 0).toFixed(1)}px`,
+      ...jaggedPolygon()
+    };
 
-    SCANS.forEach((src) => {
-      const data = {
-        x: rand(2, 62),
-        y: rand(2, 58),
-        rot: rand(-24, 24),
-        scale: rand(1.0, 1.45),
-        z: Math.floor(rand(1, 40)),
-        opacity: rand(0.82, 0.98),
-      };
-
-      blurTable.appendChild(createPaper(src, data));
-      lensTable.appendChild(createPaper(src, data));
+    Object.entries(vars).forEach(([key, value]) => {
+      el.style.setProperty(key, value);
     });
 
-    applyTransform();
+    return el;
   }
 
-  function applyTransform() {
-    blurTable.style.transformOrigin = `${originX}% ${originY}%`;
-    blurTable.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  bind() {
+    this.el.addEventListener('pointerdown', e => {
+      e.preventDefault();
 
-    if (lensX && lensY) {
-      moveLens(lensX, lensY);
+      this.dragging = true;
+      this.pointerId = e.pointerId;
+      this.el.setPointerCapture(e.pointerId);
+
+      const r = surface.getBoundingClientRect();
+      this.offsetX = e.clientX - r.left - this.x;
+      this.offsetY = e.clientY - r.top - this.y;
+
+      this.energy = 1;
+      this.instability = clamp(this.instability + 0.18, 0, 1);
+
+      this.z = 80;
+      this.el.style.zIndex = String(this.z);
+      this.el.classList.add('is-dragging');
+    });
+
+    this.el.addEventListener('pointermove', e => {
+      if (!this.dragging || e.pointerId !== this.pointerId) return;
+
+      const r = surface.getBoundingClientRect();
+
+      this.x = clamp(
+        e.clientX - r.left - this.offsetX,
+        -this.w * 0.35,
+        surfaceW - this.w * 0.65
+      );
+
+      this.y = clamp(
+        e.clientY - r.top - this.offsetY,
+        -this.h * 0.35,
+        surfaceH - this.h * 0.65
+      );
+
+      this.energy = clamp(this.energy + 0.018, 0, 1);
+      this.instability = clamp(this.instability + 0.008, 0, 1);
+    });
+
+    const endDrag = e => {
+      if (e.pointerId !== this.pointerId) return;
+
+      this.dragging = false;
+      this.pointerId = null;
+
+      this.z = Math.floor(rand(12, 38));
+      this.el.style.zIndex = String(this.z);
+      this.el.classList.remove('is-dragging');
+
+      saveStateSoon();
+    };
+
+    this.el.addEventListener('pointerup', endDrag);
+    this.el.addEventListener('pointercancel', endDrag);
+  }
+
+  centerX() {
+    return this.x + this.w * 0.5;
+  }
+
+  centerY() {
+    return this.y + this.h * 0.5;
+  }
+
+  update(now) {
+    this.age += 0.003;
+
+    if (!this.dragging) {
+      this.energy *= BAD_CONFIG.energyDecay;
+      this.instability *= BAD_CONFIG.instabilityDecay;
+
+      this.x += Math.sin(now * 0.00008 + this.seed) * BAD_CONFIG.driftStrength * this.instability;
+      this.y += Math.cos(now * 0.00007 + this.seed) * BAD_CONFIG.driftStrength * this.instability;
+    }
+
+    const breath = Math.sin(now * this.breathSpeed + this.phase);
+    const slow = Math.sin(now * 0.00016 + this.seed);
+
+    const scale = 1 + breath * BAD_CONFIG.breathStrength * this.porosity;
+    const rot = this.rot + slow * 1.2 * this.instability + this.energy * 3.2;
+
+    const dx = Math.sin(now * 0.00009 + this.seed) * this.porosity * 1.2;
+    const dy = Math.cos(now * 0.00008 + this.seed) * this.porosity * 1.2;
+
+    const opacity = clamp(
+      0.84 + breath * 0.025 + this.proximity * 0.08,
+      0.68,
+      0.96
+    );
+
+    const halo = clamp(
+      this.energy * 0.55 + this.proximity * 0.22,
+      0,
+      0.55
+    );
+
+    this.el.style.transform =
+      `translate3d(${(this.x + dx).toFixed(2)}px, ${(this.y + dy).toFixed(2)}px, 0)
+       rotate(${rot.toFixed(2)}deg)
+       scale(${scale.toFixed(4)})`;
+
+    this.el.style.opacity = opacity.toFixed(3);
+    this.el.style.setProperty('--halo', halo.toFixed(3));
+  }
+
+  destroy() {
+    this.el.remove();
+  }
+}
+
+function getLine(index) {
+  if (!linePool[index]) {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('stroke-linecap', 'round');
+    threadsSvg.appendChild(line);
+    linePool[index] = line;
+  }
+
+  return linePool[index];
+}
+
+function updateProximity() {
+  fragments.forEach(f => {
+    f.proximity *= 0.82;
+  });
+
+  let lineIndex = 0;
+
+  for (let i = 0; i < fragments.length; i++) {
+    const a = fragments[i];
+
+    for (let j = i + 1; j < fragments.length; j++) {
+      const b = fragments[j];
+
+      const dx = b.centerX() - a.centerX();
+      const dy = b.centerY() - a.centerY();
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (
+        dist < BAD_CONFIG.proximityDistance &&
+        lineIndex < BAD_CONFIG.maxVisibleLines
+      ) {
+        const force = 1 - dist / BAD_CONFIG.proximityDistance;
+
+        a.proximity = Math.max(a.proximity, force);
+        b.proximity = Math.max(b.proximity, force);
+
+        if (!a.dragging) a.energy = clamp(a.energy + force * 0.0015, 0, 1);
+        if (!b.dragging) b.energy = clamp(b.energy + force * 0.0015, 0, 1);
+
+        const line = getLine(lineIndex++);
+        line.setAttribute('x1', a.centerX().toFixed(1));
+        line.setAttribute('y1', a.centerY().toFixed(1));
+        line.setAttribute('x2', b.centerX().toFixed(1));
+        line.setAttribute('y2', b.centerY().toFixed(1));
+        line.setAttribute(
+          'stroke',
+          `rgba(255, 175, 90, ${(force * 0.24).toFixed(3)})`
+        );
+        line.setAttribute('stroke-width', (0.25 + force * 0.65).toFixed(2));
+        line.style.display = '';
+      }
     }
   }
 
-  function updateOrigin(clientX, clientY) {
-    const rect = zone.getBoundingClientRect();
-
-    originX = clamp(((clientX - rect.left) / rect.width) * 100, 0, 100);
-    originY = clamp(((clientY - rect.top) / rect.height) * 100, 0, 100);
+  for (let i = lineIndex; i < linePool.length; i++) {
+    linePool[i].style.display = 'none';
   }
+}
 
-  function moveLens(clientX, clientY) {
-    lensX = clientX;
-    lensY = clientY;
+function spawn() {
+  measure();
 
-    const zoneRect = zone.getBoundingClientRect();
-    const radius = lens.offsetWidth / 2;
+  const saved = loadState();
+  let id = 0;
 
-    lens.style.left = `${clientX}px`;
-    lens.style.top = `${clientY}px`;
-    lens.style.opacity = "1";
+  BAD_ARCHIVES.forEach(src => {
+    for (let i = 0; i < BAD_CONFIG.fragmentsPerImage; i++) {
+      const fragment = new BadFragment({
+        id,
+        src,
+        saved: saved[id]
+      });
 
-    lensTable.style.width = `${zoneRect.width}px`;
-    lensTable.style.height = `${zoneRect.height}px`;
-
-    lensTable.style.left = `${zoneRect.left - clientX + radius}px`;
-    lensTable.style.top = `${zoneRect.top - clientY + radius}px`;
-
-    lensTable.style.transformOrigin = `${originX}% ${originY}%`;
-    lensTable.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom * lensZoom})`;
-  }
-
-  function isInsideLens(clientX, clientY) {
-    const dx = clientX - lensX;
-    const dy = clientY - lensY;
-    const radius = lens.offsetWidth / 2;
-    return Math.sqrt(dx * dx + dy * dy) <= radius;
-  }
-
-  // ── PC / TRACKPAD ──
-
-  zone.addEventListener(
-    "wheel",
-    (e) => {
-      const rect = zone.getBoundingClientRect();
-
-      const inside =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
-
-      if (!inside) return;
-
-      e.preventDefault();
-      updateOrigin(e.clientX, e.clientY);
-
-      const isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY) < 40;
-
-      if (e.ctrlKey || !isTrackpad) {
-        const delta = -e.deltaY * 0.0012;
-        zoom = clamp(zoom + delta, minZoom, maxZoom);
-      } else {
-        panX -= e.deltaX;
-        panY -= e.deltaY;
-      }
-
-      applyTransform();
-      moveLens(e.clientX, e.clientY);
-    },
-    { passive: false }
-  );
-
-  zone.addEventListener("mousemove", (e) => {
-    if (!isDragging) moveLens(e.clientX, e.clientY);
-  });
-
-  zone.addEventListener("mouseenter", (e) => {
-    moveLens(e.clientX, e.clientY);
-  });
-
-  zone.addEventListener("mouseleave", () => {
-    if (!isDragging && !isTouchDevice()) lens.style.opacity = "0";
-  });
-
-  zone.addEventListener("mousedown", (e) => {
-    if (e.button !== 0) return;
-
-    isDragging = true;
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
-    panStartX = panX;
-    panStartY = panY;
-
-    zone.classList.add("is-dragging");
-  });
-
-  window.addEventListener("mousemove", (e) => {
-    if (!isDragging) return;
-
-    panX = panStartX + (e.clientX - dragStartX);
-    panY = panStartY + (e.clientY - dragStartY);
-
-    applyTransform();
-    moveLens(e.clientX, e.clientY);
-  });
-
-  window.addEventListener("mouseup", () => {
-    if (!isDragging) return;
-
-    isDragging = false;
-    zone.classList.remove("is-dragging");
-  });
-
-  // ── MOBILE / TABLETTE ──
-
-  zone.addEventListener(
-    "touchstart",
-    (e) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-
-      const now = Date.now();
-      const isDoubleTap = now - lastTapTime < 300;
-
-      if (isDoubleTap) {
-        lensZoom = lensZoom > 1 ? 1 : 2;
-        moveLens(lensX || touch.clientX, lensY || touch.clientY);
-        lastTapTime = 0;
-        return;
-      }
-
-      lastTapTime = now;
-
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchPanStartX = panX;
-      touchPanStartY = panY;
-
-      touchMode = isInsideLens(touch.clientX, touch.clientY) ? "lens" : "pan";
-
-      lens.style.opacity = "1";
-    },
-    { passive: false }
-  );
-
-  zone.addEventListener(
-    "touchmove",
-    (e) => {
-      e.preventDefault();
-
-      const touch = e.touches[0];
-      if (!touch) return;
-
-      if (touchMode === "lens") {
-        moveLens(touch.clientX, touch.clientY);
-        return;
-      }
-
-      if (touchMode === "pan") {
-        panX = touchPanStartX + (touch.clientX - touchStartX);
-        panY = touchPanStartY + (touch.clientY - touchStartY);
-
-        applyTransform();
-        moveLens(lensX, lensY);
-      }
-    },
-    { passive: false }
-  );
-
-  zone.addEventListener(
-    "touchend",
-    () => {
-      touchMode = null;
-      lens.style.opacity = "1";
-    },
-    { passive: false }
-  );
-
-  createScene();
-
-  requestAnimationFrame(() => {
-    const rect = zone.getBoundingClientRect();
-    moveLens(rect.left + rect.width / 2, rect.top + rect.height / 2);
-
-    if (!isTouchDevice()) {
-      lens.style.opacity = "0";
+      fragments.push(fragment);
+      id++;
     }
   });
+}
 
-  window.addEventListener("resize", () => {
-    applyTransform();
-    moveLens(lensX, lensY);
+function tick(now) {
+  updateProximity();
+  fragments.forEach(f => f.update(now));
+  requestAnimationFrame(tick);
+}
+
+function init() {
+  if (!surface || !threadsSvg) return;
+
+  spawn();
+
+  window.addEventListener('resize', () => {
+    measure();
+
+    fragments.forEach(f => {
+      f.x = clamp(f.x, -f.w * 0.35, surfaceW - f.w * 0.65);
+      f.y = clamp(f.y, -f.h * 0.35, surfaceH - f.h * 0.65);
+    });
+
+    saveStateSoon();
   });
-})();
+
+  if (resetButton) {
+    resetButton.addEventListener('click', clearState);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

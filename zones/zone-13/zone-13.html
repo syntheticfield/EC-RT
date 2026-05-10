@@ -9,15 +9,14 @@
   <link rel="stylesheet" href="../zone-sidebar.css" />
   <link rel="stylesheet" href="../pannel-ui.css" />
   <link rel="stylesheet" href="./zone-13.css" />
+  <link rel="stylesheet" href="./zone-13-additions.css" />
+  <link rel="stylesheet" href="../chaos-mode.css" />
 </head>
 
 <body data-zone="13" class="has-mobile-menu">
 
   <main class="page">
 
-    <!-- ═══════════════════════════
-         SIDEBAR
-         ═══════════════════════════ -->
     <aside class="sidebar">
       <div class="sidebar-top">
         <a href="../../index.html" class="home-button" aria-label="Retour à l'accueil">⌂</a>
@@ -26,16 +25,17 @@
           type="button"
           aria-expanded="false"
           aria-label="Ouvrir ou fermer le menu"
+          data-chaos-exclude
         >EC@RT</button>
       </div>
+
       <div class="zone-identity" data-zone-title="491" data-zone-desc="DADA / ARCHIVE / SIGNAL / COPY">
         <div class="zone-identity-title">Search & Destroy</div>
         <div class="zone-identity-desc">DADA Noise Kopy</div>
       </div>
 
       <nav class="zones-nav" aria-label="Zones de l'exposition">
-          <a href="../../index.html" class="zone-link" data-zone-link="0">EC@RT</a>
-          <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
+        <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
         <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">Background</a>
         <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
         <a href="../zone-04/zone-04.html" class="zone-link" data-zone-link="4">NWMV</a>
@@ -51,25 +51,14 @@
       </nav>
     </aside>
 
-    <!-- ═══════════════════════════
-         ZONE CONTENU
-         ═══════════════════════════ -->
     <section class="zone-content zone-content-image">
-
-      <!-- Champ images flottantes (injecté par zone-13.js) -->
       <div id="zone13ImageField"></div>
-
-      <!-- Canvas glitch (dessiné par Zone13GlitchRenderer) -->
       <canvas id="zone13GlitchCanvas"></canvas>
-
     </section>
 
   </main>
 
-  <!-- ═══════════════════════════
-       BOUTONS FLOTTANTS
-       ═══════════════════════════ -->
-
+  <!-- Boutons UI — exclus du chaos -->
   <button
     id="mobileMapToggle"
     class="mobile-map-toggle"
@@ -77,6 +66,7 @@
     aria-label="Ouvrir la carte"
     aria-expanded="false"
     aria-controls="mobileMapOverlay"
+    data-chaos-exclude
   >
     <span class="mobile-map-toggle__label mobile-map-toggle__label--open">MAP</span>
     <span class="mobile-map-toggle__label mobile-map-toggle__label--close">
@@ -84,16 +74,16 @@
     </span>
   </button>
 
-  <button id="soundToggle" type="button">SOUND</button>
-  <section id="soundPanel" aria-hidden="true">
+  <button id="soundToggle" type="button" data-chaos-exclude>SOUND</button>
+  <section id="soundPanel" aria-hidden="true" data-chaos-exclude>
     <div class="sound-panel-inner">
       <button class="sound-close" type="button">✕</button>
       <h2 class="sound-panel-title">SOUND</h2>
     </div>
   </section>
 
-  <button id="infoToggle" type="button">INFO</button>
-  <section id="infoPanel" aria-hidden="true">
+  <button id="infoToggle" type="button" data-chaos-exclude>INFO</button>
+  <section id="infoPanel" aria-hidden="true" data-chaos-exclude>
     <div class="info-panel-inner">
       <button class="info-close" type="button">✕</button>
       <h2 class="info-title"></h2>
@@ -102,10 +92,7 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════
-       OVERLAY MOBILE MAP
-       ═══════════════════════════ -->
-  <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true">
+  <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true" data-chaos-exclude>
     <div class="mobile-map-panel" id="mobileMapPanel">
       <div class="mobile-map-panel-inner">
         <div class="mobile-map-status-wrap">
@@ -133,17 +120,37 @@
     </div>
   </div>
 
+  <!-- Tooltip raccourcis (chaos) -->
+  <div class="ec-chaos-shortcuts" id="ecChaosShortcuts">
+    [1] thermal &nbsp;&middot;&nbsp; [2] orbital &nbsp;&middot;&nbsp; [3] fluvial &nbsp;&middot;&nbsp; [4] resonance &nbsp;&middot;&nbsp; [C] off
+  </div>
+
   <!-- ═══════════════════════════
        SCRIPTS
+       Ordre : données → ui commune → chaos → module zone
        ═══════════════════════════ -->
   <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
-  <!-- UI commune -->
   <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
 
-  <!-- Zone 13 — modules ES + orchestrateur -->
+  <!-- chaos-mode : doit être chargé avant zone-13.js
+       pour que window.EC_CHAOS existe quand le module s'initialise -->
+  <script src="../chaos-mode.js"></script>
+
+  <!-- Tooltip à l'activation chaos -->
+  <script>
+    (function () {
+      const tip = document.getElementById('ecChaosShortcuts');
+      if (!tip) return;
+      document.addEventListener('ec-chaos:on', () => {
+        tip.classList.add('is-visible');
+        setTimeout(() => tip.classList.remove('is-visible'), 3400);
+      });
+    })();
+  </script>
+
   <script type="module" src="./zone-13.js"></script>
 
 </body>

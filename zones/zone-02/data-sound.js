@@ -4,7 +4,7 @@ window.ECART_SOUND = [
     file: "../../assets/son/FR/ROLEMODELS.mp3"
   },
   {
-    title: "Curatorial Voice - Role Models (FR)",
+    title: "Curatorial Voice - Role Models (ENG)",
     file: "../../assets/son/EN/ROLEMODELS.mp3"
   },
 ];

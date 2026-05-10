@@ -10,101 +10,180 @@
   <link rel="stylesheet" href="../pannel-ui.css" />
 
   <style>
-    /* =========================
-       ZONE 05 — BAD PUBLICATIONS
-       Loupe + table de scans
-       ========================= */
+   /* =========================
+   ZONE 05 — BAD
+   Table d’archives vivante
+   version optimisée anti-lag
+   ========================= */
 
-    .bad-zone {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-      background: #050505;
-      cursor: none;
-      touch-action: none;
-    }
+.bad-zone {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(125, 90, 45, 0.10), transparent 38%),
+    radial-gradient(circle at 70% 75%, rgba(95, 58, 26, 0.12), transparent 42%),
+    linear-gradient(180deg, #080806, #020202 75%);
+  touch-action: none;
+  isolation: isolate;
+}
 
-    .bad-table,
-    .bad-lens-table {
-      transform-origin: center center;
-      overflow: visible;
-    }
+.bad-zone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
 
-    .bad-table {
-      position: absolute;
-      inset: 0;
-    }
+.bad-archive-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
 
-    .bad-table--blur {
-      filter: blur(7px) contrast(0.9) brightness(0.9);
-      opacity: 0.9;
-    }
+.bad-threads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
 
-    .bad-paper {
-      position: absolute;
-      width: clamp(220px, 30vw, 620px);
-      height: auto;
-      user-select: none;
-      pointer-events: none;
-      transform-origin: center;
-      box-shadow:
-        0 24px 65px rgba(0, 0, 0, 0.65),
-        0 0 1px rgba(255, 255, 255, 0.45);
-    }
+.bad-fragment {
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  transform-origin: center;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+  opacity: 0.9;
+  filter: none;
+  will-change: transform;
+}
 
-    .bad-lens {
-      position: fixed;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 999;
-      transform: translate(-50%, -50%);
-      opacity: 1;
-      background: rgba(245, 241, 220, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.45);
-      box-shadow:
-        0 0 30px rgba(255, 255, 255, 0.18),
-        inset 0 0 30px rgba(255, 255, 255, 0.12);
-    }
+.bad-fragment.is-dragging {
+  cursor: grabbing;
+  z-index: 80 !important;
+}
 
-    .bad-lens-table {
-      position: absolute;
-      filter: none;
-    }
+.bad-fragment__paper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-image: var(--img);
+  background-size: var(--bgw) var(--bgh);
+  background-position: var(--bgx) var(--bgy);
+  border-radius: 1px 7px 3px 10px;
 
-    .bad-zone.is-dragging {
-      cursor: grabbing;
-    }
+  clip-path: polygon(
+    var(--p1x) var(--p1y),
+    var(--p2x) var(--p2y),
+    var(--p3x) var(--p3y),
+    var(--p4x) var(--p4y),
+    var(--p5x) var(--p5y),
+    var(--p6x) var(--p6y),
+    var(--p7x) var(--p7y),
+    var(--p8x) var(--p8y),
+    var(--p9x) var(--p9y),
+    var(--p10x) var(--p10y),
+    var(--p11x) var(--p11y),
+    var(--p12x) var(--p12y)
+  );
 
-    @media (pointer: fine) {
-      .bad-zone {
-        touch-action: auto;
-      }
-    }
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.72),
+    0 0 1px rgba(255, 245, 210, 0.22),
+    inset 0 0 22px rgba(0, 0, 0, 0.32);
+}
 
-    @media (max-width: 768px) {
-      .bad-lens {
-        width: 210px;
-        height: 210px;
-      }
+.bad-fragment__paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.10), transparent 42%, rgba(0,0,0,0.20)),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.06) 0px,
+      rgba(0,0,0,0.06) 1px,
+      transparent 1px,
+      transparent 7px
+    );
+  mix-blend-mode: multiply;
+}
 
-      .bad-paper {
-        width: clamp(160px, 44vw, 360px);
-      }
-    }
+.bad-fragment__paper::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  border: 1px solid rgba(255, 235, 190, 0.14);
+  opacity: 0.45;
+}
 
-    /* Portrait mobile : plein écran derrière la sidebar flottante */
-    @media (orientation: portrait) {
-      .bad-zone {
-        position: fixed !important;
-        inset: 0 !important;
-        width: 100vw !important;
-        height: 100dvh !important;
-      }
-    }
+.bad-fragment__halo {
+  position: absolute;
+  inset: -18px;
+  pointer-events: none;
+  opacity: var(--halo, 0);
+  background: radial-gradient(circle, rgba(255, 155, 70, 0.22), transparent 70%);
+  filter: none;
+  mix-blend-mode: screen;
+}
+
+.bad-reset {
+  position: absolute;
+  right: clamp(14px, 2.5vw, 28px);
+  bottom: clamp(14px, 2.5vw, 28px);
+  z-index: 40;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.36);
+  color: rgba(255,255,255,0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.bad-reset:hover {
+  color: white;
+  border-color: rgba(255,255,255,0.48);
+}
+
+@media (max-width: 768px) {
+  .bad-zone {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+  }
+
+  .bad-reset {
+    bottom: 72px;
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bad-fragment {
+    will-change: auto;
+  }
+}
   </style>
 </head>
 
@@ -149,15 +228,15 @@
       </nav>
     </aside>
 
-    <!-- ═══════════════════════════
-         ZONE LOUPE
-         ═══════════════════════════ -->
-    <section class="bad-zone">
-      <div id="badBlurTable" class="bad-table bad-table--blur"></div>
+  <section class="bad-zone" aria-label="Table d'archives vivante — Zone 05 BAD">
+  <svg id="badThreads" class="bad-threads" aria-hidden="true"></svg>
 
-      <div id="badLens" class="bad-lens">
-        <div id="badLensTable" class="bad-lens-table"></div>
-      </div>
+  <div id="badArchiveSurface" class="bad-archive-surface"></div>
+
+  <button id="badReset" class="bad-reset" type="button">
+    reset archive
+  </button>
+</section>
     </section>
 
   </main>
