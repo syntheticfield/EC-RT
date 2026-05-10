@@ -1,568 +1,250 @@
-/* =========================
-   EC@RT — Zone 13 : Search and Destroy
-   Orchestrateur principal — simulation
+'use strict';
 
-   Intégration chaos-mode.js :
-   ─ Si window.EC_CHAOS.active → skip les transforms DOM
-     (chaos-mode prend le contrôle des positions)
-   ─ createArchive() → EC_CHAOS.addElement(wrap)
-   ─ killArchive()   → EC_CHAOS.removeElement(el)
-   ─ plantPermanentCross() → EC_CHAOS.addElement(cross)
-   Zone-13.js garde le contrôle des filtres CSS (glitch),
-   de la vitalité et de la logique vie/mort.
-   ========================= */
+/* ═══════════════════════════════════════════════════════════
+   EC@RT — Zone 05 BAD
+   Table d'archives — déplacement libre des fragments
+   ═══════════════════════════════════════════════════════════ */
 
-import { Zone13Audio }          from "./zone-13-audio.js";
-import { Zone13AnalyserData }   from "./zone-13-analyser.js";
-import { Zone13GlitchRenderer } from "./zone-13-glitch.js";
-import { getZone13State, saveZone13State } from "./zone-13-state.js";
+const BAD_ARCHIVES = [
+  './BAD-img/BAD_01.png',
+  './BAD-img/BAD_02.png',
+  './BAD-img/BAD_03.png',
+  './BAD-img/BAD_04.png',
+  './BAD-img/BAD_05.png',
+  './BAD-img/BAD_06.png',
+  './BAD-img/BAD_07.png',
+  './BAD-img/BAD_08.png',
+  './BAD-img/BAD_09.png',
+  './BAD-img/BAD_10.png',
+  './BAD-img/BAD_11.png',
+  './BAD-img/BAD_12.png',
+  './BAD-img/BAD_13.png',
+  './BAD-img/BAD_14.png',
+  './BAD-img/BAD_15.png',
+  './BAD-img/BAD_16.png'
+];
 
-/* ─────────────────────────────
-   CONFIG
-   ───────────────────────────── */
-
-const CONFIG = {
-  images: [
-    "./images/SND_01.jpeg", "./images/SND_02.jpeg",
-    "./images/SND_03.jpeg", "./images/SND_04.jpeg",
-    "./images/SND_05.jpeg", "./images/SND_06.jpeg",
-    "./images/SND_07.jpeg", "./images/SND_08.jpeg"
-  ],
-  audioFiles: ["./audio/SD_01.wav", "./audio/SD_02.wav", "./audio/SD_03.wav"],
-  srcLabels:  ["SD 01", "SD 02", "SD 03"],
-
-  maxLiving:       5,
-  spawnInterval:   4000,
-  lifeBase:        18000,
-  lifeVariance:    12000,
+const BAD_CONFIG = {
+  storageKey: 'ecart_zone05_bad_v4',
+  fragmentsPerImage: 3,
+  minSize: 120,
+  maxSize: 280,
+  saveDebounceMs: 160
 };
 
-/* ─────────────────────────────
-   POOL — pas de doublons
-   ───────────────────────────── */
+const surface   = document.getElementById('badArchiveSurface');
+const resetButton = document.getElementById('badReset');
 
-const imagePool = [...CONFIG.images].sort(() => Math.random() - 0.5);
-let   poolIdx   = 0;
-function getNextImage() { return poolIdx < imagePool.length ? imagePool[poolIdx++] : null; }
+let fragments = [];
+let surfaceW  = 0;
+let surfaceH  = 0;
+let saveTimer = null;
+let topZ      = 40;
 
-/* ─────────────────────────────
-   ÉTAT
-   ───────────────────────────── */
+const rand  = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-const state = {
-  archives:       [],
-  deadCrosses:    [],
-  glitchRenderer: null,
-  audio:          null,
-  analyser:       null,
-  running:        false,
-  audioReady:     false,
-  audioLoading:   false,
-  frameId:        null,
-  spawnTimer:     null
-};
+/* ─── mesures ─────────────────────────────────────────────── */
 
-/* ─────────────────────────────
-   HELPERS chaos
-   ───────────────────────────── */
-
-const chaosActive = () => !!window.EC_CHAOS?.active;
-
-/* ─────────────────────────────
-   DOM
-   ───────────────────────────── */
-
-const field  = document.getElementById("zone13ImageField");
-const canvas = document.getElementById("zone13GlitchCanvas");
-
-/* ─────────────────────────────
-   GLITCH CSS par archive
-   (filtres seulement — transforms gérés par chaos ou zone-13)
-   ───────────────────────────── */
-
-function applyArchiveGlitch(archive, audio) {
-  if (!archive || archive.dead) return;
-  const { amplitude, bass, mids, highs, transient } = audio;
-  const s   = archive.sensitivity;
-  const img = archive.el.querySelector(".z13-img");
-  if (!img) return;
-
-  /* ── CSS Filters (toujours actifs, chaos ou non) ── */
-  const hue      = transient > 0.35 * s ? (Math.random() - 0.5) * 280 * s : bass * 60 * s;
-  const contrast = 1 + bass * 2.2 * s + transient * 1.5 * s;
-  const sat      = 1 + mids * 3.0 * s;
-  const bright   = 1 + amplitude * 1.2 * s;
-  const inv      = transient > 0.75 && Math.random() < 0.08 * s ? 1 : 0;
-
-  img.style.filter = [
-    `hue-rotate(${hue.toFixed(0)}deg)`,
-    `contrast(${contrast.toFixed(2)})`,
-    `saturate(${sat.toFixed(2)})`,
-    `brightness(${bright.toFixed(2)})`,
-    inv ? "invert(1)" : ""
-  ].filter(Boolean).join(" ");
-
-  /* Box-shadow echo coloré */
-  if (transient > 0.45 * s) {
-    const ex = (Math.random() - 0.5) * 30 * s;
-    const ey = (Math.random() - 0.5) * 12 * s;
-    img.style.boxShadow = `${ex.toFixed(0)}px ${ey.toFixed(0)}px 0 2px rgba(0,255,255,0.55),${-ex.toFixed(0)}px 0 0 2px rgba(255,0,200,0.45)`;
-  } else {
-    img.style.boxShadow = "";
-  }
-
-  /* ── Transforms — SEULEMENT si chaos n'est pas actif ── */
-  if (!chaosActive()) {
-    /* Burst sonore */
-    const burstX = archive.burstX || 0;
-    const burstY = archive.burstY || 0;
-    archive.burstX = burstX * 0.88;
-    archive.burstY = burstY * 0.88;
-
-    const skewX    = transient > 0.5 * s ? (Math.random() - 0.5) * 20 * s : 0;
-    const rotOff   = burstX * 0.08;
-
-    if (archive.xPx === null) {
-      archive.el.style.transform =
-        `rotate(${archive.rot + rotOff}deg) skewX(${skewX.toFixed(1)}deg) translateX(${burstX.toFixed(1)}px) translateY(${burstY.toFixed(1)}px)`;
-    } else {
-      archive.el.style.transform =
-        `rotate(${archive.rot + rotOff}deg) translateX(${burstX.toFixed(1)}px) translateY(${burstY.toFixed(1)}px)`;
-    }
-  }
-  /* Si chaos est actif : chaos-mode.js gère le transform, on ne touche pas */
+function measure() {
+  surfaceW = surface.offsetWidth  || window.innerWidth;
+  surfaceH = surface.offsetHeight || window.innerHeight;
 }
 
-/* ─────────────────────────────
-   BURST SONORE (positions)
-   Ignoré si chaos actif (chaos gère les vélocités via audioBurst)
-   ───────────────────────────── */
+/* ─── forme déchirée ──────────────────────────────────────── */
 
-function triggerAudioBurst(amplitude = 0.8) {
-  if (chaosActive()) return; /* chaos-mode s'en charge via audioBurst() */
-  state.archives.forEach(archive => {
-    if (archive.dead) return;
-    archive.burstX = (Math.random() - 0.5) * 80 * archive.sensitivity * amplitude;
-    archive.burstY = (Math.random() - 0.5) * 30 * archive.sensitivity * amplitude;
-  });
-}
-
-/* ─────────────────────────────
-   VITALITÉ
-   ───────────────────────────── */
-
-function vitalityColor(ratio) {
-  if (ratio > 0.6) {
-    const r = Math.round(255 * ((ratio - 0.6) / 0.4));
-    return `rgb(${255 - r},255,80)`;
-  } else if (ratio > 0.3) {
-    return `rgb(255,${Math.round(200 * ((ratio-0.3)/0.3) + 55)},0)`;
-  } else {
-    const pulse = Math.sin(performance.now() * 0.012) * 0.5 + 0.5;
-    return `rgba(255,${Math.round(40*(ratio/0.3))},0,${0.7+pulse*0.3})`;
-  }
-}
-
-function updateVitality(archive, ratio) {
-  if (!archive.bar) return;
-  archive.bar.style.transform  = `scaleX(${ratio})`;
-  archive.bar.style.background = vitalityColor(ratio);
-  archive.bar.style.boxShadow  = ratio < 0.25 ? `0 0 8px 2px ${vitalityColor(ratio)}` : "";
-}
-
-/* ─────────────────────────────
-   DRAG + CLICK
-   Skip position si chaos actif (chaos gère les coords)
-   ───────────────────────────── */
-
-function makeInteractive(wrap, archive) {
-  let active = false, startX = 0, startY = 0, hasMoved = false, ox = 0, oy = 0;
-
-  wrap.addEventListener("pointerdown", (e) => {
-    active = true; hasMoved = false;
-    startX = e.clientX; startY = e.clientY;
-    wrap.setPointerCapture(e.pointerId);
-    const r = wrap.getBoundingClientRect();
-    ox = e.clientX - r.left; oy = e.clientY - r.top;
-    e.stopPropagation();
-  });
-
-  wrap.addEventListener("pointermove", (e) => {
-    if (!active) return;
-    if (Math.hypot(e.clientX - startX, e.clientY - startY) > 8) {
-      hasMoved = true;
-      /* Si chaos actif → position gérée par chaos-mode (via transform)
-         On skip les updates left/top mais la vélocité chaos suivra le pointeur */
-      if (!chaosActive()) {
-        wrap.style.cursor = "grabbing"; wrap.style.zIndex = "10";
-        const fr = field.getBoundingClientRect();
-        archive.xPx = e.clientX - fr.left - ox;
-        archive.yPx = e.clientY - fr.top  - oy;
-        wrap.style.left = `${archive.xPx}px`;
-        wrap.style.top  = `${archive.yPx}px`;
-      }
-    }
-  });
-
-  wrap.addEventListener("pointerup", () => {
-    if (!active) return; active = false;
-    wrap.style.cursor = "pointer"; wrap.style.zIndex = "";
-  });
-
-  wrap.addEventListener("pointercancel", () => {
-    active = false; wrap.style.cursor = "pointer"; wrap.style.zIndex = "";
-  });
-}
-
-/* ─────────────────────────────
-   ARCHIVES — création
-   ───────────────────────────── */
-
-function rand(min, max) { return Math.random() * (max - min) + min; }
-
-function createArchive(imageSrc) {
-  const wrap = document.createElement("div");
-  wrap.className = "zone13-archive";
-
-  const img = document.createElement("img");
-  img.className = "zone13-floating-image z13-img";
-  img.src = imageSrc; img.draggable = false;
-
-  const vitalWrap = document.createElement("div");
-  vitalWrap.className = "z13-vital-wrap";
-  const bar = document.createElement("div");
-  bar.className = "z13-vital-bar";
-  vitalWrap.appendChild(bar);
-
-  wrap.appendChild(img);
-  wrap.appendChild(vitalWrap);
-  field.appendChild(wrap);
-
-  const w    = rand(180, 420), h = w * rand(0.7, 1.4);
-  const xPct = rand(4, 80),    yPct = rand(4, 68);
-  const rot  = rand(-18, 18);
-  const life = CONFIG.lifeBase + rand(0, CONFIG.lifeVariance);
-
-  wrap.style.cssText = `
-    width:${w}px;height:${h}px;left:${xPct}%;top:${yPct}%;
-    transform:rotate(${rot}deg) scale(0.4);opacity:0;
-    transition:transform 0.55s ease,opacity 0.55s ease;
-    pointer-events:auto;cursor:pointer;
-  `;
-
-  requestAnimationFrame(() => {
-    wrap.style.transform = `rotate(${rot}deg) scale(1)`;
-    wrap.style.opacity   = "1";
-  });
-
-  const archive = {
-    imageSrc, el: wrap, bar,
-    born: performance.now(), life, rot,
-    xPct, yPct, w, h, xPx: null, yPx: null,
-    burstX: 0, burstY: 0,
-    sensitivity: 0.25 + Math.random() * 0.75,
-    dead: false
+function jaggedPolygon() {
+  return {
+    '--p1x':  `${rand(0,   6).toFixed(2)}%`, '--p1y':  `${rand(3,  18).toFixed(2)}%`,
+    '--p2x':  `${rand(12, 22).toFixed(2)}%`, '--p2y':  `${rand(-8,  8).toFixed(2)}%`,
+    '--p3x':  `${rand(30, 44).toFixed(2)}%`, '--p3y':  `${rand(0,  13).toFixed(2)}%`,
+    '--p4x':  `${rand(58, 72).toFixed(2)}%`, '--p4y':  `${rand(-8, 10).toFixed(2)}%`,
+    '--p5x':  `${rand(88,100).toFixed(2)}%`, '--p5y':  `${rand(8,  25).toFixed(2)}%`,
+    '--p6x':  `${rand(94,104).toFixed(2)}%`, '--p6y':  `${rand(35, 52).toFixed(2)}%`,
+    '--p7x':  `${rand(86,100).toFixed(2)}%`, '--p7y':  `${rand(72, 96).toFixed(2)}%`,
+    '--p8x':  `${rand(64, 78).toFixed(2)}%`, '--p8y':  `${rand(88,106).toFixed(2)}%`,
+    '--p9x':  `${rand(42, 54).toFixed(2)}%`, '--p9y':  `${rand(92,104).toFixed(2)}%`,
+    '--p10x': `${rand(18, 32).toFixed(2)}%`, '--p10y': `${rand(86,102).toFixed(2)}%`,
+    '--p11x': `${rand(-4, 10).toFixed(2)}%`, '--p11y': `${rand(62, 82).toFixed(2)}%`,
+    '--p12x': `${rand(-6,  9).toFixed(2)}%`, '--p12y': `${rand(28, 48).toFixed(2)}%`
   };
+}
 
-  makeInteractive(wrap, archive);
-  state.archives.push(archive);
+/* ─── localStorage ────────────────────────────────────────── */
 
-  /* Intégrer au chaos si actif — après un frame pour que les coords soient stables */
-  if (chaosActive()) {
-    setTimeout(() => window.EC_CHAOS?.addElement(wrap), 100);
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(BAD_CONFIG.storageKey) || '{}'); }
+  catch (_) { return {}; }
+}
+
+function saveStateSoon() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const state = {};
+    fragments.forEach(f => {
+      state[f.id] = { x: Math.round(f.x), y: Math.round(f.y), rot: +f.rot.toFixed(2), z: f.z };
+    });
+    try { localStorage.setItem(BAD_CONFIG.storageKey, JSON.stringify(state)); } catch (_) {}
+  }, BAD_CONFIG.saveDebounceMs);
+}
+
+function clearState() {
+  try { localStorage.removeItem(BAD_CONFIG.storageKey); } catch (_) {}
+  fragments.forEach(f => f.el.remove());
+  fragments = [];
+  topZ = 40;
+  spawn();
+}
+
+/* ─── Fragment ────────────────────────────────────────────── */
+
+class BadFragment {
+  constructor({ id, src, saved }) {
+    this.id  = id;
+    this.src = src;
+
+    this.w   = rand(BAD_CONFIG.minSize, BAD_CONFIG.maxSize);
+    this.h   = this.w * rand(0.65, 1.25);
+    this.x   = rand(20, Math.max(30, surfaceW - this.w - 20));
+    this.y   = rand(20, Math.max(30, surfaceH - this.h - 20));
+    this.rot = rand(-24, 24);
+    this.z   = Math.floor(rand(2, 40));
+
+    if (saved) {
+      this.x   = saved.x   ?? this.x;
+      this.y   = saved.y   ?? this.y;
+      this.rot = saved.rot ?? this.rot;
+      this.z   = saved.z   ?? this.z;
+    }
+
+    this.dragging  = false;
+    this.pointerId = null;
+    this.offsetX   = 0;
+    this.offsetY   = 0;
+
+    this.el = this.build();
+    this.applyTransform();
+    this.bind();
   }
 
-  return archive;
-}
+  build() {
+    const el    = document.createElement('article');
+    el.className  = 'bad-fragment';
+    el.style.zIndex = String(this.z);
 
-/* ─────────────────────────────
-   MORT — croix PERMANENTE
-   ───────────────────────────── */
+    const halo  = document.createElement('div');
+    halo.className = 'bad-fragment__halo';
 
-function killArchive(archive) {
-  if (archive.dead) return;
-  archive.dead = true;
+    const paper = document.createElement('div');
+    paper.className = 'bad-fragment__paper';
 
-  /* Retirer du chaos avant la disparition */
-  window.EC_CHAOS?.removeElement(archive.el);
+    el.appendChild(halo);
+    el.appendChild(paper);
+    surface.appendChild(el);
 
-  archive.el.style.transition = "transform 0.6s ease,opacity 0.6s ease,filter 0.6s";
-  archive.el.style.transform  = `rotate(${archive.rot + rand(-15,15)}deg) scale(0.45)`;
-  archive.el.style.opacity    = "0";
-  archive.el.style.filter     = "blur(6px) saturate(0)";
+    const bgScale = rand(1.2, 2.1);
+    const bgW = this.w * bgScale;
+    const bgH = this.h * bgScale;
 
-  const cx = archive.xPx !== null ? archive.xPx + archive.w/2 : `${archive.xPct}%`;
-  const cy = archive.yPx !== null ? archive.yPx + archive.h/2 : `${archive.yPct}%`;
-
-  setTimeout(() => {
-    archive.el.remove();
-    state.archives = state.archives.filter(a => a !== archive);
-    plantPermanentCross(archive, cx, cy);
-    const s = getZone13State(); s.visits = (s.visits||0)+1; saveZone13State(s);
-  }, 650);
-}
-
-/* ─────────────────────────────
-   CROIX PERMANENTE
-   ───────────────────────────── */
-
-function plantPermanentCross(archive, cx, cy) {
-  const cross = document.createElement("div");
-  cross.className = "z13-cross";
-
-  if (typeof cx === "string") { cross.style.left = cx; cross.style.top = typeof cy==="string"?cy:`${cy}px`; }
-  else { cross.style.left = `${cx}px`; cross.style.top = `${cy}px`; }
-
-  const hint = document.createElement("span");
-  hint.className   = "z13-cross-hint";
-  hint.textContent = "↺ RESTAURER";
-  cross.appendChild(hint);
-  field.appendChild(cross);
-
-  const record = { archive, cross, imageSrc: archive.imageSrc, cx, cy };
-  state.deadCrosses.push(record);
-
-  cross.addEventListener("mouseenter", () => cross.classList.add("is-hovered"));
-  cross.addEventListener("mouseleave", () => cross.classList.remove("is-hovered"));
-  cross.addEventListener("click",      (e) => { e.stopPropagation(); resurrectArchive(record); });
-  cross.addEventListener("touchend",   (e) => { e.preventDefault(); resurrectArchive(record); }, { passive: false });
-
-  /* Intégrer la croix au chaos */
-  if (chaosActive()) {
-    setTimeout(() => window.EC_CHAOS?.addElement(cross), 80);
-  }
-}
-
-/* ─────────────────────────────
-   RÉSURRECTION
-   ───────────────────────────── */
-
-function resurrectArchive(record) {
-  const { imageSrc, cross, cx, cy } = record;
-  cross.classList.add("is-ghost");
-  cross.style.pointerEvents = "none";
-  window.EC_CHAOS?.removeElement(cross);
-
-  const wrap = document.createElement("div");
-  wrap.className = "zone13-archive";
-  const img = document.createElement("img");
-  img.className = "zone13-floating-image z13-img"; img.src = imageSrc; img.draggable = false;
-  const vw = document.createElement("div"); vw.className = "z13-vital-wrap";
-  const bar = document.createElement("div"); bar.className = "z13-vital-bar";
-  vw.appendChild(bar); wrap.appendChild(img); wrap.appendChild(vw);
-  field.appendChild(wrap);
-
-  const w   = rand(160, 380), h = w * rand(0.7, 1.4);
-  const rot = rand(-14, 14);
-  const life = CONFIG.lifeBase * 0.55 + rand(0, CONFIG.lifeVariance * 0.4);
-  const fr   = field.getBoundingClientRect();
-  let pxLeft, pxTop;
-  if (typeof cx === "string" && cx.includes("%")) {
-    pxLeft = (parseFloat(cx)/100)*fr.width  - w/2;
-    pxTop  = (parseFloat(cy)/100)*fr.height - h/2;
-  } else { pxLeft = (parseFloat(cx)||0) - w/2; pxTop  = (parseFloat(cy)||0) - h/2; }
-
-  wrap.style.cssText = `
-    width:${w}px;height:${h}px;left:${pxLeft}px;top:${pxTop}px;
-    transform:rotate(${rot}deg) scale(0.3);opacity:0;filter:brightness(3) saturate(0);
-    transition:transform 0.8s ease,opacity 0.8s ease,filter 1.2s ease;
-    pointer-events:auto;cursor:pointer;
-  `;
-  requestAnimationFrame(() => {
-    wrap.style.transform = `rotate(${rot}deg) scale(1)`;
-    wrap.style.opacity   = "1"; wrap.style.filter = "";
-  });
-
-  const archive = {
-    imageSrc, el: wrap, bar,
-    born: performance.now(), life, rot,
-    xPct: null, yPct: null, xPx: pxLeft, yPx: pxTop, w, h,
-    burstX: (Math.random()-0.5)*60, burstY: (Math.random()-0.5)*30,
-    sensitivity: 0.5 + Math.random() * 0.5,
-    dead: false, resurrected: true
-  };
-
-  makeInteractive(wrap, archive);
-  state.archives.push(archive);
-  if (chaosActive()) setTimeout(() => window.EC_CHAOS?.addElement(wrap), 100);
-}
-
-/* ─────────────────────────────
-   UPDATE BOUCLE
-   ───────────────────────────── */
-
-function updateArchives(now, audioState) {
-  for (const archive of state.archives) {
-    if (archive.dead) continue;
-    const elapsed = now - archive.born;
-    const ratio   = Math.max(0, 1 - elapsed / archive.life);
-    updateVitality(archive, ratio);
-
-    const drain = audioState
-      ? 1 + audioState.amplitude * 3.2 + audioState.bass * 2.0 : 1;
-
-    if (ratio <= 0 || elapsed > archive.life / drain) { killArchive(archive); continue; }
-    if (audioState) applyArchiveGlitch(archive, audioState);
-    else { archive.burstX = (archive.burstX||0)*0.9; archive.burstY = (archive.burstY||0)*0.9; }
-  }
-}
-
-function spawnIfNeeded() {
-  if (state.archives.filter(a=>!a.dead).length >= CONFIG.maxLiving) return;
-  const src = getNextImage(); if (!src) return;
-  createArchive(src);
-}
-
-/* ─────────────────────────────
-   CANVAS
-   ───────────────────────────── */
-
-function resizeCanvas() {
-  const r = canvas.getBoundingClientRect();
-  canvas.width = Math.floor(r.width); canvas.height = Math.floor(r.height);
-  state.glitchRenderer?.resize();
-}
-
-/* ─────────────────────────────
-   LOOP
-   ───────────────────────────── */
-
-function loop(now) {
-  state.frameId = requestAnimationFrame(loop);
-  let audioState = null;
-  if (state.audioReady && state.analyser) {
-    const raw = state.analyser.update();
-    audioState = { amplitude:raw.amplitude, bass:raw.bass, mids:raw.mids, highs:raw.highs, transient:raw.transient };
-  }
-  updateArchives(now, audioState);
-  if (state.glitchRenderer)
-    audioState && audioState.amplitude > 0.02 ? state.glitchRenderer.render(audioState) : state.glitchRenderer.clear();
-}
-
-/* ─────────────────────────────
-   INIT AUDIO
-   ───────────────────────────── */
-
-async function initAudio() {
-  if (state.audioReady || state.audioLoading) return;
-  state.audioLoading = true;
-  try {
-    const audio = new Zone13Audio();
-    await audio.init(); await audio.resume();
-    await audio.loadBuffers(CONFIG.audioFiles);
-
-    audio.onTrigger = (srcIdx) => {
-      const amp = 0.85 + Math.random() * 0.15;
-      triggerAudioBurst(amp);
-      /* Propagation au chaos */
-      window.EC_CHAOS?.audioBurst(amp);
-      /* Update panel LED */
-      document.querySelectorAll(".z13-src-row").forEach((row, i) => row.classList.toggle("is-playing", i === srcIdx));
+    const vars = {
+      '--w':   `${this.w}px`,
+      '--h':   `${this.h}px`,
+      '--img': `url("${this.src}")`,
+      '--bgw': `${bgW}px`,
+      '--bgh': `${bgH}px`,
+      '--bgx': `${rand(-bgW * 0.48, 0).toFixed(1)}px`,
+      '--bgy': `${rand(-bgH * 0.48, 0).toFixed(1)}px`,
+      ...jaggedPolygon()
     };
 
-    audio.onEnd = () => {
-      document.querySelectorAll(".z13-src-row").forEach(r => r.classList.remove("is-playing"));
+    Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
+
+    return el;
+  }
+
+  applyTransform() {
+    this.el.style.transform =
+      `translate3d(${this.x.toFixed(1)}px, ${this.y.toFixed(1)}px, 0) rotate(${this.rot.toFixed(2)}deg)`;
+  }
+
+  bind() {
+    this.el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.dragging  = true;
+      this.pointerId = e.pointerId;
+      this.el.setPointerCapture(e.pointerId);
+      this.el.classList.add('is-dragging');
+
+      /* monter au premier plan */
+      this.z = ++topZ;
+      this.el.style.zIndex = String(this.z);
+
+      this.offsetX = e.clientX - this.x;
+      this.offsetY = e.clientY - this.y;
+    });
+
+    this.el.addEventListener('pointermove', e => {
+      if (!this.dragging || e.pointerId !== this.pointerId) return;
+      e.preventDefault();
+
+      this.x = clamp(e.clientX - this.offsetX, -this.w * 0.35, surfaceW - this.w * 0.65);
+      this.y = clamp(e.clientY - this.offsetY, -this.h * 0.35, surfaceH - this.h * 0.65);
+
+      this.applyTransform();
+    });
+
+    const endDrag = e => {
+      if (e.pointerId !== this.pointerId) return;
+      this.dragging  = false;
+      this.pointerId = null;
+      this.el.classList.remove('is-dragging');
+      saveStateSoon();
     };
 
-    audio.startCycle();
-    state.audio = audio;
-    state.analyser = new Zone13AnalyserData(audio.getAnalyser());
-    state.audioReady = true; state.audioLoading = false;
-    state.glitchRenderer = new Zone13GlitchRenderer(canvas);
-    resizeCanvas();
-    injectGrainSection_enable();
-    console.log("[Zone13] Audio démarré");
-  } catch (err) { state.audioLoading = false; console.warn("[Zone13] Audio échec :", err); }
+    this.el.addEventListener('pointerup',     endDrag);
+    this.el.addEventListener('pointercancel', endDrag);
+  }
 }
 
-/* ─────────────────────────────
-   SOUND PANEL
-   ───────────────────────────── */
+/* ─── spawn / init ────────────────────────────────────────── */
 
-let _grainSectionEl = null;
+function spawn() {
+  measure();
+  const saved = loadState();
+  let id = 0;
 
-function injectGrainSection() {
-  const panelInner = document.querySelector("#ecartAudioPanel .ecart-audio-panel-inner");
-  if (!panelInner || panelInner.querySelector(".z13-sound-section")) return;
+  BAD_ARCHIVES.forEach(src => {
+    for (let i = 0; i < BAD_CONFIG.fragmentsPerImage; i++) {
+      fragments.push(new BadFragment({ id, src, saved: saved[id] }));
+      id++;
+    }
+  });
+}
 
-  const sourcesHTML = CONFIG.srcLabels.map((label, i) => `
-    <div class="z13-src-row" data-src="${i}">
-      <span class="z13-src-led"></span>
-      <span class="z13-src-name">${label}</span>
-      <span class="z13-src-bar"></span>
-    </div>`).join("");
+function init() {
+  if (!surface) return;
 
-  const section = document.createElement("div");
-  section.className = "z13-sound-section";
-  section.innerHTML = `
-    <div class="z13-sound-label">SOUND DESIGN</div>
-    <button class="z13-activate-btn" id="z13ActivateBtn" type="button">
-      <span class="z13-ring"></span>ACTIVER
-    </button>
-    <p class="z13-loading-msg" id="z13Loading" hidden>Chargement…</p>
-    <div class="z13-src-list z13-locked" id="z13SrcList">${sourcesHTML}</div>
-    <button class="z13-trigger-btn z13-locked" id="z13TriggerBtn" type="button" disabled>↗ DÉCLENCHER</button>
-    <p class="z13-sim-hint">${CONFIG.images.length} archives · pool unique · croix permanentes</p>
-  `;
+  spawn();
 
-  panelInner.appendChild(section);
-  _grainSectionEl = section;
-
-  section.querySelector("#z13ActivateBtn").addEventListener("click", async (e) => {
-    if (state.audioLoading || state.audioReady) return;
-    e.currentTarget.disabled    = true;
-    e.currentTarget.textContent = "…";
-    section.querySelector("#z13Loading").hidden = false;
-    await initAudio();
+  window.addEventListener('resize', () => {
+    measure();
+    fragments.forEach(f => {
+      f.x = clamp(f.x, -f.w * 0.35, surfaceW - f.w * 0.65);
+      f.y = clamp(f.y, -f.h * 0.35, surfaceH - f.h * 0.65);
+      f.applyTransform();
+    });
+    saveStateSoon();
   });
 
-  section.querySelector("#z13TriggerBtn").addEventListener("click", () => state.audio?.manualTrigger());
+  if (resetButton) {
+    resetButton.addEventListener('click', clearState);
+  }
 }
 
-function injectGrainSection_enable() {
-  if (!_grainSectionEl) return;
-  const s = _grainSectionEl;
-  s.querySelector("#z13ActivateBtn").hidden  = true;
-  s.querySelector("#z13Loading").hidden      = true;
-  s.querySelector("#z13SrcList").classList.remove("z13-locked");
-  s.querySelector("#z13TriggerBtn").classList.remove("z13-locked");
-  s.querySelector("#z13TriggerBtn").disabled = false;
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
 }
-
-/* ─────────────────────────────
-   MUTE MASTER
-   ───────────────────────────── */
-
-(function() {
-  const btn = document.getElementById("soundToggle");
-  if (!btn) return;
-  let muted = false;
-  btn.addEventListener("click", () => {
-    if (!state.audio?.masterGain) return;
-    muted = !muted;
-    const { gain } = state.audio.masterGain;
-    const now = state.audio.ctx.currentTime;
-    gain.cancelScheduledValues(now);
-    gain.setTargetAtTime(muted ? 0 : 0.92, now, 0.12);
-    btn.setAttribute("aria-pressed", String(muted));
-  });
-})();
-
-/* ─────────────────────────────
-   START
-   ───────────────────────────── */
-
-function start() {
-  if (state.running) return;
-  state.running = true;
-  injectGrainSection();
-  for (let i = 0; i < CONFIG.maxLiving; i++) spawnIfNeeded();
-  state.spawnTimer = setInterval(spawnIfNeeded, CONFIG.spawnInterval);
-  state.frameId    = requestAnimationFrame(loop);
-  const s = getZone13State();
-  if (!s.activated) { s.activated = true; saveZone13State(s); }
-  console.log("[Zone13] Simulation démarrée — pool:", imagePool.length, "images");
-}
-
-window.addEventListener("resize", resizeCanvas);
-document.addEventListener("DOMContentLoaded", start);
