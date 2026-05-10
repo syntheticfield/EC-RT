@@ -1,18 +1,22 @@
 /* ==========================================================
-   EC@RT — INTERFACE UNIFIÉE v8
+   EC@RT — INTERFACE UNIFIÉE v9
    ========================================================== */
 
 (function () {
-  const STORAGE_KEY       = "ecart_visited_zones";
-  const LIGHT_KEY         = "ecart_light_mode";
-  const FOCUS_KEY         = "ecart_focus_mode";
+  const STORAGE_KEY = "ecart_visited_zones";
+  const LIGHT_KEY   = "ecart_light_mode";
+  const FOCUS_KEY   = "ecart_focus_mode";
 
-  /* SVG inline */
+  /* ── Icônes SVG — [6] identiques desktop/tablette/phone ── */
   const SVG_EYE_OPEN = `<svg class="eye-open" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
 
   const SVG_EYE_CLOSED = `<svg class="eye-closed" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
 
   const SVG_SUN = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>`;
+
+  /* [5][6] SVG play/pause — rendu identique sur tous les appareils */
+  const SVG_PLAY  = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><polygon points="6,3 20,12 6,21"/></svg>`;
+  const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><rect x="5"  y="4" width="4.5" height="16" rx="1"/><rect x="14.5" y="4" width="4.5" height="16" rx="1"/></svg>`;
 
   function qs(sel, root)  { return (root || document).querySelector(sel); }
   function qsa(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
@@ -59,9 +63,7 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     CLUSTER — SOUND / MAP / INFO / LIGHT
-     Pas de bouton MENU, boutons toujours visibles
-     La sidebar (EC@RT toggle) n'interagit PLUS avec le cluster
+     CLUSTER — SOUND / MAP / INFO
      ────────────────────────────────────────────────────── */
 
   function initCluster() {
@@ -81,7 +83,6 @@
 
     document.body.appendChild(cluster);
 
-    /* Escape ferme tous les panels ouverts */
     document.addEventListener("keydown", e => {
       if (e.key === "Escape") closeAllPanelsExcept("__none__");
     });
@@ -89,6 +90,7 @@
 
   /* ──────────────────────────────────────────────────────
      TOAST — "SURFACE PHOTOSENSIBLE : ON / OFF"
+     [3] Taille réduite, positionné à gauche du bouton œil
      ────────────────────────────────────────────────────── */
 
   function showToast(message) {
@@ -104,7 +106,7 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     CONTENEUR TOP-RIGHT — crée #ecartTopRight une seule fois
+     CONTENEUR TOP-RIGHT — #ecartTopRight
      ────────────────────────────────────────────────────── */
 
   function getOrCreateTopRight() {
@@ -118,7 +120,7 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     MODE FOCUS — bouton ŒIL (top-right)
+     MODE FOCUS — bouton ŒIL
      ────────────────────────────────────────────────────── */
 
   function initFocusMode() {
@@ -140,10 +142,7 @@
       btn.classList.toggle("is-active", active);
       btn.setAttribute("aria-label", active ? "Quitter le mode immersif" : "Mode immersif");
       localStorage.setItem(FOCUS_KEY, active ? "1" : "0");
-      if (active) {
-        /* Ferme MAP et INFO — le panel SOUND reste accessible */
-        closeAllPanelsExcept("sound");
-      }
+      if (active) closeAllPanelsExcept("sound");
     }
 
     if (isActive) applyFocus(true);
@@ -151,9 +150,7 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     MODE JOUR (LIGHT) — bouton ☀ (top-right, sous l'œil)
-     filter: invert(0.88)… sur <html>
-     canvas non ré-inversé → scènes 3D affectées
+     MODE JOUR — bouton ☀
      ────────────────────────────────────────────────────── */
 
   function initLightMode() {
@@ -175,7 +172,6 @@
       btn.classList.toggle("is-active", on);
       btn.setAttribute("aria-label", on ? "Mode nuit" : "Mode jour");
       localStorage.setItem(LIGHT_KEY, on ? "1" : "0");
-      /* Toast affiché APRÈS le toggle pour hériter du bon mode visuel */
       requestAnimationFrame(() => {
         showToast(on ? "SURFACE PHOTOSENSIBLE : ON" : "SURFACE PHOTOSENSIBLE : OFF");
       });
@@ -186,8 +182,8 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     SOUND — overlay fullscreen (même structure que MAP/INFO)
-     Fermeture du panel ne coupe PAS le son
+     SOUND — [5] chaque piste = lecteur indépendant
+     [6] SVG play/pause identique partout
      ────────────────────────────────────────────────────── */
 
   function initSoundDirect() {
@@ -195,7 +191,6 @@
     if (!btn) return;
 
     let sounds = Array.isArray(window.ECART_SOUND) ? [...window.ECART_SOUND] : [];
-
     const hasVoice = sounds.some(s => s.type === "voice");
     if (!hasVoice) sounds.push({ title: "Voix de l'écran", type: "voice" });
 
@@ -212,6 +207,7 @@
     const audio = new Audio();
     audio.preload = "metadata";
 
+    /* ── Création du panel — sans lecteur global ── */
     const panel = document.createElement("div");
     panel.id = "ecartAudioPanel";
     panel.setAttribute("aria-hidden", "true");
@@ -219,15 +215,6 @@
     panel.innerHTML = `
       <div class="ecart-audio-panel-inner">
         <h2 class="ecart-audio-panel-title">SOUND</h2>
-        <div class="ecart-audio-main">
-          <button class="ecart-audio-playpause" id="ecartAudioPP" type="button" aria-label="Lecture / Pause">▶</button>
-          <div class="ecart-audio-info">
-            <div class="ecart-audio-now" id="ecartAudioNow">Audio</div>
-            <div class="ecart-audio-progress-strip" id="ecartAudioStrip" role="progressbar" aria-valuenow="0">
-              <div class="ecart-audio-progress-fill" id="ecartAudioFill"></div>
-            </div>
-          </div>
-        </div>
         <div class="ecart-audio-tracklist" id="ecartAudioTracklist"></div>
       </div>
     `;
@@ -235,27 +222,30 @@
     document.body.appendChild(panel);
 
     const tracklist = qs("#ecartAudioTracklist", panel);
-    const nowEl     = qs("#ecartAudioNow",        panel);
-    const fill      = qs("#ecartAudioFill",        panel);
-    const strip     = qs("#ecartAudioStrip",       panel);
-    const ppBtn     = qs("#ecartAudioPP",          panel);
 
-    /* ▼ setPanelVisible cache/montre l'UI sans toucher à l'audio */
+    /* ── État panel ── */
     function setPanelVisible(on) {
       panel.classList.toggle("is-visible", on);
       panel.setAttribute("aria-hidden", on ? "false" : "true");
       btn.classList.toggle("is-open", on);
     }
 
+    /* ── [5][6] Met à jour tous les boutons pp ── */
     function setPlaying(on) {
       btn.classList.toggle("is-playing", on);
       panel.classList.toggle("is-playing", on);
-      ppBtn.textContent = on ? "⏸" : "▶";
+
+      sounds.forEach((s, i) => {
+        if (!s._ppEl) return;
+        const isThis = (i === currentIndex);
+        s._ppEl.innerHTML = (on && isThis) ? SVG_PAUSE : SVG_PLAY;
+        s._ppEl.setAttribute("aria-label", (on && isThis) ? "Pause" : "Lecture");
+      });
     }
 
     function resetProgress() {
-      fill.style.width = "0%";
-      strip.setAttribute("aria-valuenow", "0");
+      const s = sounds[currentIndex];
+      if (s?._fillEl) s._fillEl.style.width = "0%";
     }
 
     function stopAll() {
@@ -270,6 +260,7 @@
       });
     }
 
+    /* ── Voix ── */
     function collectScreenText() {
       const info  = window.ECART_INFO || {};
       const texts = [];
@@ -286,31 +277,18 @@
       const content = text?.trim() || "Aucun texte lisible détecté.";
       const utterance = new SpeechSynthesisUtterance(content);
       utterance.lang = "fr-FR"; utterance.rate = 0.88; utterance.pitch = 0.92; utterance.volume = 1;
-      utterance.onstart = () => { currentMode = "voice"; setPlaying(true); fill.style.width = "100%"; strip.setAttribute("aria-valuenow", "100"); };
+      utterance.onstart = () => {
+        currentMode = "voice";
+        setPlaying(true);
+        const s = sounds[currentIndex];
+        if (s?._fillEl) s._fillEl.style.width = "100%";
+      };
       utterance.onend = utterance.onerror = () => { setPlaying(false); resetProgress(); };
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utterance);
     }
 
-    function loadTrack(index, autoplay = false) {
-      currentIndex = index;
-      const sound = sounds[currentIndex];
-      stopAll(); resetProgress();
-      nowEl.textContent = sound.title || `Piste ${currentIndex + 1}`;
-      updateActiveTrack();
-      setPanelVisible(true);
-      if (sound.type === "voice") {
-        currentMode = "voice";
-        audio.removeAttribute("src");
-        if (autoplay) speakText(collectScreenText());
-        return;
-      }
-      currentMode = "audio";
-      if (!sound.file) { console.warn("[EC@RT] Piste sans fichier :", sound); setPlaying(false); return; }
-      audio.src = sound.file; audio.currentTime = 0; audio.load();
-      if (autoplay) play(); else setPlaying(false);
-    }
-
+    /* ── Lecture ── */
     function play() {
       const sound = sounds[currentIndex];
       if (sound?.type === "voice") { speakText(collectScreenText()); return; }
@@ -329,51 +307,141 @@
 
     function togglePlay() {
       const sound = sounds[currentIndex];
-      if (sound?.type === "voice") { panel.classList.contains("is-playing") ? pause() : play(); return; }
+      if (sound?.type === "voice") {
+        panel.classList.contains("is-playing") ? pause() : play();
+        return;
+      }
       audio.paused ? play() : pause();
     }
 
+    function loadTrack(index, autoplay = false) {
+      currentIndex = index;
+      const sound  = sounds[currentIndex];
+      stopAll(); resetProgress();
+      updateActiveTrack();
+      setPanelVisible(true);
+
+      if (sound.type === "voice") {
+        currentMode = "voice";
+        audio.removeAttribute("src");
+        if (autoplay) speakText(collectScreenText());
+        return;
+      }
+
+      currentMode = "audio";
+      if (!sound.file) {
+        console.warn("[EC@RT] Piste sans fichier :", sound);
+        setPlaying(false);
+        return;
+      }
+      audio.src = sound.file; audio.currentTime = 0; audio.load();
+      if (autoplay) play(); else setPlaying(false);
+    }
+
+    /* ── [5] Génération des pistes — lecteur par piste ── */
     sounds.forEach((sound, index) => {
-      const item = document.createElement("button");
-      item.type = "button"; item.className = "ecart-audio-track";
-      item.innerHTML = `<span class="ecart-audio-track-index">${String(index + 1).padStart(2, "0")}</span><span class="ecart-audio-track-title">${sound.title || `Piste ${index + 1}`}</span><span class="ecart-audio-track-meta">${sound.date || sound.year || ""}</span>`;
-      item.addEventListener("click", () => loadTrack(index, true));
+      const item = document.createElement("div");
+      item.className = "ecart-audio-track";
+
+      /* Bouton play/pause propre à cette piste */
+      const ppBtn = document.createElement("button");
+      ppBtn.type      = "button";
+      ppBtn.className = "ecart-track-pp";
+      ppBtn.innerHTML = SVG_PLAY;
+      ppBtn.setAttribute("aria-label", "Lecture");
+
+      /* Corps : titre + barre de progression */
+      const body = document.createElement("div");
+      body.className = "ecart-track-body";
+
+      const header = document.createElement("div");
+      header.className = "ecart-track-header";
+      header.innerHTML = `
+        <span class="ecart-audio-track-index">${String(index + 1).padStart(2, "0")}</span>
+        <span class="ecart-audio-track-title">${sound.title || `Piste ${index + 1}`}</span>
+      `;
+
+      const strip = document.createElement("div");
+      strip.className = "ecart-track-progress-strip";
+
+      const fill = document.createElement("div");
+      fill.className = "ecart-track-progress-fill";
+      strip.appendChild(fill);
+
+      body.appendChild(header);
+      body.appendChild(strip);
+      item.appendChild(ppBtn);
+      item.appendChild(body);
       tracklist.appendChild(item);
+
+      /* Références stockées sur l'objet sound */
+      sound._ppEl   = ppBtn;
+      sound._fillEl = fill;
+      sound._strip  = strip;
+
+      /* Clic sur le bouton pp */
+      ppBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        if (currentIndex === index) togglePlay();
+        else loadTrack(index, true);
+      });
+
+      /* Clic sur le corps de piste */
+      body.addEventListener("click", () => {
+        if (currentIndex === index) togglePlay();
+        else loadTrack(index, true);
+      });
+
+      /* Seek sur la barre — pointer */
+      strip.addEventListener("click", e => {
+        e.stopPropagation();
+        if (currentMode === "voice" || !audio.duration || currentIndex !== index) return;
+        const rect = strip.getBoundingClientRect();
+        audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * audio.duration;
+      });
+
+      /* Seek tactile */
+      strip.addEventListener("touchend", e => {
+        e.stopPropagation();
+        if (currentMode === "voice" || !audio.duration || currentIndex !== index) return;
+        const rect  = strip.getBoundingClientRect();
+        const touch = e.changedTouches[0];
+        audio.currentTime = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width)) * audio.duration;
+      }, { passive: true });
     });
 
+    /* ── Événements audio ── */
     audio.addEventListener("loadedmetadata", resetProgress);
+
     audio.addEventListener("timeupdate", () => {
       if (!audio.duration) return;
-      const pct = (audio.currentTime / audio.duration) * 100;
-      fill.style.width = `${pct}%`;
-      strip.setAttribute("aria-valuenow", Math.round(pct));
+      const pct  = (audio.currentTime / audio.duration) * 100;
+      const s    = sounds[currentIndex];
+      if (s?._fillEl) s._fillEl.style.width = `${pct}%`;
     });
-    audio.addEventListener("ended",  () => { setPlaying(false); resetProgress(); audio.currentTime = 0; });
-    audio.addEventListener("error",  () => { console.warn("[EC@RT] Erreur audio :", audio.src); setPlaying(false); resetProgress(); });
 
-    strip.addEventListener("click", e => {
-      if (currentMode === "voice" || !audio.duration) return;
-      const rect = strip.getBoundingClientRect();
-      audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * audio.duration;
+    audio.addEventListener("ended", () => {
+      setPlaying(false);
+      resetProgress();
+      audio.currentTime = 0;
     });
-    strip.addEventListener("touchend", e => {
-      if (currentMode === "voice" || !audio.duration) return;
-      const rect = strip.getBoundingClientRect();
-      const touch = e.changedTouches[0];
-      audio.currentTime = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width)) * audio.duration;
-    }, { passive: true });
 
+    audio.addEventListener("error", () => {
+      console.warn("[EC@RT] Erreur audio :", audio.src);
+      setPlaying(false);
+      resetProgress();
+    });
+
+    /* ── Bouton cluster SOUND ── */
     btn.addEventListener("click", () => {
       panel.classList.contains("is-visible")
         ? setPanelVisible(false)
         : (closeAllPanelsExcept("sound"), setPanelVisible(true), updateActiveTrack(), emitPanelOpen("sound"));
     });
 
-    ppBtn.addEventListener("click", togglePlay);
-
+    /* ── Fermeture ── */
     panel.addEventListener("click", e => { if (e.target === panel) setPanelVisible(false); });
 
-    /* ▼ Ferme le panel UI mais NE COUPE PAS le son */
     document.addEventListener("ecart:panel-close-others", e => {
       if (e.detail?.panel !== "sound") setPanelVisible(false);
     });
@@ -429,8 +497,7 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     MAP — flèches navigation directe (1 tap)
-     Zones sur minimap : 2 taps (arm → navigate)
+     MAP
      ────────────────────────────────────────────────────── */
 
   function initMapPanel() {
@@ -450,10 +517,9 @@
       .filter(z => z.id && z.href)
       .sort((a, b) => parseInt(a.id) - parseInt(b.id));
 
-    const curIdx      = zoneList.findIndex(z => z.id === currentZone);
+    const curIdx       = zoneList.findIndex(z => z.id === currentZone);
     const defaultLabel = curIdx >= 0 ? zoneList[curIdx].name : "Sélectionne une zone.";
 
-    /* Barre nav */
     const statusWrap = qs(".mobile-map-status-wrap", overlay);
     if (statusWrap) {
       statusWrap.innerHTML = `
@@ -469,7 +535,6 @@
     const navPrev = qs("#mapNavPrev");
     const navNext = qs("#mapNavNext");
 
-    /* ── Flèches — navigation directe (1 tap) ──────────── */
     if (navPrev && zoneList.length > 1) {
       navPrev.addEventListener("click", e => {
         e.stopPropagation();
@@ -550,7 +615,6 @@
     document.addEventListener("keydown", e => { if (e.key === "Escape") closeMap(); });
     document.addEventListener("ecart:panel-close-others", e => { if (e.detail?.panel !== "map") closeMap(); });
 
-    /* ── Zones minimap — 2 taps (arm → navigate) ─────── */
     zones.forEach(zone => {
       zone.dataset.armed = "false";
 
@@ -567,7 +631,7 @@
       });
 
       zone.addEventListener("click", e => {
-        e.stopPropagation(); /* corrige l'overlap zone-10/zone-11 */
+        e.stopPropagation();
         const name    = zone.dataset.zoneName || "zone";
         const isArmed = zone.dataset.armed === "true";
 
@@ -603,8 +667,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initCluster();
-    initFocusMode();   /* œil en haut dans #ecartTopRight */
-    initLightMode();   /* ☀ en dessous dans #ecartTopRight */
+    initFocusMode();
+    initLightMode();
     initSoundDirect();
     initInfoPanel();
     initMapPanel();

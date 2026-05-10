@@ -1,5 +1,5 @@
 /* ==========================================================
-   EC@RT — PANEL UI  v8
+   EC@RT — PANEL UI  v9
    ========================================================== */
 
 :root {
@@ -12,6 +12,13 @@
   --ecart-z-button:   100050;
   --ecart-z-panel:    100015;
   --ecart-z-audiobar:  99990;
+
+  /* [7] Rouge transparent — variables centralisées */
+  --ecart-btn-bg:       rgba(160, 12, 12, 0.28);
+  --ecart-btn-border:   rgba(220, 55, 55, 0.44);
+  --ecart-btn-hover-bg: rgba(190, 15, 15, 0.46);
+  --ecart-btn-hover-bd: rgba(240, 75, 75, 0.65);
+  --ecart-btn-active-bg: rgba(210, 18, 18, 0.92);
 }
 
 .sidebar, .site-title, .home-button {
@@ -25,8 +32,7 @@
 
 
 /* ==========================================================
-   CLUSTER — SOUND / MAP / INFO + LIGHT
-   Pas de bouton MENU, boutons toujours visibles
+   CLUSTER — SOUND / MAP / INFO
    ========================================================== */
 
 .ecart-ui-cluster {
@@ -47,7 +53,7 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 
 /* ==========================================================
-   BASE BOUTON — lisible, contraste suffisant
+   BASE BOUTON — [7] rouge transparent
    ========================================================== */
 
 .ecart-ui-cluster > button {
@@ -58,9 +64,9 @@ body.ecart-audio-active .ecart-ui-cluster {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.30);
-  background: rgba(255,255,255,0.14);
-  color: rgba(255,255,255,0.86);
+  border: 1px solid var(--ecart-btn-border);
+  background: var(--ecart-btn-bg);
+  color: rgba(255,255,255,0.90);
   font-size:      0.50rem;
   font-weight:    700;
   letter-spacing: 0.13em;
@@ -81,18 +87,18 @@ body.ecart-audio-active .ecart-ui-cluster {
 }
 
 .ecart-ui-cluster > button:hover {
-  background:   rgba(255,255,255,0.24);
+  background:   var(--ecart-btn-hover-bg);
   color:        rgba(255,255,255,1);
-  border-color: rgba(255,255,255,0.48);
-  box-shadow:   0 2px 14px rgba(0,0,0,0.34);
+  border-color: var(--ecart-btn-hover-bd);
+  box-shadow:   0 2px 14px rgba(180,0,0,0.22);
 }
 
 .ecart-ui-cluster > button.is-open,
 .ecart-ui-cluster > button.is-playing {
-  background:   rgba(255,255,255,0.96);
-  color:        #000;
+  background:   var(--ecart-btn-active-bg);
+  color:        #fff;
   border-color: transparent;
-  box-shadow:   0 2px 12px rgba(255,255,255,0.16);
+  box-shadow:   0 2px 14px rgba(200,20,20,0.34);
 }
 
 .ecart-ui-cluster > button:active { transform: scale(0.90); }
@@ -100,7 +106,6 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 /* ==========================================================
    CONTENEUR TOP-RIGHT — boutons ŒIL + LIGHT
-   Aligné sur le même right que le cluster (--ecart-ui-right)
    ========================================================== */
 
 #ecartTopRight {
@@ -122,29 +127,32 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 /* ==========================================================
    TOAST — "SURFACE PHOTOSENSIBLE : ON / OFF"
-   Haut-droite sous les boutons œil + light, disparaît après ~2.6s
-   Calcul : 18px (top #ecartTopRight) + 34px (œil) + 8px (gap) + 34px (soleil) + 10px
+   [3] Taille réduite + positionné à GAUCHE du cluster boutons
    ========================================================== */
 
 .ecart-toast {
   position: fixed;
-  top:   calc(104px + env(safe-area-inset-top, 0px));
-  right: var(--ecart-ui-right);
+  top:   calc(18px + env(safe-area-inset-top, 0px));
+
+  /* [3] Décalé à gauche des boutons top-right */
+  right: calc(var(--ecart-ui-right) + var(--ecart-ui-size) + 10px);
   left:  auto;
   transform: none;
   text-align: right;
   z-index: 100200;
 
   font-family: Arial, Helvetica, sans-serif;
-  font-size: clamp(0.62rem, 2vw, 0.92rem);
+
+  /* [3] Légèrement plus petit */
+  font-size: clamp(0.50rem, 1.1vw, 0.66rem);
   font-weight: 700;
-  letter-spacing: 0.30em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
 
-  color: rgba(255,255,255,0.92);
+  color: rgba(255,255,255,0.88);
   text-shadow:
-    0 0 18px rgba(255,255,255,0.36),
-    0 0 40px rgba(255,255,255,0.16);
+    0 0 14px rgba(255,255,255,0.30),
+    0 0 32px rgba(255,255,255,0.14);
 
   pointer-events: none;
   white-space: nowrap;
@@ -154,29 +162,31 @@ body.ecart-audio-active .ecart-ui-cluster {
 }
 
 @keyframes ecartToastAnim {
-  0%   { opacity: 0; letter-spacing: 0.40em; }
-  14%  { opacity: 1; letter-spacing: 0.30em; }
-  70%  { opacity: 1; letter-spacing: 0.30em; }
-  100% { opacity: 0; letter-spacing: 0.22em; }
+  0%   { opacity: 0; letter-spacing: 0.34em; }
+  14%  { opacity: 1; letter-spacing: 0.24em; }
+  70%  { opacity: 1; letter-spacing: 0.24em; }
+  100% { opacity: 0; letter-spacing: 0.16em; }
 }
 
 
 /* ==========================================================
-   BOUTONS ŒIL + LIGHT — style unifié (même que home-button)
+   BOUTONS ŒIL + LIGHT — [7] rouge transparent
+   [2] Même taille que cluster sur touch
    ========================================================== */
 
 .ecart-focus-btn,
 .ecart-light-btn {
-  width: 34px;
-  height: 34px;
+  /* [2] base desktop : même taille entre eux */
+  width:  var(--ecart-ui-size);
+  height: var(--ecart-ui-size);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.82);
+  border: 1px solid var(--ecart-btn-border);
+  background: var(--ecart-btn-bg);
+  color: rgba(255,255,255,0.90);
   cursor: pointer;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -193,8 +203,8 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 .ecart-focus-btn:hover,
 .ecart-light-btn:hover {
-  background:   rgba(255,255,255,0.13);
-  border-color: rgba(255,255,255,0.36);
+  background:   var(--ecart-btn-hover-bg);
+  border-color: var(--ecart-btn-hover-bd);
 }
 
 .ecart-focus-btn:active,
@@ -202,9 +212,9 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 .ecart-focus-btn.is-active,
 .ecart-light-btn.is-active {
-  background:   rgba(255,255,255,0.92);
+  background:   var(--ecart-btn-active-bg);
   border-color: transparent;
-  color:        #000;
+  color:        #fff;
 }
 
 /* Bascule icône œil ouvert / fermé */
@@ -217,11 +227,8 @@ body.ecart-focus-mode .ecart-focus-btn .eye-closed { display: block; }
 
 /* ==========================================================
    MODE FOCUS — immersion totale
-   Cache : sidebar, zone-identity, MAP, INFO
-   Garde : #ecartTopRight (œil + light), SOUND + son panel
    ========================================================== */
 
-/* Sidebar et identité de zone disparaissent */
 body.ecart-focus-mode .sidebar,
 body.ecart-focus-mode .zone-identity {
   opacity: 0 !important;
@@ -229,37 +236,25 @@ body.ecart-focus-mode .zone-identity {
   transition: opacity 0.28s ease;
 }
 
-/* MAP et INFO cachés dans le cluster — SOUND reste visible */
 body.ecart-focus-mode #mobileMapToggle,
 body.ecart-focus-mode #infoToggle {
   display: none !important;
 }
 
-/* Panels MAP et INFO fermés */
 body.ecart-focus-mode #mobileMapOverlay,
 body.ecart-focus-mode #infoPanel {
   opacity: 0 !important;
   pointer-events: none !important;
   visibility: hidden !important;
 }
-/* Le panel SOUND (#ecartAudioPanel) reste accessible en mode focus */
 
-/* #ecartTopRight toujours visible */
 body.ecart-focus-mode #ecartTopRight {
   z-index: 100200;
 }
 
-/* Bouton SOUND repositionné seul dans le cluster (pas besoin de CSS spécial,
-   MAP et INFO sont display:none, SOUND s'affiche seul) */
-
 
 /* ==========================================================
-   MODE JOUR (LIGHT) — filtre accessibilité visuelle
-   Inversion partielle (0.88) : fond noir → gris-blanc doux,
-   pas de blanc pur → moins d'éblouissement.
-   Contraste réduit (0.90) → atténue l'effet d'empâtement
-   sur les textes causé par l'inversion des halos d'anti-aliasing.
-   canvas/iframe non ré-inversés → scènes 3D affectées.
+   MODE JOUR (LIGHT)
    ========================================================== */
 
 html.ecart-light-mode {
@@ -276,11 +271,8 @@ html.ecart-light-mode .mini-map-image {
 }
 
 
-
 /* ==========================================================
    MODE JOUR — boutons lisibles après invert(0.88)
-   On donne aux boutons fond sombre + texte blanc AVANT filtre,
-   ce qui produit fond clair + texte sombre APRÈS inversion.
    ========================================================== */
 
 html.ecart-light-mode .ecart-ui-cluster > button {
@@ -304,7 +296,6 @@ html.ecart-light-mode .ecart-ui-cluster > button.is-playing {
   box-shadow:   0 2px 12px rgba(0,0,0,0.30) !important;
 }
 
-/* Boutons œil + light (top-right) idem */
 html.ecart-light-mode .ecart-focus-btn,
 html.ecart-light-mode .ecart-light-btn {
   background:   rgba(0,0,0,0.80) !important;
@@ -382,14 +373,14 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   CARDS INTÉRIEURES — INFO / MAP / SOUND (même style)
+   CARDS INTÉRIEURES — [4] même taille pour les 3 panels
    ========================================================== */
 
 .info-panel-inner,
 .mobile-map-panel-inner,
 .ecart-audio-panel-inner {
   box-sizing: border-box;
-  width: min(100%, 600px) !important;
+  width: min(100%, 560px) !important;   /* [4] taille unifiée */
   max-height: calc(100dvh - clamp(28px, 8vw, 64px)) !important;
   overflow-y: auto;
   padding: 24px;
@@ -408,13 +399,13 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   TITRE PANEL — unifié
+   TITRE PANEL — [1] taille lisible
    ========================================================== */
 
 .info-title,
 .ecart-audio-panel-title {
   margin: 0 0 20px;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.48);
@@ -422,10 +413,10 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   INFO — contenu
+   INFO — contenu  [1] tailles agrandies
    ========================================================== */
 
-.info-description { font-size: 0.94rem; line-height: 1.65; }
+.info-description { font-size: 1.00rem; line-height: 1.65; }
 
 .info-gameplay {
   margin-top: 16px;
@@ -434,20 +425,20 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 .info-gameplay h3 {
   margin: 0 0 8px;
-  font-size: 0.58rem;
+  font-size: 0.65rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(255,255,255,0.48);
 }
 .info-gameplay p {
   margin: 0;
-  font-size: 0.68rem;
-  line-height: 1.38;
+  font-size: 0.78rem;
+  line-height: 1.40;
   color: rgba(255,255,255,0.72);
 }
 .info-ref { margin-top: 24px; }
 .info-ref h3 {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   opacity: 0.6;
@@ -457,42 +448,70 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   margin-bottom: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(255,255,255,0.07);
-  font-size: 0.85rem;
-  line-height: 1.48;
+  font-size: 0.90rem;
+  line-height: 1.50;
 }
 
 
 /* ==========================================================
-   SOUND — contenu dans la card
+   SOUND — card intérieure
    ========================================================== */
 
 .ecart-audio-panel-inner {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: min(100%, 480px) !important;
+  gap: 10px;
 }
 
-.ecart-audio-main {
+
+/* ==========================================================
+   SOUND — tracklist  [5] chaque piste = lecteur complet
+   ========================================================== */
+
+.ecart-audio-tracklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 340px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.ecart-audio-tracklist::-webkit-scrollbar { display: none; }
+
+/* Conteneur de piste */
+.ecart-audio-track {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255,255,255,0.50);
+  transition: background 0.14s, color 0.14s, border-color 0.14s;
 }
 
-.ecart-audio-playpause {
-  width: 34px;
+.ecart-audio-track:hover {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.76);
+}
+
+.ecart-audio-track.is-active {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.92);
+}
+
+/* [5] Bouton play/pause par piste */
+.ecart-track-pp {
+  width:  34px;
   height: 34px;
   flex-shrink: 0;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.88);
+  color: rgba(255,255,255,0.80);
   cursor: pointer;
-  font-size: 0.72rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -500,85 +519,68 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   -webkit-tap-highlight-color: transparent;
   transition: background 0.14s, border-color 0.14s, transform 0.12s;
 }
-.ecart-audio-playpause:hover  { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.36); }
-.ecart-audio-playpause:active { transform: scale(0.88); }
+.ecart-track-pp:hover  { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.36); }
+.ecart-track-pp:active { transform: scale(0.88); }
 
-.ecart-audio-info { flex: 1; min-width: 0; }
+.ecart-audio-track.is-active .ecart-track-pp {
+  background:   rgba(255,255,255,0.92);
+  border-color: transparent;
+  color:        #111;
+}
 
-.ecart-audio-now {
-  margin-bottom: 8px;
-  font-size: 0.68rem;
-  line-height: 1.2;
-  color: rgba(255,255,255,0.84);
+/* Corps de piste (titre + barre) */
+.ecart-track-body {
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.ecart-track-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ecart-audio-track-index {
+  font-size: 0.52rem;
+  opacity: 0.40;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.ecart-audio-track-title {
+  min-width: 0;
+  font-size: 0.72rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: 0.04em;
 }
 
-.ecart-audio-progress-strip {
+/* [5] Barre de progression par piste */
+.ecart-track-progress-strip {
   position: relative;
-  height: 3px;
+  height: 2px;
   border-radius: 999px;
   overflow: hidden;
-  background: rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.10);
   cursor: pointer;
   transition: height 0.12s ease;
 }
-.ecart-audio-progress-strip:hover { height: 5px; }
+.ecart-audio-track.is-active .ecart-track-progress-strip {
+  background: rgba(255,255,255,0.18);
+}
+.ecart-track-progress-strip:hover { height: 4px; }
 
-.ecart-audio-progress-fill {
+.ecart-track-progress-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: 0%;
-  background: #fff;
+  background: rgba(255,255,255,0.85);
+  border-radius: 999px;
   transition: width 0.25s linear;
 }
-
-.ecart-audio-tracklist {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  max-height: 220px;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-.ecart-audio-tracklist::-webkit-scrollbar { display: none; }
-
-.ecart-audio-track {
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 10px;
-  border: 0;
-  background: transparent;
-  color: rgba(255,255,255,0.42);
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.14s, color 0.14s;
-}
-.ecart-audio-track:hover,
-.ecart-audio-track.is-active {
-  background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.92);
-}
-.ecart-audio-track-index {
-  font-size: 0.50rem;
-  opacity: 0.45;
-  font-variant-numeric: tabular-nums;
-}
-.ecart-audio-track-title {
-  min-width: 0;
-  font-size: 0.64rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: 0.04em;
-}
-.ecart-audio-track-meta { display: none; }
 
 
 /* ==========================================================
@@ -586,24 +588,24 @@ html.ecart-light-mode .ecart-light-btn.is-active {
    ========================================================== */
 
 #soundToggle.is-playing {
-  background:   rgba(255,255,255,0.96) !important;
-  color:        #000 !important;
+  background:   var(--ecart-btn-active-bg) !important;
+  color:        #fff !important;
   border-color: transparent !important;
   animation: ecartSoundPulse 2.6s ease-in-out infinite;
 }
 
 @keyframes ecartSoundPulse {
-  0%,100% { box-shadow: 0 0 0  0px rgba(255,255,255,0.16); }
-      50% { box-shadow: 0 0 0  7px rgba(255,255,255,0.06); }
+  0%,100% { box-shadow: 0 0 0  0px rgba(200,20,20,0.18); }
+      50% { box-shadow: 0 0 0  8px rgba(200,20,20,0.06); }
 }
 
 
 /* ==========================================================
-   MAP — panneau intérieur
+   MAP — panneau intérieur  [4] taille unifiée
    ========================================================== */
 
 .mobile-map-panel {
-  width: min(100%, 640px) !important;
+  width: min(100%, 560px) !important;  /* [4] aligné sur les autres */
   height: min(80dvh, 700px) !important;
   max-height: calc(100dvh - 32px) !important;
   display: flex;
@@ -628,7 +630,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   MAP — barre nav flèches
+   MAP — barre nav flèches  [1] textes agrandis
    ========================================================== */
 
 .mobile-map-status-wrap {
@@ -655,7 +657,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(255,255,255,0.07);
   color: rgba(255,255,255,0.72);
-  font-size: 0.80rem;
+  font-size: 0.88rem;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -679,8 +681,8 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   min-width: 0;
   text-align: center;
   color: rgba(255,255,255,0.80);
-  font-size: clamp(0.52rem, 1.4vw, 0.66rem) !important;
-  letter-spacing: 0.12em;
+  font-size: clamp(0.68rem, 1.6vw, 0.82rem) !important;  /* [1] agrandi */
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
@@ -689,8 +691,8 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 .mobile-map-status {
   color: rgba(255,255,255,0.80);
-  font-size: clamp(0.52rem, 1.4vw, 0.66rem) !important;
-  letter-spacing: 0.12em;
+  font-size: clamp(0.68rem, 1.6vw, 0.82rem) !important;  /* [1] agrandi */
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   text-align: center;
 }
@@ -858,7 +860,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 #ecartAudioBar.is-playing .ecart-audio-icon--pause { display: block; }
 
 .ecart-audio-title {
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   color: rgba(255,255,255,0.88);
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -869,7 +871,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 
 .ecart-audio-meta {
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   color: rgba(255,255,255,0.34);
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -877,7 +879,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 
 .ecart-audio-time {
-  font-size: 0.63rem;
+  font-size: 0.68rem;
   color: rgba(255,255,255,0.40);
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -956,8 +958,6 @@ html.ecart-light-mode .ecart-light-btn.is-active {
     --ecart-ui-bottom:   calc(14px + env(safe-area-inset-bottom, 0px));
     --ecart-audio-bar-h: 55px;
   }
-
-  .ecart-ui-cluster > button { font-size: 0.44rem !important; }
 
   #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
     left: 0 !important;
@@ -1056,51 +1056,91 @@ html.ecart-light-mode .ecart-light-btn.is-active {
    ========================================================== */
 
 #infoPanel.is-open .info-panel-inner {
-  width: min(100%, 520px) !important;
+  width: min(100%, 560px) !important;
   padding: 18px !important;
   border-radius: 18px !important;
 }
 #infoPanel.is-open .info-title {
   margin-bottom: 12px !important;
-  font-size: 0.68rem !important;
+  font-size: 0.78rem !important;
   letter-spacing: 0.16em !important;
   line-height: 1.15 !important;
 }
 #infoPanel.is-open .info-description {
-  font-size: 0.72rem !important;
-  line-height: 1.42 !important;
+  font-size: 0.84rem !important;
+  line-height: 1.44 !important;
   letter-spacing: 0.01em !important;
 }
 #infoPanel.is-open .info-description p { margin: 0 !important; }
 #infoPanel.is-open .info-ref { margin-top: 16px !important; }
-#infoPanel.is-open .info-ref h3 { font-size: 0.58rem !important; margin-bottom: 8px !important; }
+#infoPanel.is-open .info-ref h3 { font-size: 0.66rem !important; margin-bottom: 8px !important; }
 #infoPanel.is-open .info-ref-item {
-  font-size: 0.66rem !important;
-  line-height: 1.35 !important;
+  font-size: 0.76rem !important;
+  line-height: 1.38 !important;
   margin-bottom: 8px !important;
   padding-bottom: 8px !important;
 }
 
-@media (pointer: coarse) {
-  #infoPanel.is-open .info-panel-inner {
-    padding: 14px !important;
-    max-height: calc(100dvh - 110px) !important;
-  }
-  #infoPanel.is-open .info-title { font-size: 0.62rem !important; }
-  #infoPanel.is-open .info-description { font-size: 0.66rem !important; line-height: 1.36 !important; }
-  #infoPanel.is-open .info-ref-item { font-size: 0.61rem !important; }
-}
+
+/* ==========================================================
+   TOUCH / TABLETTE — [1][2][6] textes, boutons, play
+   ========================================================== */
+
 @media (pointer: coarse) {
 
   :root {
     --ecart-ui-size: 68px;
   }
 
+  /* [1] Textes panel agrandis */
+  .info-title,
+  .ecart-audio-panel-title {
+    font-size: 1.10rem !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .info-description { font-size: 1.05rem !important; line-height: 1.60 !important; }
+  .info-gameplay p  { font-size: 0.88rem !important; }
+  .info-gameplay h3 { font-size: 0.72rem !important; }
+  .info-ref h3      { font-size: 0.86rem !important; }
+  .info-ref-item    { font-size: 0.96rem !important; line-height: 1.50 !important; }
+
+  .map-nav-label,
+  .mobile-map-status {
+    font-size: clamp(0.82rem, 2vw, 1.00rem) !important;
+  }
+
+  .ecart-audio-panel-title { font-size: 1.05rem !important; }
+  .ecart-audio-track-title { font-size: 0.82rem !important; }
+  .ecart-audio-track-index { font-size: 0.62rem !important; }
+
+  /* [1] Cluster boutons — label texte */
   .ecart-ui-cluster > button {
-    font-size: 0.56rem !important;
+    font-size: 0.62rem !important;
     letter-spacing: 0.14em;
     border-width: 1.4px;
   }
+
+  /* [2] Boutons œil + light : même taille que cluster */
+  .ecart-focus-btn,
+  .ecart-light-btn {
+    width:  var(--ecart-ui-size) !important;
+    height: var(--ecart-ui-size) !important;
+  }
+
+  /* [6] Bouton play/pause par piste : taille touch */
+  .ecart-track-pp {
+    width:  44px !important;
+    height: 44px !important;
+  }
+
+  /* [6] Barre de progression plus épaisse sur touch */
+  .ecart-track-progress-strip {
+    height: 3px !important;
+  }
+  .ecart-track-progress-strip:hover { height: 5px !important; }
+
+  .ecart-audio-track { padding: 12px 14px !important; }
 
   .map-nav-btn {
     width: 42px !important;
@@ -1108,9 +1148,11 @@ html.ecart-light-mode .ecart-light-btn.is-active {
     font-size: 1rem !important;
   }
 
-  .ecart-focus-btn,
-  .ecart-light-btn {
-    width: 44px;
-    height: 44px;
+  #infoPanel.is-open .info-panel-inner {
+    padding: 18px !important;
+    max-height: calc(100dvh - 110px) !important;
   }
+  #infoPanel.is-open .info-title       { font-size: 1.00rem !important; }
+  #infoPanel.is-open .info-description { font-size: 0.96rem !important; line-height: 1.52 !important; }
+  #infoPanel.is-open .info-ref-item    { font-size: 0.88rem !important; }
 }
