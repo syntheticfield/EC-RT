@@ -2,7 +2,8 @@
 
 /* ═══════════════════════════════════════════════════════════
    EC@RT — Zone 05 BAD
-   Table d’archives vivante — version optimisée anti-lag
+   Table d’archives vivante
+   + zoom / pan surface sans zoomer l’UI
    ═══════════════════════════════════════════════════════════ */
 
 const BAD_ARCHIVES = [
@@ -13,19 +14,19 @@ const BAD_ARCHIVES = [
   './BAD-img/BAD_05.png',
   './BAD-img/BAD_06.png',
   './BAD-img/BAD_07.png',
-   './BAD-img/BAD_08.png',
+  './BAD-img/BAD_08.png',
   './BAD-img/BAD_09.png',
   './BAD-img/BAD_10.png',
   './BAD-img/BAD_11.png',
-   './BAD-img/BAD_12.png',
+  './BAD-img/BAD_12.png',
   './BAD-img/BAD_13.png',
   './BAD-img/BAD_14.png',
   './BAD-img/BAD_15.png',
-    './BAD-img/BAD_16.png'
+  './BAD-img/BAD_16.png'
 ];
 
 const BAD_CONFIG = {
-  storageKey: 'ecart_zone05_bad_archive_surface_v2',
+  storageKey: 'ecart_zone05_bad_archive_surface_v3',
 
   fragmentsPerImage: 3,
   minSize: 120,
@@ -39,7 +40,10 @@ const BAD_CONFIG = {
   breathStrength: 0.006,
 
   maxVisibleLines: 14,
-  saveDebounceMs: 160
+  saveDebounceMs: 160,
+
+  minZoom: 0.7,
+  maxZoom: 4.5
 };
 
 const surface = document.getElementById('badArchiveSurface');
@@ -52,13 +56,74 @@ let surfaceH = 0;
 let saveTimer = null;
 let linePool = [];
 
+/* ═══════════════════════════════════════════════════════════
+   ZOOM / PAN DE LA SURFACE
+   ═══════════════════════════════════════════════════════════ */
+
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
+
+let panning = false;
+let panStartX = 0;
+let panStartY = 0;
+let panOffsetStartX = 0;
+let panOffsetStartY = 0;
+
+let pinchDistance = null;
+
 const rand = (a, b) => a + Math.random() * (b - a);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function applySurfaceTransform() {
+  surface.style.transform =
+    `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+}
+
+function screenToSurface(clientX, clientY) {
+  return {
+    x: (clientX - offsetX) / zoom,
+    y: (clientY - offsetY) / zoom
+  };
+}
+
+function zoomAt(clientX, clientY, factor) {
+  const oldZoom = zoom;
+
+  const newZoom = clamp(
+    zoom * factor,
+    BAD_CONFIG.minZoom,
+    BAD_CONFIG.maxZoom
+  );
+
+  if (newZoom === oldZoom) return;
+
+  const point = screenToSurface(clientX, clientY);
+
+  zoom = newZoom;
+
+  offsetX = clientX - point.x * zoom;
+  offsetY = clientY - point.y * zoom;
+
+  applySurfaceTransform();
+}
+
+function resetView() {
+  zoom = 1;
+  offsetX = 0;
+  offsetY = 0;
+  applySurfaceTransform();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MESURES / STOCKAGE
+   ═══════════════════════════════════════════════════════════ */
 
 function measure() {
   if (!surface || !threadsSvg) return;
 
   const r = surface.getBoundingClientRect();
+
   surfaceW = r.width || window.innerWidth;
   surfaceH = r.height || window.innerHeight;
 
@@ -143,6 +208,8 @@ function clearState() {
     localStorage.removeItem(BAD_CONFIG.storageKey);
   } catch (_) {}
 
+  resetView();
+
   fragments.forEach(f => f.destroy());
   fragments = [];
 
@@ -151,6 +218,10 @@ function clearState() {
 
   spawn();
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FRAGMENT
+   ═══════════════════════════════════════════════════════════ */
 
 class BadFragment {
   constructor({ id, src, saved }) {
@@ -234,14 +305,16 @@ class BadFragment {
   bind() {
     this.el.addEventListener('pointerdown', e => {
       e.preventDefault();
+      e.stopPropagation();
 
       this.dragging = true;
       this.pointerId = e.pointerId;
       this.el.setPointerCapture(e.pointerId);
 
-      const r = surface.getBoundingClientRect();
-      this.offsetX = e.clientX - r.left - this.x;
-      this.offsetY = e.clientY - r.top - this.y;
+      const point = screenToSurface(e.clientX, e.clientY);
+
+      this.offsetX = point.x - this.x;
+      this.offsetY = point.y - this.y;
 
       this.energy = 1;
       this.instability = clamp(this.instability + 0.18, 0, 1);
@@ -254,16 +327,16 @@ class BadFragment {
     this.el.addEventListener('pointermove', e => {
       if (!this.dragging || e.pointerId !== this.pointerId) return;
 
-      const r = surface.getBoundingClientRect();
+      const point = screenToSurface(e.clientX, e.clientY);
 
       this.x = clamp(
-        e.clientX - r.left - this.offsetX,
+        point.x - this.offsetX,
         -this.w * 0.35,
         surfaceW - this.w * 0.65
       );
 
       this.y = clamp(
-        e.clientY - r.top - this.offsetY,
+        point.y - this.offsetY,
         -this.h * 0.35,
         surfaceH - this.h * 0.65
       );
@@ -304,8 +377,13 @@ class BadFragment {
       this.energy *= BAD_CONFIG.energyDecay;
       this.instability *= BAD_CONFIG.instabilityDecay;
 
-      this.x += Math.sin(now * 0.00008 + this.seed) * BAD_CONFIG.driftStrength * this.instability;
-      this.y += Math.cos(now * 0.00007 + this.seed) * BAD_CONFIG.driftStrength * this.instability;
+      this.x += Math.sin(now * 0.00008 + this.seed) *
+        BAD_CONFIG.driftStrength *
+        this.instability;
+
+      this.y += Math.cos(now * 0.00007 + this.seed) *
+        BAD_CONFIG.driftStrength *
+        this.instability;
     }
 
     const breath = Math.sin(now * this.breathSpeed + this.phase);
@@ -342,6 +420,10 @@ class BadFragment {
     this.el.remove();
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   LIGNES / PROXIMITÉS
+   ═══════════════════════════════════════════════════════════ */
 
 function getLine(index) {
   if (!linePool[index]) {
@@ -403,6 +485,10 @@ function updateProximity() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   SPAWN / LOOP
+   ═══════════════════════════════════════════════════════════ */
+
 function spawn() {
   measure();
 
@@ -429,10 +515,121 @@ function tick(now) {
   requestAnimationFrame(tick);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   INTERACTIONS ZOOM / PAN
+   ═══════════════════════════════════════════════════════════ */
+
+function bindSurfaceNavigation() {
+  window.addEventListener(
+    'wheel',
+    e => {
+      if (
+        e.target.closest('.sidebar') ||
+        e.target.closest('#badReset') ||
+        e.target.closest('#soundToggle') ||
+        e.target.closest('#infoToggle') ||
+        e.target.closest('#mobileMapToggle') ||
+        e.target.closest('#soundPanel') ||
+        e.target.closest('#infoPanel') ||
+        e.target.closest('#mobileMapOverlay')
+      ) {
+        return;
+      }
+
+      e.preventDefault();
+
+      const factor = e.deltaY < 0 ? 1.08 : 0.92;
+      zoomAt(e.clientX, e.clientY, factor);
+    },
+    { passive: false }
+  );
+
+  surface.addEventListener('pointerdown', e => {
+    if (
+      e.target.closest('.bad-fragment') ||
+      e.target.closest('button') ||
+      e.target.closest('a')
+    ) {
+      return;
+    }
+
+    e.preventDefault();
+
+    panning = true;
+
+    panStartX = e.clientX;
+    panStartY = e.clientY;
+
+    panOffsetStartX = offsetX;
+    panOffsetStartY = offsetY;
+  });
+
+  window.addEventListener('pointermove', e => {
+    if (!panning) return;
+
+    offsetX = panOffsetStartX + (e.clientX - panStartX);
+    offsetY = panOffsetStartY + (e.clientY - panStartY);
+
+    applySurfaceTransform();
+  });
+
+  window.addEventListener('pointerup', () => {
+    panning = false;
+  });
+
+  window.addEventListener('pointercancel', () => {
+    panning = false;
+  });
+
+  surface.addEventListener(
+    'touchmove',
+    e => {
+      if (e.touches.length !== 2) return;
+
+      e.preventDefault();
+
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (pinchDistance !== null) {
+        const factor = dist / pinchDistance;
+
+        const centerX =
+          (e.touches[0].clientX + e.touches[1].clientX) * 0.5;
+
+        const centerY =
+          (e.touches[0].clientY + e.touches[1].clientY) * 0.5;
+
+        zoomAt(centerX, centerY, factor);
+      }
+
+      pinchDistance = dist;
+    },
+    { passive: false }
+  );
+
+  surface.addEventListener('touchend', () => {
+    pinchDistance = null;
+  });
+
+  surface.addEventListener('touchcancel', () => {
+    pinchDistance = null;
+  });
+
+  applySurfaceTransform();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+
 function init() {
   if (!surface || !threadsSvg) return;
 
   spawn();
+  bindSurfaceNavigation();
 
   window.addEventListener('resize', () => {
     measure();

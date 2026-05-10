@@ -10,79 +10,77 @@
   <link rel="stylesheet" href="../pannel-ui.css" />
 
   <style>
-   /* =========================
-   ZONE 05 — BAD
-   Table d’archives vivante
-   version optimisée anti-lag
-   ========================= */
+    .bad-zone {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(125, 90, 45, 0.10), transparent 38%),
+        radial-gradient(circle at 70% 75%, rgba(95, 58, 26, 0.12), transparent 42%),
+        linear-gradient(180deg, #080806, #020202 75%);
+      touch-action: none;
+      isolation: isolate;
+    }
 
-.bad-zone {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  min-height: 100dvh;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 30% 20%, rgba(125, 90, 45, 0.10), transparent 38%),
-    radial-gradient(circle at 70% 75%, rgba(95, 58, 26, 0.12), transparent 42%),
-    linear-gradient(180deg, #080806, #020202 75%);
-  touch-action: none;
-  isolation: isolate;
-}
+    .bad-zone::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 44px 44px;
+      z-index: 0;
+    }
 
-.bad-zone::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.18;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
+    .bad-threads {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      overflow: visible;
+    }
 
-.bad-archive-surface {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-}
+    .bad-archive-surface {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      transform-origin: 0 0;
+      will-change: transform;
+      touch-action: none;
+    }
 
-.bad-threads {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-  overflow: visible;
-}
+    .bad-fragment {
+      position: absolute;
+      width: var(--w);
+      height: var(--h);
+      transform-origin: center;
+      user-select: none;
+      touch-action: none;
+      cursor: grab;
+      opacity: 0.9;
+      will-change: transform;
+    }
 
-.bad-fragment {
-  position: absolute;
-  width: var(--w);
-  height: var(--h);
-  transform-origin: center;
-  user-select: none;
-  touch-action: none;
-  cursor: grab;
-  opacity: 0.9;
-  filter: none;
-  will-change: transform;
-}
-
-.bad-fragment.is-dragging {
-  cursor: grabbing;
-  z-index: 80 !important;
-}
-
+    .bad-fragment.is-dragging {
+      cursor: grabbing;
+      z-index: 80 !important;
+    }
 .bad-fragment__paper {
   position: absolute;
   inset: 0;
   overflow: hidden;
+
   background-image: var(--img);
   background-size: var(--bgw) var(--bgh);
   background-position: var(--bgx) var(--bgy);
+
   border-radius: 1px 7px 3px 10px;
 
   clip-path: polygon(
@@ -106,84 +104,86 @@
     inset 0 0 22px rgba(0, 0, 0, 0.32);
 }
 
-.bad-fragment__paper::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.12;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.10), transparent 42%, rgba(0,0,0,0.20)),
-    repeating-linear-gradient(
-      90deg,
-      rgba(0,0,0,0.06) 0px,
-      rgba(0,0,0,0.06) 1px,
-      transparent 1px,
-      transparent 7px
-    );
-  mix-blend-mode: multiply;
-}
+    .bad-fragment__paper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.12;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.10), transparent 42%, rgba(0,0,0,0.20)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(0,0,0,0.06) 0px,
+          rgba(0,0,0,0.06) 1px,
+          transparent 1px,
+          transparent 7px
+        );
+      mix-blend-mode: multiply;
+    }
 
-.bad-fragment__paper::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  pointer-events: none;
-  border: 1px solid rgba(255, 235, 190, 0.14);
-  opacity: 0.45;
-}
+    .bad-fragment__paper::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      pointer-events: none;
+      border: 1px solid rgba(255, 235, 190, 0.14);
+      opacity: 0.45;
+    }
 
-.bad-fragment__halo {
-  position: absolute;
-  inset: -18px;
-  pointer-events: none;
-  opacity: var(--halo, 0);
-  background: radial-gradient(circle, rgba(255, 155, 70, 0.22), transparent 70%);
-  filter: none;
-  mix-blend-mode: screen;
-}
+    .bad-fragment__halo {
+      position: absolute;
+      inset: -18px;
+      pointer-events: none;
+      opacity: var(--halo, 0);
+      background: radial-gradient(circle, rgba(255, 155, 70, 0.22), transparent 70%);
+      mix-blend-mode: screen;
+    }
 
-.bad-reset {
-  position: absolute;
-  right: clamp(14px, 2.5vw, 28px);
-  bottom: clamp(14px, 2.5vw, 28px);
-  z-index: 40;
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(0,0,0,0.36);
-  color: rgba(255,255,255,0.62);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding: 9px 12px;
-  cursor: pointer;
-}
+    .bad-reset {
+      position: fixed;
+      left: clamp(14px, 2.5vw, 28px);
+      bottom: clamp(14px, 2.5vw, 28px);
+      z-index: 99960;
 
-.bad-reset:hover {
-  color: white;
-  border-color: rgba(255,255,255,0.48);
-}
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(0,0,0,0.36);
+      color: rgba(255,255,255,0.62);
 
-@media (max-width: 768px) {
-  .bad-zone {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-  }
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
 
-  .bad-reset {
-    bottom: 72px;
-    font-size: 9px;
-  }
-}
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
 
-@media (prefers-reduced-motion: reduce) {
-  .bad-fragment {
-    will-change: auto;
-  }
-}
+    .bad-reset:hover {
+      color: white;
+      border-color: rgba(255,255,255,0.48);
+    }
+
+    @media (pointer: fine) {
+      .bad-reset {
+        left: calc(48px + clamp(14px, 2.5vw, 28px));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .bad-reset {
+        left: 14px;
+        bottom: 72px;
+        font-size: 9px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bad-fragment {
+        will-change: auto;
+      }
+    }
   </style>
 </head>
 
@@ -191,9 +191,6 @@
 
   <main class="page">
 
-    <!-- ═══════════════════════════
-         SIDEBAR
-         ═══════════════════════════ -->
     <aside class="sidebar">
       <div class="sidebar-top">
         <a href="../../index.html" class="home-button" aria-label="Retour à l'accueil">⌂</a>
@@ -204,15 +201,15 @@
           aria-label="Ouvrir ou fermer le menu"
         >EC@RT</button>
       </div>
-        <div class="zone-identity" data-zone-title="491" data-zone-desc="DADA / ARCHIVE / SIGNAL / COPY">
-    <div class="zone-identity-title">BAD - B Area Dada</div>
-      <div class="zone-identity-desc">DADA Noise Kopy</div>
-        </div>
+
+      <div class="zone-identity" data-zone-title="BAD" data-zone-desc="DADA / ARCHIVE / SIGNAL / COPY">
+        <div class="zone-identity-title">BAD - B Area Dada</div>
+        <div class="zone-identity-desc">DADA Noise Kopy</div>
       </div>
 
       <nav class="zones-nav" aria-label="Zones de l'exposition">
-         <a href="../../index.html" class="zone-link" data-zone-link="0">EC@RT</a>
-          <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
+        <a href="../../index.html" class="zone-link" data-zone-link="0">EC@RT</a>
+        <a href="../zone-01/zone-01.html" class="zone-link" data-zone-link="1">Poster</a>
         <a href="../zone-02/zone-02.html" class="zone-link" data-zone-link="2">Background</a>
         <a href="../zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
         <a href="../zone-04/zone-04.html" class="zone-link" data-zone-link="4">NWMV</a>
@@ -228,22 +225,17 @@
       </nav>
     </aside>
 
-  <section class="bad-zone" aria-label="Table d'archives vivante — Zone 05 BAD">
-  <svg id="badThreads" class="bad-threads" aria-hidden="true"></svg>
+    <section class="bad-zone" aria-label="Table d'archives vivante — Zone 05 BAD">
+      <svg id="badThreads" class="bad-threads" aria-hidden="true"></svg>
 
-  <div id="badArchiveSurface" class="bad-archive-surface"></div>
+      <div id="badArchiveSurface" class="bad-archive-surface"></div>
 
-  <button id="badReset" class="bad-reset" type="button">
-    reset archive
-  </button>
-</section>
+      <button id="badReset" class="bad-reset" type="button">
+        reset archive
+      </button>
     </section>
 
   </main>
-
-  <!-- ═══════════════════════════
-       BOUTONS FLOTTANTS
-       ═══════════════════════════ -->
 
   <button
     id="mobileMapToggle"
@@ -260,6 +252,7 @@
   </button>
 
   <button id="soundToggle" type="button">SOUND</button>
+
   <section id="soundPanel" aria-hidden="true">
     <div class="sound-panel-inner">
       <button class="sound-close" type="button">✕</button>
@@ -268,6 +261,7 @@
   </section>
 
   <button id="infoToggle" type="button">INFO</button>
+
   <section id="infoPanel" aria-hidden="true">
     <div class="info-panel-inner">
       <button class="info-close" type="button">✕</button>
@@ -277,13 +271,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════
-       OVERLAY MOBILE MAP
-       ═══════════════════════════ -->
   <div id="mobileMapOverlay" class="mobile-map-overlay" aria-hidden="true">
     <div class="mobile-map-panel" id="mobileMapPanel">
       <div class="mobile-map-panel-inner">
-
         <div class="mobile-map-status-wrap">
           <div id="mobileMapStatus" class="mobile-map-status">Sélectionne une zone.</div>
         </div>
@@ -292,30 +282,25 @@
           <div class="mini-map-wrap mobile-mini-map-wrap">
             <img src="../../assets/mini.png" class="mini-map-image" alt="Mini-map EC@RT" />
 
-            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1"  data-mini-zone="1"  data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2"  data-mini-zone="2"  data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3"  data-mini-zone="3"  data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4"  data-mini-zone="4"  data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5"  data-mini-zone="5"  data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6"  data-mini-zone="6"  data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7"  data-mini-zone="7"  data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8"  data-mini-zone="8"  data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
-            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9"  data-mini-zone="9"  data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-01/zone-01.html" class="mini-zone mini-zone-1" data-mini-zone="1" data-zone-name="Poster"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-02/zone-02.html" class="mini-zone mini-zone-2" data-mini-zone="2" data-zone-name="Background"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-03/zone-03.html" class="mini-zone mini-zone-3" data-mini-zone="3" data-zone-name="Anthropomorph"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-04/zone-04.html" class="mini-zone mini-zone-4" data-mini-zone="4" data-zone-name="NWMV"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-05/zone-05.html" class="mini-zone mini-zone-5" data-mini-zone="5" data-zone-name="Bad publications &amp; mailers"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-06/zone-06.html" class="mini-zone mini-zone-6" data-mini-zone="6" data-zone-name="VILE"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-07/zone-07.html" class="mini-zone mini-zone-7" data-mini-zone="7" data-zone-name="Cazazza"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-08/zone-08.html" class="mini-zone mini-zone-8" data-mini-zone="8" data-zone-name="Futurist Sound"><span class="mobile-zone-hint"></span></a>
+            <a href="../zone-09/zone-09.html" class="mini-zone mini-zone-9" data-mini-zone="9" data-zone-name="Irène Dogmatic"><span class="mobile-zone-hint"></span></a>
             <a href="../zone-10/zone-10.html" class="mini-zone mini-zone-10" data-mini-zone="10" data-zone-name="COUM"><span class="mobile-zone-hint"></span></a>
             <a href="../zone-11/zone-11.html" class="mini-zone mini-zone-11" data-mini-zone="11" data-zone-name="491"><span class="mobile-zone-hint"></span></a>
             <a href="../zone-12/zone-12.html" class="mini-zone mini-zone-12" data-mini-zone="12" data-zone-name="MAD"><span class="mobile-zone-hint"></span></a>
             <a href="../zone-13/zone-13.html" class="mini-zone mini-zone-13" data-mini-zone="13" data-zone-name="Search and Destroy"><span class="mobile-zone-hint"></span></a>
           </div>
         </div>
-
       </div>
     </div>
   </div>
-  <!-- /mobileMapOverlay -->
 
-  <!-- ═══════════════════════════
-       SCRIPTS
-       ═══════════════════════════ -->
   <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
