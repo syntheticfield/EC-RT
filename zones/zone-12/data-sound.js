@@ -5,10 +5,10 @@ window.ECART_SOUND = [
   },
   {
     title: "Curatorial Voice - MAD (FR)",
-    file: "../../assets/son/FR/NWMV.mp3"
+    file: "../../assets/son/FR/MAD.mp3"
   },
   {
     title: "Curatorial Voice - MAD (ENG)",
-    file: "../../assets/son/EN/NWMV2.mp3"
+    file: "../../assets/son/EN/MAD2.mp3"
   },
 ];

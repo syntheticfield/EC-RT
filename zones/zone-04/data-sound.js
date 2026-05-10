@@ -1,7 +1,7 @@
 window.ECART_SOUND = [
     {
     title: "Audio Collage - Interrupted Sound",
-    file: "../../assets/NWMV.mp3"
+    file: "../../assets/son/NWMV.mp3"
   },
   {
     title: "Curatorial Voice - NWMV (FR)",
