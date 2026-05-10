@@ -1,18 +1,18 @@
 window.ECART_SOUND = [
     {
-    title: "Noisy Transmission",
-    file: "../../assets/son/AD_MC_Star.wav"
+    title: "Audio Collage - Signal Decay",
+    file: "../../assets/son/MONTECAZAZZA01.mp3"
   },
     {
-    title: "Noisy Transmission",
-    file: "../../assets/son/AD_MC_BayAreaDada.wav"
+    title: "Audio Collage - Noise Transmission",
+    file: "../../assets/son/MONTECAZAZZA02.mp3"
   },
   {
-    title: "Audio Description (fr)",
+    title: "Curatorial Voice - Monte Cazazza (FR)",
     file: "../../assets/son/FR/MC.mp3"
   },
   {
-    title: "Audio Description (eng)",
+    title: "Curatorial Voice - Monte Cazazza (ENG)",
     file: "../../assets/son/EN/MC_2.mp3"
   },
 ];

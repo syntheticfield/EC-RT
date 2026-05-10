@@ -1,10 +1,10 @@
 window.ECART_SOUND = [
   {
-    title: "Audio Description (fr)",
+    title: "Curatorial Voice - Figures Tutélaires (FR)",
     file: "../../assets/son/FR/ROLEMODELS.mp3"
   },
   {
-    title: "Audio Description (eng)",
+    title: "Curatorial Voice - Role Models (FR)",
     file: "../../assets/son/EN/ROLEMODELS.mp3"
   },
 ];

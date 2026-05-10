@@ -538,3 +538,768 @@ body {
   opacity: 0.45;
   text-align: right;
 }
+
+/* ═══════════════════════════════════════════════════════
+   ZONE 13 — CHANNEL STRIP
+   ═══════════════════════════════════════════════════════ */
+
+.z13-channel-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.018);
+  margin-bottom: 18px;
+}
+
+.z13-channel-label {
+  font-size: 0.60rem;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  opacity: 0.38;
+}
+
+.z13-channel-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.z13-channel-state {
+  font-size: 0.60rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.38;
+  min-width: 32px;
+  text-align: right;
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+.z13-channel-state.is-cut {
+  color: #ff3c3c;
+  opacity: 1;
+}
+
+.z13-channel-btn {
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: transparent;
+  color: rgba(255,255,255,0.52);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background  0.20s ease,
+    border-color 0.20s ease,
+    color        0.20s ease;
+}
+
+.z13-channel-btn:hover {
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+}
+
+.z13-channel-btn.is-cut {
+  border-color: rgba(255,60,60,0.45);
+  color: #ff3c3c;
+  background: rgba(255,0,0,0.05);
+}
+
+.z13-channel-btn.is-cut:hover {
+  border-color: rgba(255,60,60,0.75);
+  background: rgba(255,0,0,0.10);
+}
+/* ===================================================
+   ZONE 13 — ADDITIONS CSS
+   Ajouter à la fin de zone-13.css
+   =================================================== */
+
+/* ─── ARCHIVES — INTERACTION ─────────────────────── */
+
+.zone13-archive {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* Hover sur archives dormantes — indique l'interactivité */
+.zone13-archive:hover img {
+  outline: 1px solid rgba(255,255,255,0.18);
+}
+
+/* ─── SOUND PANEL — GRAIN ENGINE ─────────────────── */
+
+.z13-grain-engine {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.z13-engine-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  opacity: 0.35;
+}
+
+/* ─── BOUTON ACTIVER ────────────────────────────── */
+
+.z13-activate-btn {
+  width: 100%;
+  height: 46px;
+  border: 1px solid rgba(255,255,255,0.26);
+  background: rgba(255,255,255,0.03);
+  color: #fff;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.22s ease, border-color 0.22s ease;
+}
+
+.z13-activate-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.52);
+}
+
+.z13-activate-btn:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+
+.z13-activate-ring {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.65);
+  animation: z13Ring 1.6s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes z13Ring {
+  0%, 100% { transform: scale(1);   opacity: 0.45; }
+  50%       { transform: scale(1.55); opacity: 1;   }
+}
+
+.z13-loading {
+  font-size: 0.63rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.42;
+  text-align: center;
+  margin: 0;
+}
+
+/* ─── ÉTAT DÉSACTIVÉ (avant activation son) ──────── */
+
+.z13-block-disabled {
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.z13-ctrl-disabled {
+  pointer-events: none;
+}
+
+/* ─── SOURCES ────────────────────────────────────── */
+
+.z13-sources {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.3s ease;
+}
+
+.z13-source {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.z13-src-btn {
+  min-width: 60px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: rgba(255,255,255,0.28);
+  font-size: 0.67rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.z13-src-btn.is-on {
+  color: #fff;
+  border-color: rgba(255,255,255,0.38);
+  background: rgba(255,255,255,0.04);
+}
+
+.z13-src-btn:not(.z13-ctrl-disabled):hover {
+  border-color: rgba(255,255,255,0.26);
+  color: rgba(255,255,255,0.72);
+}
+
+/* Dots activité grain */
+.z13-src-grains {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.z13-grain-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  transition: background 0.06s ease, transform 0.06s ease;
+  flex-shrink: 0;
+}
+
+.z13-grain-dot.is-active {
+  background: #fff;
+  transform: scale(1.65);
+}
+
+/* Barre pulse grain */
+.z13-src-pulse {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.z13-src-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.06s ease;
+}
+
+.z13-src-pulse.is-firing::after {
+  transform: scaleX(1);
+  transition: none;
+}
+
+/* ─── SLIDERS ────────────────────────────────────── */
+
+.z13-params {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  transition: opacity 0.3s ease;
+}
+
+.z13-param {
+  display: grid;
+  grid-template-columns: 80px 1fr 32px;
+  align-items: center;
+  gap: 10px;
+}
+
+.z13-param-label {
+  font-size: 0.61rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.48;
+}
+
+.z13-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: rgba(255,255,255,0.14);
+  outline: none;
+  cursor: pointer;
+}
+
+.z13-slider:disabled { cursor: default; }
+
+.z13-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.z13-slider:not(:disabled)::-webkit-slider-thumb:hover {
+  transform: scale(1.4);
+}
+
+.z13-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+}
+
+.z13-param-val {
+  font-size: 0.61rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  opacity: 0.38;
+  text-align: right;
+}
+
+/* ─── HINT GAMEPLAY ──────────────────────────────── */
+
+.z13-ecosystem-hint {
+  font-size: 0.6rem;
+  line-height: 1.55;
+  letter-spacing: 0.07em;
+  opacity: 0.32;
+  text-transform: uppercase;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 12px;
+}
+/* ===================================================
+   ZONE 13 — ADDITIONS CSS
+   Ajouter à la fin de zone-13.css
+   =================================================== */
+
+/* ─── ARCHIVES — INTERACTION ─────────────────────── */
+
+.zone13-archive {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.zone13-archive:hover img {
+  outline: 1px solid rgba(255,255,255,0.16);
+}
+
+/* ─── SÉPARATEUR dans #ecartAudioPanel ──────────── */
+
+.z13-grain-engine {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.z13-engine-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.32;
+}
+
+/* ─── BOUTON ACTIVER ─────────────────────────────── */
+
+.z13-activate-btn {
+  width: 100%;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.z13-activate-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.z13-activate-btn:disabled { opacity: 0.42; cursor: wait; }
+
+.z13-activate-ring {
+  display: block; width: 8px; height: 8px;
+  border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.6);
+  animation: z13Ring 1.6s ease-in-out infinite; flex-shrink: 0;
+}
+
+@keyframes z13Ring {
+  0%,100% { transform:scale(1);   opacity:0.4; }
+  50%     { transform:scale(1.6); opacity:1;   }
+}
+
+.z13-loading {
+  font-size: 0.62rem; letter-spacing: 0.16em;
+  text-transform: uppercase; opacity: 0.4;
+  text-align: center; margin: 0;
+}
+
+/* ─── DISABLED BLOCK ─────────────────────────────── */
+
+.z13-block-disabled {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.z13-ctrl-disabled { pointer-events: none; }
+
+/* ─── SOURCES ────────────────────────────────────── */
+
+.z13-sources { display:flex; flex-direction:column; gap:7px; }
+
+.z13-source { display:flex; align-items:center; gap:9px; }
+
+.z13-src-btn {
+  min-width: 58px; height: 28px; padding: 0 9px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: rgba(255,255,255,0.28);
+  font-size: 0.65rem; letter-spacing: 0.18em;
+  text-transform: uppercase; cursor: pointer; flex-shrink: 0;
+  transition: color .18s, border-color .18s, background .18s;
+}
+
+.z13-src-btn.is-on {
+  color: #fff;
+  border-color: rgba(255,255,255,0.36);
+  background: rgba(255,255,255,0.04);
+}
+
+.z13-src-btn:not(.z13-ctrl-disabled):hover {
+  border-color: rgba(255,255,255,0.24);
+  color: rgba(255,255,255,0.7);
+}
+
+.z13-src-grains { display:flex; gap:4px; align-items:center; }
+
+.z13-grain-dot {
+  width:5px; height:5px; border-radius:50%;
+  background: rgba(255,255,255,0.1);
+  transition: background .06s, transform .06s;
+  flex-shrink: 0;
+}
+
+.z13-grain-dot.is-active { background:#fff; transform:scale(1.65); }
+
+.z13-src-pulse {
+  flex:1; height:2px; background:rgba(255,255,255,0.05);
+  position:relative; overflow:hidden;
+}
+
+.z13-src-pulse::after {
+  content:""; position:absolute; inset:0; background:#fff;
+  transform:scaleX(0); transform-origin:left; transition:transform .06s;
+}
+
+.z13-src-pulse.is-firing::after { transform:scaleX(1); transition:none; }
+
+/* ─── SLIDERS ────────────────────────────────────── */
+
+.z13-params { display:flex; flex-direction:column; gap:12px; }
+
+.z13-param {
+  display:grid; grid-template-columns:78px 1fr 30px;
+  align-items:center; gap:9px;
+}
+
+.z13-param-label {
+  font-size: 0.59rem; letter-spacing: 0.2em;
+  text-transform: uppercase; opacity: 0.45;
+}
+
+.z13-slider {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:2px;
+  background:rgba(255,255,255,0.13);
+  outline:none; cursor:pointer;
+}
+
+.z13-slider:disabled { cursor:default; }
+
+.z13-slider::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:12px; height:12px; border-radius:50%; background:#fff;
+  cursor:pointer; transition:transform .12s;
+}
+
+.z13-slider:not(:disabled)::-webkit-slider-thumb:hover { transform:scale(1.4); }
+
+.z13-slider::-moz-range-thumb {
+  width:12px; height:12px; border-radius:50%;
+  border:none; background:#fff; cursor:pointer;
+}
+
+.z13-param-val {
+  font-size:0.59rem; font-variant-numeric:tabular-nums;
+  letter-spacing:0.06em; opacity:0.36; text-align:right;
+}
+
+/* ─── HINT ───────────────────────────────────────── */
+
+.z13-ecosystem-hint {
+  font-size: 0.58rem; line-height: 1.6;
+  letter-spacing: 0.07em; opacity: 0.28;
+  text-transform: uppercase; margin: 0;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 10px;
+}
+/* ===================================================
+   ZONE 13 — ADDITIONS CSS
+   Ajouter à la fin de zone-13.css
+   =================================================== */
+
+/* ─── ARCHIVES ───────────────────────────────────── */
+
+.zone13-archive {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: pointer;
+}
+
+/* ─── BARRE DE VITALITÉ — visible, color-codée ───── */
+
+.z13-vital-wrap {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 8px;
+  background: rgba(0,0,0,0.55);
+  overflow: hidden;
+}
+
+.z13-vital-bar {
+  width: 100%;
+  height: 100%;
+  background: rgb(80,255,80);
+  transform-origin: left center;
+  transition: background 0.4s ease;
+}
+
+/* ─── CROIX PERMANENTE ───────────────────────────── */
+
+.z13-cross {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.4s ease;
+}
+
+/* Bras vertical */
+.z13-cross::before {
+  content: "";
+  position: absolute;
+  left: 10px; top: 0;
+  width: 2px; height: 22px;
+  background: rgba(255,255,255,0.85);
+}
+
+/* Bras horizontal */
+.z13-cross::after {
+  content: "";
+  position: absolute;
+  left: 4px; top: 9px;
+  width: 14px; height: 2px;
+  background: rgba(255,255,255,0.85);
+}
+
+/* Hover — glow + hint visible */
+.z13-cross.is-hovered::before,
+.z13-cross.is-hovered::after {
+  background: #fff;
+  box-shadow: 0 0 6px 2px rgba(255,255,255,0.7);
+}
+
+/* Ghost après résurrection */
+.z13-cross.is-ghost {
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+/* ─── HINT RÉSURRECTION ──────────────────────────── */
+
+.z13-cross-hint {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0,0,0,0.8);
+  padding: 3px 7px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.z13-cross.is-hovered .z13-cross-hint {
+  opacity: 1;
+}
+
+/* ─── SOUND PANEL — section injectée ─────────────── */
+
+.z13-sound-section {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.z13-sound-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.3;
+}
+
+/* ─── BOUTON ACTIVER ─────────────────────────────── */
+
+.z13-activate-btn {
+  width: 100%; height: 44px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+  font-size: 0.68rem; letter-spacing: 0.24em; text-transform: uppercase;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.z13-activate-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.z13-activate-btn:disabled { opacity: 0.4; cursor: wait; }
+
+.z13-ring {
+  display: block; width: 8px; height: 8px;
+  border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.6);
+  animation: z13Ring 1.6s ease-in-out infinite; flex-shrink: 0;
+}
+
+@keyframes z13Ring {
+  0%,100% { transform:scale(1);    opacity:0.4; }
+  50%      { transform:scale(1.65); opacity:1;   }
+}
+
+.z13-loading-msg {
+  font-size: 0.62rem; letter-spacing: 0.14em;
+  text-transform: uppercase; opacity: 0.38;
+  text-align: center; margin: 0;
+}
+
+/* ─── SOURCES ────────────────────────────────────── */
+
+.z13-src-list {
+  display: flex; flex-direction: column; gap: 6px;
+  transition: opacity 0.3s;
+}
+
+.z13-locked { opacity: 0.2; pointer-events: none; }
+
+.z13-src-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0;
+  transition: opacity 0.2s;
+}
+
+.z13-src-row:not(.is-playing) { opacity: 0.4; }
+
+/* LED — indique la piste active */
+.z13-src-led {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+  transition: background 0.1s, box-shadow 0.1s;
+}
+
+.z13-src-row.is-playing .z13-src-led {
+  background: #fff;
+  box-shadow: 0 0 8px 2px rgba(255,255,255,0.7);
+  animation: z13LedPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes z13LedPulse {
+  from { box-shadow: 0 0 4px 1px rgba(255,255,255,0.5); }
+  to   { box-shadow: 0 0 12px 4px rgba(255,255,255,0.9); }
+}
+
+.z13-src-name {
+  font-size: 0.66rem; letter-spacing: 0.18em;
+  text-transform: uppercase; flex: 1;
+}
+
+/* Barre de lecture (future progression) */
+.z13-src-bar {
+  width: 40px; height: 2px;
+  background: rgba(255,255,255,0.08);
+}
+
+.z13-src-row.is-playing .z13-src-bar {
+  background: rgba(255,255,255,0.5);
+  animation: z13BarPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes z13BarPulse {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+/* ─── BOUTON DÉCLENCHER ──────────────────────────── */
+
+.z13-trigger-btn {
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.z13-trigger-btn:not(:disabled):hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
+}
+
+.z13-trigger-btn:disabled { opacity: 0.2; cursor: default; }
+
+/* ─── HINT SIM ───────────────────────────────────── */
+
+.z13-sim-hint {
+  font-size: 0.56rem; letter-spacing: 0.1em;
+  text-transform: uppercase; opacity: 0.24;
+  margin: 0; line-height: 1.5;
+}

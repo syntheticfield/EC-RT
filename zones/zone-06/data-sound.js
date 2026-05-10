@@ -1,14 +1,14 @@
 window.ECART_SOUND = [
     {
-    title: "Noisy Transmission",
-    file: "../../assets/son/AD_ANT.wav"
+    title: "Archival Transmission (AD)",
+    file: "../../assets/son/VILE.mp3"
   },
   {
-    title: "Audio Description (fr)",
+    title: "Curatorial Voice - VILE (FR)",
     file: "../../assets/son/FR/VILE.mp3"
   },
   {
-    title: "Audio Description (eng)",
+    title: "Curatorial Voice - VILE (ENG)",
     file: "../../assets/son/EN/VILE2.mp3"
   },
 ];

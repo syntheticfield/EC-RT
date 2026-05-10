@@ -1,15 +1,15 @@
 window.ECART_SOUND = [
-   {
-    title: "Noisy Transmission",
-    file: "../../assets/son/AD_ANT.wav"
+  {
+    title: "Archival Transmission (AD)",
+    file: "../../assets/son/ANTROPOMORPH.mp3"
   },
   
   {
-    title: "MAMCO Antropomorph Mediation (fr)",
+    title: "Curatorial Voice - Antropomorph (FR)",
     file: "../../assets/son/FR/ANTROPOMORPH.mp3"
   },
   {
-    title: "MAMCO Mediation (eng)",
+    title: "Curatorial Voice - Antropomorph (ENG)",
     file: "../../assets/son/EN/ANTROPOMORPH.mp3"
   },
 ];

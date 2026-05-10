@@ -1,10 +1,15 @@
 window.ECART_SOUND = [
+    {
+    title: "Audio Collage - Burned Transmission",
+    file: "../../assets/son/FR/491.mp3"
+  },
+  
   {
-    title: "Audio Description (fr)",
+    title: "Curatorial Voice - 491 (FR)",
     file: "../../assets/son/FR/491.mp3"
   },
   {
-    title: "Audio Description (eng)",
+    title: "Curatorial Voice - 491 (ENG)",
     file: "../../assets/son/EN/4912.mp3"
   },
 ];

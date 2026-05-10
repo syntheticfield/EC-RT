@@ -1,14 +1,14 @@
 window.ECART_SOUND = [
       {
-    title: "Noisy transmission",
-    file: "../../assets/son/FR/NWMV.wav"
+    title: "Archival Transmission (AD)",
+    file: "../../assets/son/MAD.mp3"
   },
   {
-    title: "Audio Description (fr)",
+    title: "Curatorial Voice - MAD (FR)",
     file: "../../assets/son/FR/NWMV.mp3"
   },
   {
-    title: "Audio Description (eng)",
+    title: "Curatorial Voice - MAD (ENG)",
     file: "../../assets/son/EN/NWMV2.mp3"
   },
 ];
