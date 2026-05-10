@@ -62,8 +62,6 @@ links.forEach(link => {
   link.addEventListener('blur',       clearActive);
 });
 
-/* ── Bind hover + click — hover-zones ──────────────── */
-
 zones.forEach(zone => {
   const id = zone.dataset.section;
   if (!id) return;

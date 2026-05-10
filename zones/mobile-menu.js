@@ -1,70 +1,40 @@
-(function () {
-  const body   = document.body;
+/* ==========================================================
+   EC@RT — MENU GLOBAL
+   Sidebar fermée par défaut, ouvrable au clic
+   ========================================================== */
+
+(() => {
   const toggle = document.querySelector(".menu-toggle");
-  const nav    = document.querySelector(".zones-nav, .sections");
+  if (!toggle) return;
 
-  if (!body || !toggle || !nav) return;
-
-  /* Détection du type de pointeur (réévalue à chaque appel) */
-  const isDesktop = () => window.matchMedia("(pointer: fine)").matches;
-
-  /* ── Mobile / tablette ───────────────────────────────── */
-
-  function setMobileMenu(open) {
-    body.classList.toggle("menu-open", open);
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  function closeMenu() {
+    document.body.classList.remove("menu-open");
+    document.body.classList.remove("ecart-menu-open");
+    toggle.setAttribute("aria-expanded", "false");
   }
 
-  /* ── Desktop — toggle sidebar ouverte / repliée ─────── */
-
-  function setDesktopSidebar(open) {
-    body.classList.toggle("desktop-sidebar-closed", !open);
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  function openMenu() {
+    document.body.classList.add("menu-open");
+    document.body.classList.add("ecart-menu-open");
+    toggle.setAttribute("aria-expanded", "true");
   }
 
-  function isDesktopSidebarOpen() {
-    return !body.classList.contains("desktop-sidebar-closed");
-  }
-
-  /* ── Toggle principal ───────────────────────────────── */
-
-  function handleToggle(event) {
+  function toggleMenu(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (isDesktop()) {
-      setDesktopSidebar(!isDesktopSidebarOpen());
+    if (document.body.classList.contains("ecart-menu-open")) {
+      closeMenu();
     } else {
-      setMobileMenu(!body.classList.contains("menu-open"));
+      openMenu();
     }
   }
 
-  /* ── Init ────────────────────────────────────────────── */
+  closeMenu();
 
-  toggle.setAttribute("aria-expanded", "false");
+  toggle.addEventListener("click", toggleMenu);
 
-  if (!nav.id) nav.id = "ecart-zone-menu";
-  toggle.setAttribute("aria-controls", nav.id);
-
-  toggle.addEventListener("click", handleToggle);
-
-  /* Escape : ferme seulement le menu mobile (pas la sidebar desktop) */
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && !isDesktop()) {
-      setMobileMenu(false);
-    }
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeMenu();
   });
-
-  /* Clic hors sidebar : ferme seulement sur mobile */
-  document.addEventListener("click", function (event) {
-    if (isDesktop()) return;
-
-    const insideSidebar = event.target.closest(".sidebar");
-    const insideNav     = event.target.closest(".zones-nav, .sections");
-
-    if (!insideSidebar && !insideNav) {
-      setMobileMenu(false);
-    }
-  });
-
 })();

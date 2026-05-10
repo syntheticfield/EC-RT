@@ -804,3 +804,33 @@ body,
     justify-content: center !important;
   }
 }
+/* ==========================================================
+   EC@RT — SIDEBAR FERMÉE PAR DÉFAUT / OUVRABLE
+   ========================================================== */
+
+@media (pointer: fine) {
+
+  body:not(.ecart-menu-open) .sidebar {
+    width: 48px !important;
+    grid-template-columns: 48px 0 !important;
+  }
+
+  body:not(.ecart-menu-open) .zones-nav,
+  body:not(.ecart-menu-open) .sections {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-8px) !important;
+  }
+
+  body.ecart-menu-open .sidebar {
+    width: 200px !important;
+    grid-template-columns: 48px 152px !important;
+  }
+
+  body.ecart-menu-open .zones-nav,
+  body.ecart-menu-open .sections {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+  }
+}

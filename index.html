@@ -10,23 +10,16 @@
 
   <title>EC@RT</title>
 
-  <!-- Icône / quasi-app iPad -->
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
-
-  <!-- Icônes web -->
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 
-  <!-- Affichage immersif iPad quand ajouté à l’écran d’accueil -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="EC@RT">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Couleur navigateur / fond -->
   <meta name="theme-color" content="#000000">
 
-  <!-- CSS -->
   <link rel="stylesheet" href="zones/zone-core.css" />
   <link rel="stylesheet" href="zones/zone-sidebar.css" />
   <link rel="stylesheet" href="style/style.css" />
@@ -52,7 +45,7 @@
 
       <div class="zone-identity">
         <div class="zone-identity-title">EC@RT</div>
-        <div class="zone-identity-desc">Plan de scénographie</div>
+        <div class="zone-identity-desc">Virtual Dada Noisy Quickkopy</div>
       </div>
 
       <nav class="zones-nav" aria-label="Zones de l'exposition">
@@ -72,44 +65,64 @@
       </nav>
     </aside>
 
-    <section class="viewer">
-      <div class="map-wrap">
-        <img src="assets/world/plan-clean.png" alt="Plan de scénographie" class="map-image" />
+    <section class="viewer about-viewer">
+      <canvas id="homeArchiveCanvas" aria-hidden="true"></canvas>
 
-        <div class="zone-glow" id="zoneGlow"></div>
-
-        <div class="locator loc-1" data-section="1"></div>
-        <div class="locator loc-2" data-section="2"></div>
-        <div class="locator loc-3" data-section="3"></div>
-        <div class="locator loc-4" data-section="4"></div>
-        <div class="locator loc-5" data-section="5"></div>
-        <div class="locator loc-6" data-section="6"></div>
-        <div class="locator loc-7" data-section="7"></div>
-        <div class="locator loc-8" data-section="8"></div>
-        <div class="locator loc-9" data-section="9"></div>
-        <div class="locator loc-10" data-section="10"></div>
-        <div class="locator loc-11" data-section="11"></div>
-        <div class="locator loc-12" data-section="12"></div>
-        <div class="locator loc-13" data-section="13"></div>
-
-        <div class="plan-overlay">
-          <button class="hover-zone zone-1" data-section="1" aria-label="Zone 1 — Poster"></button>
-          <button class="hover-zone zone-2" data-section="2" aria-label="Zone 2 — Background"></button>
-          <button class="hover-zone zone-3" data-section="3" aria-label="Zone 3 — Anthropomorph"></button>
-          <button class="hover-zone zone-4" data-section="4" aria-label="Zone 4 — NWMV"></button>
-          <button class="hover-zone zone-5" data-section="5" aria-label="Zone 5 — Bad publications"></button>
-          <button class="hover-zone zone-6" data-section="6" aria-label="Zone 6 — VILE"></button>
-          <button class="hover-zone zone-7" data-section="7" aria-label="Zone 7 — Cazazza"></button>
-          <button class="hover-zone zone-8" data-section="8" aria-label="Zone 8 — Futurist Sound"></button>
-          <button class="hover-zone zone-9" data-section="9" aria-label="Zone 9 — Irène Dogmatic"></button>
-          <button class="hover-zone zone-10" data-section="10" aria-label="Zone 10 — COUM"></button>
-          <button class="hover-zone zone-11" data-section="11" aria-label="Zone 11 — 491"></button>
-          <button class="hover-zone zone-12" data-section="12" aria-label="Zone 12 — MAD"></button>
-          <button class="hover-zone zone-13" data-section="13" aria-label="Zone 13 — Search and Destroy"></button>
-        </div>
-
-        <div class="plan-caption">Plan interactif</div>
+      <div class="home-noise-status" id="homeNoiseStatus">
+        ENT 00 / LOCK 00 / DES 00
       </div>
+
+      <button id="homeNoiseToggle" type="button">▶ NOISE</button>
+
+      <article class="about-home">
+        <p class="about-kicker">MAMCO x HEAD</p>
+
+        <h1>
+          Quickkopy Conceptualism:<br>
+          Bay Area Dada to Bay Area Punk
+        </h1>
+
+        <h2>EC@RT — Virtual Dada Noisy Quickkopy</h2>
+
+        <div class="about-text">
+          <p>
+            Dans le cadre de l’exposition <em>Quickkopy Conceptualism: Bay Area Dada to Bay Area Punk</em> au MAMCO,
+            la plateforme <strong>EC@RT — Virtual Dada Noisy Quickkopy</strong> propose un espace de médiation numérique
+            dédié aux archives de l’exposition.
+          </p>
+
+          <p>
+            Elle réunit une sélection de documents — affiches, publications, correspondances — adaptés par le son,
+            l’audio-description, la transcription et des environnements numériques. La navigation s’apparente à un
+            environnement situé entre archéologie numérique et conservation infidèle.
+          </p>
+
+          <p>
+            Pensée comme une déambulation alternative, elle permet d’explorer ces archives autrement, par fragments,
+            récits et ambiances. Le parcours invite à produire sa propre lecture, entre écoute, interprétation et recomposition.
+          </p>
+
+          <p>
+            La plateforme EC@RT se présente comme un territoire parallèle, développé par Hugo Lemahieu et Noemy Rubio Meau.
+            Les œuvres et documents y deviennent consultables de manière immatérielle, selon des modalités alternatives de
+            lecture et de perception. Il s’agit de déplacer les modes d’accès aux archives.
+          </p>
+
+          <p>
+            Composées en grande partie de documents visuels, les archives d’Écart reposent habituellement sur le regard.
+            EC@RT propose de les ouvrir à d’autres formes d’expérience en mobilisant des outils liés à l’accessibilité :
+            audio-description, transcription, voix de synthèse, dispositifs de médiation, son — envisagés ici comme des
+            formes actives de transformation.
+          </p>
+
+          <p>
+            En écho à l’esprit expérimental et subversif qui traverse l’histoire d’Écart — du mail art aux esthétiques punk —
+            EC@RT interroge les formes contemporaines de circulation des images, des textes et des voix. Plutôt que de fixer
+            les documents dans une forme définitive, le projet les considère comme des matières à réactiver, à transformer,
+            à réinterpréter, des espaces d’écoute, d’imagination et de lecture plurielle.
+          </p>
+        </div>
+      </article>
     </section>
 
   </main>
@@ -186,6 +199,6 @@
   <script src="script.js"></script>
   <script src="zones/pannel-ui.js"></script>
   <script src="zones/mobile-menu.js"></script>
-
+  <script src="home-archive-noise.js"></script>
 </body>
 </html>
