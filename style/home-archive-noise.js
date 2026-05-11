@@ -1,11 +1,12 @@
 /* ==========================================================
    EC@RT — HOME ARCHIVE NOISE  v3
-   [1] Canvas fixe plein-écran → visible sur mobile/tablette
-   [2] Population réduite
-   [3][4] Bouton NOISE bas-gauche, au-dessus de la sidebar
-   [5] Texte centré colonne récursive tous formats
-   [6] Zones cliquables même sous le texte (events doc)
-   [7] Scroll sans barre sur tout device
+   Tout le CSS est dans style.css.
+   Ce fichier gère uniquement la logique canvas + audio.
+
+   [1] resize() → window.innerWidth/Height (canvas fixed = viewport)
+   [2] Population et mots ambiants réduits
+   [6] Events souris/touch au niveau document → zones cliquables
+       même sous .about-home et .about-scroll-outer
    ========================================================== */
 
 (() => {
@@ -15,160 +16,16 @@
 
   if (!canvas || !btn) return;
 
-  /* ── [1-7] Injection CSS ─────────────────────────────── */
-  (() => {
-    const s = document.createElement("style");
-    s.textContent = `
-
-/* [1] Canvas plein écran fixe — visible sur tous les devices */
-#homeArchiveCanvas {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: block;
-  z-index: 1;
-  pointer-events: none; /* [6] événements gérés au niveau document */
-}
-
-/* [3][4] Bouton NOISE — bas gauche, au-dessus sidebar et UI, récursif */
-#homeNoiseToggle {
-  position:   fixed !important;
-  bottom:     calc(20px + env(safe-area-inset-bottom, 0px)) !important;
-  left:       calc(16px + env(safe-area-inset-left,   0px)) !important;
-  z-index:    100070 !important;
-  top: auto !important;
-  right: auto !important;
-  /* Style cohérent avec les boutons EC@RT */
-  background:     rgba(160, 12, 12, 0.76);
-  color:          rgba(255,255,255,0.90);
-  border:         1px solid rgba(0,0,0,0.16);
-  border-radius:  999px;
-  padding:        0 18px;
-  height:         36px;
-  line-height:    36px;
-  font-size:      0.48rem;
-  font-weight:    700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-family:    "Courier New", Courier, monospace;
-  cursor:         pointer;
-  backdrop-filter:         blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow:     0 2px 10px rgba(0,0,0,0.25);
-  touch-action:   manipulation;
-  -webkit-tap-highlight-color: transparent;
-  user-select:    none;
-  white-space:    nowrap;
-  transition:     background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
-}
-#homeNoiseToggle:hover {
-  background: rgba(180, 15, 15, 0.86);
-}
-#homeNoiseToggle.is-on {
-  background:   #ffffff;
-  color:        #000000;
-  border-color: rgba(0,0,0,0.22);
-  box-shadow:   0 2px 14px rgba(255,255,255,0.22);
-  animation:    ecartNoisePulse 2.6s ease-in-out infinite;
-}
-@keyframes ecartNoisePulse {
-  0%,100% { box-shadow: 0 0 0 0px rgba(255,255,255,0.20); }
-      50% { box-shadow: 0 0 0 8px rgba(255,255,255,0.08); }
-}
-
-/* Statut ENT/LOCK/DES — juste au-dessus du bouton */
-#homeNoiseStatus {
-  position:       fixed !important;
-  bottom:         calc(62px + env(safe-area-inset-bottom, 0px)) !important;
-  left:           calc(16px + env(safe-area-inset-left,   0px)) !important;
-  z-index:        100070 !important;
-  font-size:      0.44rem;
-  font-family:    "Courier New", Courier, monospace;
-  letter-spacing: 0.14em;
-  color:          rgba(255,255,255,0.34);
-  pointer-events: none;
-  user-select:    none;
-  white-space:    nowrap;
-}
-
-/* [5][7] Article texte — colonne centrée, récursive, scroll interne */
-.about-home {
-  position:       fixed !important;
-  top:            50% !important;
-  left:           50% !important;
-  transform:      translate(-50%, -50%) !important;
-  z-index:        100010;
-  width:          min(90vw, 520px);
-  pointer-events: none; /* [6] laisse passer les clics vers le canvas */
-  display:        flex;
-  flex-direction: column;
-  align-items:    center;
-  gap:            6px;
-  text-align:     center;
-}
-
-/* Kicker, titres — non interactifs, centrés */
-.about-kicker,
-.about-home h1,
-.about-home h2 {
-  pointer-events: none;
-  text-align:     center;
-  width:          100%;
-}
-
-/* [7] Conteneur scroll sans barre, interactif pour le scroll */
-.about-scroll-outer {
-  overflow-y:                  auto;
-  max-height:                  36vh;
-  width:                       100%;
-  -webkit-overflow-scrolling:  touch;
-  overscroll-behavior:         contain;
-  touch-action:                pan-y;
-  scrollbar-width:             none;
-  pointer-events:              auto; /* scroll actif */
-}
-.about-scroll-outer::-webkit-scrollbar { display: none; }
-
-.about-scroll, .about-text {
-  pointer-events: none;
-}
-
-/* Viewer — zone non interactive */
-.about-viewer {
-  position:       relative;
-  pointer-events: none;
-}
-
-/* Prevent double scroll on body */
-body.home {
-  overflow: hidden;
-}
-
-/* Paysage compact : article plus petit */
-@media (max-height: 500px) and (orientation: landscape) {
-  .about-home {
-    top:   50% !important;
-    width: min(90vw, 460px);
-  }
-  .about-home h1 { font-size: clamp(0.9rem, 2.5vw, 1.2rem); }
-  .about-home h2 { font-size: clamp(0.7rem, 1.8vw, 0.9rem); }
-  .about-scroll-outer { max-height: 28vh; }
-}
-
-    `;
-    document.head.appendChild(s);
-  })();
-
   const ctx = canvas.getContext("2d");
 
-  /* ── Zones → URLs ────────────────────────────────────── */
+  /* ── Zones → URLs navigables ─────────────────────────── */
   const ZONES = [
     { name: "POSTER",             href: "zones/zone-01/zone-01.html" },
     { name: "BACKGROUND",         href: "zones/zone-02/zone-02.html" },
     { name: "ANTHROPOMORPH",      href: "zones/zone-03/zone-03.html" },
     { name: "NWMV",               href: "zones/zone-04/zone-04.html" },
     { name: "BAD PUBLICATIONS",   href: "zones/zone-05/zone-05.html" },
+    { name: "MAILERS",            href: "zones/zone-05/zone-05.html" },
     { name: "VILE",               href: "zones/zone-06/zone-06.html" },
     { name: "CAZAZZA",            href: "zones/zone-07/zone-07.html" },
     { name: "FUTURIST SOUND",     href: "zones/zone-08/zone-08.html" },
@@ -179,7 +36,7 @@ body.home {
     { name: "SEARCH AND DESTROY", href: "zones/zone-13/zone-13.html" },
   ];
 
-  /* [2] Mots ambiants — liste réduite */
+  /* [2] Mots ambiants — liste réduite (moins de vagabondage) */
   const AMBIENT = [
     "EC@RT", "MAMCO", "HEAD",
     "QUICKKOPY", "BAY AREA DADA",
@@ -195,7 +52,7 @@ body.home {
   let mx = -999, my = -999;
   let hoveredEntity = null;
 
-  /* Audio */
+  /* ── Audio ───────────────────────────────────────────── */
   let AC = null, masterGain = null, noiseGain = null, droneOsc = null;
   let analyserNode = null, freqData = null, timeData = null;
   let soundOn = false;
@@ -210,7 +67,9 @@ body.home {
   function rand(a, b) { return a + Math.random() * (b - a); }
   function pick(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
 
-  /* [1] resize utilise window dimensions — canvas fixe plein-écran */
+  /* [1] resize() — canvas est position:fixed → viewport = canvas.
+         On lit window.innerWidth/Height directement,
+         même si le canvas avait clientWidth/Height = 0 au chargement. */
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     W = window.innerWidth;
@@ -348,7 +207,6 @@ body.home {
   class Entity {
     constructor(forceZone) {
       const useZone = forceZone !== undefined ? forceZone : Math.random() < 0.40;
-
       const zoneData  = useZone ? pick(ZONES) : null;
       this.zone       = zoneData;
       this.text       = zoneData ? zoneData.name : pick(AMBIENT);
@@ -363,9 +221,9 @@ body.home {
       const base = isMobile() ? rand(8, 14) : rand(9, 16);
       this.size  = zoneData ? base * rand(1.1, 1.45) : base;
 
-      this.opacity    = 0;
-      this.maxOpacity = zoneData ? rand(0.82, 0.94) : rand(0.46, 0.68);
-      this.freq       = rand(80, 960);
+      this.opacity     = 0;
+      this.maxOpacity  = zoneData ? rand(0.82, 0.94) : rand(0.46, 0.68);
+      this.freq        = rand(80, 960);
       this.sensitivity = zoneData ? rand(0.42, 0.90) : rand(0.18, 0.65);
 
       this.state       = "born";
@@ -381,7 +239,6 @@ body.home {
     update(all) {
       this.age++;
 
-      /* Emergence sonore */
       if (soundOn && audioState.amplitude > 0.008) {
         const s = this.sensitivity;
         if (this.state === "searching" || this.state === "locking") {
@@ -395,13 +252,11 @@ body.home {
         this.pulse = 0;
       }
 
-      /* FSM */
       if (this.state === "born") {
         this.opacity = Math.min(this.maxOpacity, this.opacity + 0.009);
         this.vx *= 0.98; this.vy *= 0.98;
         if (this.opacity >= this.maxOpacity) this.state = "searching";
       }
-
       else if (this.state === "searching") {
         this.vx += rand(-0.020, 0.020);
         this.vy += rand(-0.020, 0.020);
@@ -412,7 +267,6 @@ body.home {
           if (pool.length) { this.target = pick(pool); this.state = "locking"; }
         }
       }
-
       else if (this.state === "locking") {
         if (!this.target || this.target.dead || this.target.state === "destroying") {
           this.target = null; this.state = "searching";
@@ -430,7 +284,6 @@ body.home {
           }
         }
       }
-
       else if (this.state === "destroying") {
         this.opacity -= 0.040;
         this.vx = Math.cos(this.scatter) * 1.9;
@@ -441,7 +294,6 @@ body.home {
       this.x += this.vx;
       this.y += this.vy;
 
-      /* [6] Repousse douce des bords */
       const m = 70;
       if (this.x < m)     this.vx += 0.040;
       if (this.x > W - m) this.vx -= 0.040;
@@ -489,7 +341,9 @@ body.home {
       }, rand(500, 1100));
     }
 
-    /* [6] hitTest — coordonnées viewport directes (canvas fixe 0,0) */
+    /* [6] hitTest en coordonnées viewport.
+       Canvas est position:fixed à (0,0) → e.clientX === canvas x.
+       Pas d'offset à calculer. */
     hitTest(px, py) {
       const approxW = this.size * this.text.length * 0.60;
       return px > this.x - 4        && px < this.x + approxW + 4 &&
@@ -501,7 +355,7 @@ body.home {
       ctx.save();
 
       let r, g, b;
-      if (this.state === "locking")         { r=255; g=48;  b=0;   }
+      if      (this.state === "locking")    { r=255; g=48;  b=0;   }
       else if (this.state === "destroying") { r=255; g=210; b=80;  }
       else if (this.state === "born")       { r=130; g=255; b=170; }
       else if (this.zone)                   { r=255; g=255; b=255; }
@@ -513,7 +367,6 @@ body.home {
       }
 
       const alpha = this.hovered ? Math.min(1, this.opacity * 1.40) : this.opacity;
-
       ctx.globalAlpha = alpha;
       ctx.fillStyle   = `rgb(${r},${g},${b})`;
 
@@ -568,7 +421,7 @@ body.home {
     const pop       = targetPop();
     const zoneCount = Math.min(ZONES.length, Math.round(pop * 0.42));
     for (let i = 0; i < zoneCount; i++) entities.push(new Entity(true));
-    for (let i = zoneCount; i < pop; i++) entities.push(new Entity(false));
+    for (let i = zoneCount; i < pop;   i++) entities.push(new Entity(false));
   }
 
   function maintainPopulation() {
@@ -594,7 +447,7 @@ body.home {
     });
   }
 
-  /* [6] checkHover utilise coordonnées viewport (canvas fixe = pas d'offset) */
+  /* [6] checkHover — coordonnées viewport directes (canvas fixed à 0,0) */
   function checkHover(px, py) {
     hoveredEntity = null;
     for (const e of entities) {
@@ -604,7 +457,7 @@ body.home {
       }
     }
     entities.forEach(e => { e.hovered = (e === hoveredEntity); });
-    /* Curseur pointeur sur le document entier si survol d'une zone */
+    /* Curseur sur toute la page, pas seulement sur le canvas */
     document.documentElement.style.cursor = hoveredEntity ? "pointer" : "";
   }
 
@@ -656,19 +509,20 @@ body.home {
 
   /* =====================================================
      ÉVÉNEMENTS
-     [6] Tous au niveau document → clics valides même
-         au-dessus de l'article .about-home
+     [6] Niveau document — fonctionne même si la souris/le doigt
+         est sur .about-home ou .about-scroll-outer
      ===================================================== */
 
-  /* Bouton NOISE */
+  /* Bouton NOISE : stopPropagation pour éviter le disturb */
   btn.addEventListener("click", e => {
     e.stopPropagation();
     toggleSound();
   });
 
-  /* [6] Suivi de la souris au niveau document */
+  /* [6] Suivi souris sur toute la page */
   document.addEventListener("mousemove", e => {
-    mx = e.clientX; my = e.clientY;
+    mx = e.clientX;
+    my = e.clientY;
     checkHover(mx, my);
   });
 
@@ -679,23 +533,23 @@ body.home {
     document.documentElement.style.cursor = "";
   });
 
-  /* [6] Clic global — navigue vers zone même si clic sur l'article */
+  /* [6] Clic global — navigation même si clic sur l'article */
   document.addEventListener("click", e => {
-    /* Ignorer le bouton NOISE et la zone de scroll */
+    /* Ne rien faire sur le bouton NOISE */
     if (e.target.closest("#homeNoiseToggle")) return;
-    if (e.target.closest(".about-scroll-outer")) return;
 
     if (hoveredEntity && hoveredEntity.href) {
       window.location.href = hoveredEntity.href;
       return;
     }
-    /* Perturbe le champ uniquement hors de l'article */
+
+    /* Disturb si clic hors de l'article de texte */
     if (!e.target.closest(".about-home")) {
       disturb(e.clientX, e.clientY);
     }
   });
 
-  /* Touch — suivi global + navigation + disturb */
+  /* ── Touch ─────────────────────────────────────────── */
   let touchSX = 0, touchSY = 0;
 
   document.addEventListener("touchstart", e => {
@@ -703,14 +557,15 @@ body.home {
     if (!t) return;
     touchSX = t.clientX;
     touchSY = t.clientY;
-    mx = t.clientX; my = t.clientY;
+    mx = t.clientX;
+    my = t.clientY;
 
-    /* Ne pas interférer avec le scroll de l'article */
-    if (e.target.closest(".about-scroll-outer")) return;
+    /* Ne pas perturber si l'utilisateur scroll le texte */
+    if (e.target.closest(".about-scroll")) return;
 
     checkHover(mx, my);
 
-    /* Disturb si hors de l'article */
+    /* Disturb uniquement hors de l'article */
     if (!e.target.closest(".about-home")) {
       disturb(mx, my);
     }
@@ -719,8 +574,10 @@ body.home {
   document.addEventListener("touchmove", e => {
     const t = e.touches[0];
     if (!t) return;
-    mx = t.clientX; my = t.clientY;
-    if (!e.target.closest(".about-scroll-outer")) {
+    mx = t.clientX;
+    my = t.clientY;
+    /* Mise à jour du hover même lors du scroll */
+    if (!e.target.closest(".about-scroll")) {
       checkHover(mx, my);
     }
   }, { passive: true });
@@ -731,16 +588,14 @@ body.home {
     const dx = Math.abs(t.clientX - touchSX);
     const dy = Math.abs(t.clientY - touchSY);
 
-    /* Navigation uniquement sur un vrai tap (pas de scroll) */
-    if (dx < 12 && dy < 12) {
-      if (hoveredEntity && hoveredEntity.href) {
-        window.location.href = hoveredEntity.href;
-        return;
-      }
+    /* Tap court → navigation vers la zone */
+    if (dx < 12 && dy < 12 && hoveredEntity && hoveredEntity.href) {
+      window.location.href = hoveredEntity.href;
+      return;
     }
 
-    /* Reset hover après le tap */
-    window.setTimeout(() => {
+    /* Reset hover */
+    setTimeout(() => {
       mx = -999; my = -999;
       hoveredEntity = null;
       entities.forEach(e2 => { e2.hovered = false; });
@@ -748,14 +603,16 @@ body.home {
     }, 200);
   }, { passive: true });
 
+  /* Redimensionnement */
   window.addEventListener("resize", () => { resize(); seed(); });
 
+  /* Gestion visibilité (onglet caché → audio suspendu) */
   document.addEventListener("visibilitychange", () => {
     if (document.hidden  && AC && soundOn) AC.suspend();
     if (!document.hidden && AC && soundOn) AC.resume();
   });
 
-  /* ── START ──────────────────────────────────────────── */
+  /* ── DÉMARRAGE ── */
   resize();
   seed();
   updateStatus();

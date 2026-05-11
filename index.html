@@ -173,10 +173,117 @@
   <script src="/zones/infos.js"></script>
   <script src="./data-sound.js"></script>
 
-  <script src="script.js"></script>
   <script src="zones/pannel-ui.js"></script>
   <script src="zones/mobile-menu.js"></script>
   <script src="/style/home-archive-noise.js"></script>
+  <script>
+/* ==========================================================
+   HOME — anti zoom rotation + tactile bridge
+   ========================================================== */
+(function () {
+  const viewport = document.querySelector('meta[name="viewport"]');
+
+  function lockViewport() {
+    if (!viewport) return;
+
+    viewport.setAttribute(
+      "content",
+      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    );
+  }
+
+  function updateHeight() {
+    document.documentElement.style.setProperty(
+      "--app-height",
+      window.innerHeight + "px"
+    );
+
+    document.documentElement.style.height = window.innerHeight + "px";
+    document.body.style.height = window.innerHeight + "px";
+  }
+
+  function refreshViewport() {
+    lockViewport();
+    updateHeight();
+    window.scrollTo(0, 0);
+  }
+
+  refreshViewport();
+
+  window.addEventListener("resize", refreshViewport, { passive: true });
+  window.addEventListener("orientationchange", function () {
+    refreshViewport();
+    setTimeout(refreshViewport, 120);
+    setTimeout(refreshViewport, 420);
+  });
+
+  document.addEventListener("gesturestart", function (e) {
+    e.preventDefault();
+  });
+
+  document.addEventListener("gesturechange", function (e) {
+    e.preventDefault();
+  });
+
+  document.addEventListener("gestureend", function (e) {
+    e.preventDefault();
+  });
+
+  /* Bridge tactile → souris pour home-archive-noise.js
+     Utile si ton JS vivant écoute mousemove/click mais pas touch/pointer. */
+  const canvas = document.getElementById("homeArchiveCanvas");
+  if (!canvas) return;
+
+  function isUI(target) {
+    return !!target.closest(
+      ".about-scroll, .sidebar, .zones-nav, .sections, #homeNoiseToggle, #soundToggle, #infoToggle, #mobileMapToggle, #soundPanel, #infoPanel, #mobileMapOverlay"
+    );
+  }
+
+  function emitMouse(type, touch) {
+    const event = new MouseEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      screenX: touch.screenX,
+      screenY: touch.screenY
+    });
+
+    canvas.dispatchEvent(event);
+  }
+
+  canvas.addEventListener("touchstart", function (e) {
+    if (isUI(e.target)) return;
+    if (!e.touches.length) return;
+
+    e.preventDefault();
+    emitMouse("mousedown", e.touches[0]);
+    emitMouse("mousemove", e.touches[0]);
+  }, { passive: false });
+
+  canvas.addEventListener("touchmove", function (e) {
+    if (isUI(e.target)) return;
+    if (!e.touches.length) return;
+
+    e.preventDefault();
+    emitMouse("mousemove", e.touches[0]);
+  }, { passive: false });
+
+  canvas.addEventListener("touchend", function (e) {
+    if (isUI(e.target)) return;
+
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+
+    e.preventDefault();
+    emitMouse("mouseup", touch);
+    emitMouse("click", touch);
+  }, { passive: false });
+})();
+</script>
+
   <script src="/zones/ecart-preloader.js"></script>
 <script>
   ECARTPreloader.init({

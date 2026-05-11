@@ -28,12 +28,14 @@ body.home .plan-caption {
 
 .about-viewer {
   position: relative;
-  min-height: 100vh;
+  /* [5] min-height: 100dvh pour tous les devices et formats */
+  min-height: 100dvh;
   width: 100%;
   background:
     radial-gradient(circle at 50% 50%, rgba(255,255,255,0.035), transparent 34%),
     linear-gradient(180deg, #050505 0%, #020202 100%);
   color: #f4f0e2;
+  /* [5] Centrage flex conservé sur tous les formats */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,6 +96,7 @@ body.home .plan-caption {
   width: min(640px, 100%);
   margin: auto;
   padding: clamp(22px, 5vw, 52px);
+  /* [5] Toujours centré */
   text-align: center;
   pointer-events: none;
   background:
@@ -136,6 +139,7 @@ body.home .plan-caption {
 .about-text {
   max-width: 500px;
   margin: 0 auto;
+  /* [5] Centré mais lisible — texte justifié */
   text-align: left;
   font-size: clamp(0.88rem, 1.05vw, 1.02rem);
   line-height: 1.68;
@@ -162,30 +166,33 @@ body.home .plan-caption {
 
 /* ===============================
    SCROLL ZONE TEXTE
+   [7] Scroll fonctionnel sur tous devices, sans barre visible
    =============================== */
 
 .about-scroll {
   position: relative;
-  max-height: clamp(200px, 38vh, 340px);
+  /* [7] Max-height cohérent sur tous les formats */
+  max-height: clamp(180px, 36vh, 340px);
   overflow-y: auto;
   pointer-events: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(244,240,226,0.10) transparent;
-  padding-right: 6px;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  /* [7] Pas de barre de scroll visible */
+  scrollbar-width: none;
+  padding-right: 0;
   margin-top: 4px;
 }
 
-.about-scroll::-webkit-scrollbar        { width: 2px; }
-.about-scroll::-webkit-scrollbar-track  { background: transparent; }
-.about-scroll::-webkit-scrollbar-thumb  {
-  background: rgba(244,240,226,0.12);
-  border-radius: 99px;
-}
+/* [7] Masquer la scrollbar webkit sur tous les devices */
+.about-scroll::-webkit-scrollbar { display: none; }
 
 /* Fondu bas pour indiquer le scroll */
 .about-scroll-outer {
   position: relative;
+  /* [6] Pointer-events auto pour que le scroll fonctionne,
+         mais le document-level click handler gère la navigation */
+  pointer-events: auto;
 }
 .about-scroll-outer::after {
   content: "";
@@ -198,14 +205,17 @@ body.home .plan-caption {
 }
 
 /* ===============================
-   SOUND NOISE BUTTON
+   BOUTON NOISE — bas gauche fixe
+   [3][4] Visible sur tous les devices et formats
    =============================== */
-/* ─── NOISYLIVINGCODE BUTTON (home) ──────────────────── */
+
 #homeNoiseToggle {
   position: fixed;
-  left:   18px;
-  bottom: 18px;
-  z-index: 100070; /* passe au-dessus de la sidebar */
+  /* [3][4] Safe-area pour les encoches iPhone en paysage */
+  left:   calc(18px + env(safe-area-inset-left,   0px));
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  /* [3] Au-dessus de la sidebar et de tous les panels */
+  z-index: 100070;
 
   font-family: "Courier New", Courier, monospace;
   font-size: 10px;
@@ -216,10 +226,15 @@ body.home .plan-caption {
   border: 1px solid rgba(244,240,226,0.22);
   background: rgba(0,0,0,0.42);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   padding: 9px 13px;
   cursor: pointer;
   text-transform: uppercase;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  white-space: nowrap;
 
   transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -237,93 +252,85 @@ body.home .plan-caption {
   background: rgba(35,0,0,0.46);
 }
 
-/* Desktop — petit décalage pour la marge de la sidebar */
-@media (pointer: fine) {
-  #homeNoiseToggle {
-    left:   26px;
-    bottom: 22px;
-  }
-}
-
-/* Mobile/tablette — remonte au-dessus des boutons UI bas */
-@media (pointer: coarse) {
-  #homeNoiseToggle {
-    bottom: clamp(72px, 12vh, 96px);
-  }
-}
-
-/* Statut discret */
+/* Statut discret — au-dessus du bouton NOISE */
 .home-noise-status {
   position: fixed;
-  left: max(22px, env(safe-area-inset-left));
-  bottom: max(20px, env(safe-area-inset-bottom));
-  z-index: 30;
+  left:   calc(18px + env(safe-area-inset-left,   0px));
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+  z-index: 100070;
   font-family: "Courier New", Courier, monospace;
   font-size: 9px;
   letter-spacing: 0.14em;
   color: rgba(244,240,226,0.26);
   pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
 /* ===============================
-   ADAPTATIONS MOBILE
+   ADAPTATIONS — TÉLÉPHONE PORTRAIT
+   [5] Centrage conservé, scroll activé
    =============================== */
 
 @media (max-width: 760px) {
-  .about-viewer {
-    align-items: flex-start;
-    justify-content: flex-start;
-    min-height: 100vh;
-    padding: 100px 22px calc(160px + env(safe-area-inset-bottom, 0px)) 22px;
-    overflow-y: auto;
-  }
 
-  .about-viewer::before {
-    background:
-      linear-gradient(
-        180deg,
-        rgba(0,0,0,0.78) 0%,
-        rgba(0,0,0,0.58) 34%,
-        rgba(0,0,0,0.74) 100%
-      );
+  .about-viewer {
+    /* [5] Garde align-items/justify-content: center du style de base */
+    /* Padding : espace pour les boutons haut (eye/light ~70px)
+       et bas (cluster ~70px + noise btn) */
+    padding:
+      clamp(80px, 13vh, 110px)
+      18px
+      clamp(100px, 16vh, 140px)
+      18px;
+    /* [7] Pas de scroll sur le viewer lui-même */
+    overflow: hidden;
   }
 
   .about-home {
     width: 100%;
-    padding: 0;
-    text-align: left;
-    background: transparent;
-    backdrop-filter: none;
+    padding: clamp(16px, 4vw, 28px);
+    /* [5] Centrage conservé — PAS de text-align: left ici */
+    text-align: center;
+    background:
+      radial-gradient(
+        circle at center,
+        rgba(0,0,0,0.74),
+        rgba(0,0,0,0.40) 65%,
+        rgba(0,0,0,0) 100%
+      );
+    backdrop-filter: blur(1.5px);
   }
 
   .about-kicker {
     font-size: 0.66rem;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   .about-home h1 {
-    font-size: clamp(1.8rem, 9vw, 3.1rem);
+    font-size: clamp(1.6rem, 8vw, 2.8rem);
     line-height: 0.96;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .about-home h2 {
-    font-size: 1rem;
-    margin-bottom: 28px;
+    font-size: clamp(0.88rem, 3.5vw, 1.05rem);
+    margin-bottom: 22px;
   }
 
   .about-text {
-    font-size: 0.92rem;
+    font-size: 0.90rem;
     line-height: 1.62;
+    text-align: left;
   }
 
-  /* Sur mobile scroll = page entière, pas de sous-scroll */
+  /* [7] Scroll interne activé sur mobile (PAS désactivé comme avant) */
   .about-scroll {
-    max-height: none;
-    overflow-y: visible;
+    max-height: clamp(140px, 28vh, 260px);
+    overflow-y: auto;
   }
-  .about-scroll-outer::after { display: none; }
 
+  /* Statut masqué sur mobile (trop petit et encombrant) */
   .home-noise-status {
     display: none;
   }
@@ -332,22 +339,81 @@ body.home .plan-caption {
 /* Très petits écrans */
 @media (max-width: 420px) {
   .about-viewer {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left:  14px;
+    padding-right: 14px;
   }
-
-  .about-text {
-    font-size: 0.89rem;
+  .about-home h1 {
+    font-size: clamp(1.4rem, 7vw, 2.2rem);
+  }
+  .about-scroll {
+    max-height: clamp(120px, 24vh, 220px);
   }
 }
 
-/* Tablette — écarter le texte du cluster UI (droite) */
-@media (pointer: coarse) and (min-width: 481px) {
+/* ===============================
+   TÉLÉPHONE PAYSAGE
+   [5] Compact, centré, scroll réduit
+   =============================== */
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+
   .about-viewer {
-    padding-right: calc(22px + 80px); /* clearance cluster */
+    /* Espace pour la colonne de boutons à droite (pannel-ui.css) */
+    padding:
+      clamp(20px, 4vh, 40px)
+      calc(clamp(40px, 11vmin, 52px) + 28px)  /* droite = taille bouton + marge */
+      clamp(20px, 4vh, 40px)
+      18px;
+    overflow: hidden;
+  }
+
+  .about-home {
+    width: min(92vw, 480px);
+    padding: 14px 18px;
+  }
+
+  .about-home h1 {
+    font-size: clamp(1.1rem, 4.5vw, 1.8rem);
+    margin-bottom: 12px;
+  }
+
+  .about-home h2 {
+    font-size: clamp(0.78rem, 2.5vw, 0.95rem);
+    margin-bottom: 16px;
+  }
+
+  .about-kicker {
+    font-size: 0.58rem;
+    margin-bottom: 10px;
+  }
+
+  .about-text {
+    font-size: clamp(0.78rem, 2vw, 0.88rem);
+    line-height: 1.52;
+  }
+
+  /* [7] Scroll très compact en paysage */
+  .about-scroll {
+    max-height: clamp(80px, 22vh, 160px);
+  }
+
+  /* Masquer le statut en paysage aussi */
+  .home-noise-status {
+    display: none;
+  }
+}
+
+/* ===============================
+   TABLETTE — écarter le texte du cluster UI
+   =============================== */
+
+@media (pointer: coarse) and (min-width: 481px) and (orientation: portrait) {
+  .about-viewer {
+    /* Espace droite pour le cluster de boutons */
+    padding-right: calc(22px + 80px);
   }
   .about-scroll {
-    max-height: clamp(220px, 36vh, 380px);
+    max-height: clamp(200px, 34vh, 360px);
   }
 }
 
@@ -357,7 +423,11 @@ body.home .plan-caption {
     opacity: 0.26;
   }
 }
-/* FORCE HOME NOISE VISIBLE */
+
+/* ===============================
+   FORCE HOME NOISE VISIBLE
+   Canvas toujours rendu, z-index cohérent
+   =============================== */
 
 body.home,
 body.home html {
@@ -365,28 +435,32 @@ body.home html {
 }
 
 body.home .page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: #050505;
 }
 
 body.home .about-viewer {
   position: relative !important;
-  min-height: 100vh !important;
+  min-height: 100dvh !important;
   width: 100% !important;
   overflow: hidden !important;
   background: #050505 !important;
 }
 
+/* [1] Canvas fixe plein-écran — visible sur mobile/tablette/desktop */
 body.home #homeArchiveCanvas {
-  display: block !important;
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 5 !important;
-  opacity: 1 !important;
+  display:        block !important;
+  position:       fixed !important;
+  inset:          0 !important;
+  width:          100vw !important;
+  height:         100vh !important;
+  z-index:        5 !important;
+  opacity:        1 !important;
+  /* [6] pointer-events: auto → le canvas reçoit les events directs.
+         Le document-level handler dans home-archive-noise.js
+         capture AUSSI les clicks sur .about-home pour la navigation. */
   pointer-events: auto !important;
-  background: transparent !important;
+  background:     transparent !important;
 }
 
 body.home .about-viewer::before,
@@ -397,13 +471,98 @@ body.home .about-viewer::after {
 
 body.home .about-home {
   position: relative !important;
-  z-index: 8 !important;
+  z-index:  8 !important;
 }
 
+/* Sidebar et boutons UI au-dessus de tout */
 body.home .sidebar,
 body.home #homeNoiseToggle,
 body.home #soundToggle,
 body.home #infoToggle,
 body.home .mobile-map-toggle {
-  z-index: 50 !important;
+  z-index: 100070 !important;
+}
+/* ==========================================================
+   HOME — FIX ROTATION / MOBILE CENTER / TOUCH
+   ========================================================== */
+
+html,
+body,
+body.home,
+body.home .page,
+body.home .about-viewer {
+  width: 100vw !important;
+  min-height: 100dvh !important;
+  height: var(--app-height, 100dvh) !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  -webkit-text-size-adjust: 100% !important;
+  text-size-adjust: 100% !important;
+}
+
+/* Empêche le canvas de provoquer des zooms/gestes bizarres */
+body.home #homeArchiveCanvas {
+  touch-action: none !important;
+}
+
+/* Mais le texte scrollable reste scrollable */
+body.home .about-scroll,
+body.home .about-scroll * {
+  touch-action: pan-y !important;
+}
+
+/* UI téléphone : texte centré, pas collé aux marges */
+@media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
+  body.home .about-viewer {
+    padding-left: max(26px, env(safe-area-inset-left)) !important;
+    padding-right: max(26px, env(safe-area-inset-right)) !important;
+  }
+
+  body.home .about-home {
+    width: min(92vw, 520px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  body.home .about-text {
+    text-align: left !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Téléphone paysage : centre aussi, avec espace pour boutons */
+@media (pointer: coarse) and (max-width: 767px) and (orientation: landscape) {
+  body.home .about-viewer {
+    padding-left: 42px !important;
+    padding-right: 84px !important;
+  }
+
+  body.home .about-home {
+    width: min(76vw, 480px) !important;
+    margin: auto !important;
+  }
+}
+
+/* Tablette portrait */
+@media (pointer: coarse) and (min-width: 768px) and (orientation: portrait) {
+  body.home .about-viewer {
+    padding-left: 72px !important;
+    padding-right: 72px !important;
+  }
+
+  body.home .about-home {
+    width: min(680px, 88vw) !important;
+  }
+}
+
+/* Tablette paysage */
+@media (pointer: coarse) and (min-width: 768px) and (orientation: landscape) {
+  body.home .about-viewer {
+    padding-left: 88px !important;
+    padding-right: 110px !important;
+  }
+
+  body.home .about-home {
+    width: min(680px, 74vw) !important;
+  }
 }
