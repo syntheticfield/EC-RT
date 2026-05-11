@@ -1,6 +1,11 @@
 /* ==========================================================
-   EC@RT — HOME ARCHIVE NOISE  v2
-   Champ vivant · zones nommées + émergence sonore
+   EC@RT — HOME ARCHIVE NOISE  v3
+   [1] Canvas fixe plein-écran → visible sur mobile/tablette
+   [2] Population réduite
+   [3][4] Bouton NOISE bas-gauche, au-dessus de la sidebar
+   [5] Texte centré colonne récursive tous formats
+   [6] Zones cliquables même sous le texte (events doc)
+   [7] Scroll sans barre sur tout device
    ========================================================== */
 
 (() => {
@@ -10,16 +15,160 @@
 
   if (!canvas || !btn) return;
 
+  /* ── [1-7] Injection CSS ─────────────────────────────── */
+  (() => {
+    const s = document.createElement("style");
+    s.textContent = `
+
+/* [1] Canvas plein écran fixe — visible sur tous les devices */
+#homeArchiveCanvas {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block;
+  z-index: 1;
+  pointer-events: none; /* [6] événements gérés au niveau document */
+}
+
+/* [3][4] Bouton NOISE — bas gauche, au-dessus sidebar et UI, récursif */
+#homeNoiseToggle {
+  position:   fixed !important;
+  bottom:     calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  left:       calc(16px + env(safe-area-inset-left,   0px)) !important;
+  z-index:    100070 !important;
+  top: auto !important;
+  right: auto !important;
+  /* Style cohérent avec les boutons EC@RT */
+  background:     rgba(160, 12, 12, 0.76);
+  color:          rgba(255,255,255,0.90);
+  border:         1px solid rgba(0,0,0,0.16);
+  border-radius:  999px;
+  padding:        0 18px;
+  height:         36px;
+  line-height:    36px;
+  font-size:      0.48rem;
+  font-weight:    700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family:    "Courier New", Courier, monospace;
+  cursor:         pointer;
+  backdrop-filter:         blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:     0 2px 10px rgba(0,0,0,0.25);
+  touch-action:   manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select:    none;
+  white-space:    nowrap;
+  transition:     background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+#homeNoiseToggle:hover {
+  background: rgba(180, 15, 15, 0.86);
+}
+#homeNoiseToggle.is-on {
+  background:   #ffffff;
+  color:        #000000;
+  border-color: rgba(0,0,0,0.22);
+  box-shadow:   0 2px 14px rgba(255,255,255,0.22);
+  animation:    ecartNoisePulse 2.6s ease-in-out infinite;
+}
+@keyframes ecartNoisePulse {
+  0%,100% { box-shadow: 0 0 0 0px rgba(255,255,255,0.20); }
+      50% { box-shadow: 0 0 0 8px rgba(255,255,255,0.08); }
+}
+
+/* Statut ENT/LOCK/DES — juste au-dessus du bouton */
+#homeNoiseStatus {
+  position:       fixed !important;
+  bottom:         calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+  left:           calc(16px + env(safe-area-inset-left,   0px)) !important;
+  z-index:        100070 !important;
+  font-size:      0.44rem;
+  font-family:    "Courier New", Courier, monospace;
+  letter-spacing: 0.14em;
+  color:          rgba(255,255,255,0.34);
+  pointer-events: none;
+  user-select:    none;
+  white-space:    nowrap;
+}
+
+/* [5][7] Article texte — colonne centrée, récursive, scroll interne */
+.about-home {
+  position:       fixed !important;
+  top:            50% !important;
+  left:           50% !important;
+  transform:      translate(-50%, -50%) !important;
+  z-index:        100010;
+  width:          min(90vw, 520px);
+  pointer-events: none; /* [6] laisse passer les clics vers le canvas */
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            6px;
+  text-align:     center;
+}
+
+/* Kicker, titres — non interactifs, centrés */
+.about-kicker,
+.about-home h1,
+.about-home h2 {
+  pointer-events: none;
+  text-align:     center;
+  width:          100%;
+}
+
+/* [7] Conteneur scroll sans barre, interactif pour le scroll */
+.about-scroll-outer {
+  overflow-y:                  auto;
+  max-height:                  36vh;
+  width:                       100%;
+  -webkit-overflow-scrolling:  touch;
+  overscroll-behavior:         contain;
+  touch-action:                pan-y;
+  scrollbar-width:             none;
+  pointer-events:              auto; /* scroll actif */
+}
+.about-scroll-outer::-webkit-scrollbar { display: none; }
+
+.about-scroll, .about-text {
+  pointer-events: none;
+}
+
+/* Viewer — zone non interactive */
+.about-viewer {
+  position:       relative;
+  pointer-events: none;
+}
+
+/* Prevent double scroll on body */
+body.home {
+  overflow: hidden;
+}
+
+/* Paysage compact : article plus petit */
+@media (max-height: 500px) and (orientation: landscape) {
+  .about-home {
+    top:   50% !important;
+    width: min(90vw, 460px);
+  }
+  .about-home h1 { font-size: clamp(0.9rem, 2.5vw, 1.2rem); }
+  .about-home h2 { font-size: clamp(0.7rem, 1.8vw, 0.9rem); }
+  .about-scroll-outer { max-height: 28vh; }
+}
+
+    `;
+    document.head.appendChild(s);
+  })();
+
   const ctx = canvas.getContext("2d");
 
-  /* ── Zones → URLs navigables ─────────────────────────── */
+  /* ── Zones → URLs ────────────────────────────────────── */
   const ZONES = [
     { name: "POSTER",             href: "zones/zone-01/zone-01.html" },
     { name: "BACKGROUND",         href: "zones/zone-02/zone-02.html" },
     { name: "ANTHROPOMORPH",      href: "zones/zone-03/zone-03.html" },
     { name: "NWMV",               href: "zones/zone-04/zone-04.html" },
     { name: "BAD PUBLICATIONS",   href: "zones/zone-05/zone-05.html" },
-    { name: "MAILERS",            href: "zones/zone-05/zone-05.html" },
     { name: "VILE",               href: "zones/zone-06/zone-06.html" },
     { name: "CAZAZZA",            href: "zones/zone-07/zone-07.html" },
     { name: "FUTURIST SOUND",     href: "zones/zone-08/zone-08.html" },
@@ -30,15 +179,12 @@
     { name: "SEARCH AND DESTROY", href: "zones/zone-13/zone-13.html" },
   ];
 
-  /* ── Mots ambiants ───────────────────────────────────── */
+  /* [2] Mots ambiants — liste réduite */
   const AMBIENT = [
-    "EC@RT", "MAMCO", "HEAD", "QUICKKOPY CONCEPTUALISM",
-    "CONCEPTUALISM", "BAY AREA DADA", "BAY AREA PUNK",
-    "DADA", "PUNKY", "MAIL-ART", "NOISYARCHIVES",
-    "VILE MAGAZINE", "491", "COUM TRANSMISSIONS", "NOISY MEDIATION",
-    "BEAUTY KILLERS", "ROLE MODELS",
-    "NORTH WEST MOUNTED VALISE",
-    "KOPYKOPY", "FUTURIST SOUND", "IRENE DOGMATIC",
+    "EC@RT", "MAMCO", "HEAD",
+    "QUICKKOPY", "BAY AREA DADA",
+    "DADA", "MAIL-ART",
+    "KOPYKOPY", "NOISY",
   ];
 
   const GLITCH = "!@#$%^&*abcde░▒▓│╡╖╣║╗╛┐└┬├─┼╚╔╠═╬a▄▀■◆◇x——//";
@@ -49,24 +195,26 @@
   let mx = -999, my = -999;
   let hoveredEntity = null;
 
-  /* ── Audio ───────────────────────────────────────────── */
+  /* Audio */
   let AC = null, masterGain = null, noiseGain = null, droneOsc = null;
   let analyserNode = null, freqData = null, timeData = null;
   let soundOn = false;
   const audioState = { amplitude: 0, bass: 0, mids: 0, highs: 0 };
 
-  const POP_DESKTOP = 36;
-  const POP_MOBILE  = 22;
+  /* [2] Population réduite */
+  const POP_DESKTOP = 18;
+  const POP_MOBILE  = 9;
 
   function isMobile() { return window.innerWidth <= 760; }
   function targetPop() { return isMobile() ? POP_MOBILE : POP_DESKTOP; }
   function rand(a, b) { return a + Math.random() * (b - a); }
   function pick(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
 
+  /* [1] resize utilise window dimensions — canvas fixe plein-écran */
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = canvas.clientWidth;
-    H = canvas.clientHeight;
+    W = window.innerWidth;
+    H = window.innerHeight;
     canvas.width  = Math.max(1, W * dpr);
     canvas.height = Math.max(1, H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -84,7 +232,6 @@
     masterGain.gain.linearRampToValueAtTime(0.30, AC.currentTime + 1.2);
     masterGain.connect(AC.destination);
 
-    /* Analyser pour l'emergence sonore */
     analyserNode = AC.createAnalyser();
     analyserNode.fftSize = 512;
     analyserNode.smoothingTimeConstant = 0.82;
@@ -92,7 +239,6 @@
     freqData = new Uint8Array(analyserNode.frequencyBinCount);
     timeData = new Uint8Array(analyserNode.fftSize);
 
-    /* Bruit blanc filtre */
     const sr     = AC.sampleRate;
     const buffer = AC.createBuffer(1, sr * 2, sr);
     const data   = buffer.getChannelData(0);
@@ -115,7 +261,6 @@
     noiseGain.connect(masterGain);
     noise.start();
 
-    /* Drone basse frequence */
     droneOsc = AC.createOscillator();
     droneOsc.type            = "sawtooth";
     droneOsc.frequency.value = 46;
@@ -202,9 +347,7 @@
 
   class Entity {
     constructor(forceZone) {
-      const useZone = forceZone !== undefined
-        ? forceZone
-        : Math.random() < 0.40;
+      const useZone = forceZone !== undefined ? forceZone : Math.random() < 0.40;
 
       const zoneData  = useZone ? pick(ZONES) : null;
       this.zone       = zoneData;
@@ -217,7 +360,7 @@
       this.vx = rand(-0.36, 0.36);
       this.vy = rand(-0.36, 0.36);
 
-      const base = isMobile() ? rand(7, 13) : rand(9, 16);
+      const base = isMobile() ? rand(8, 14) : rand(9, 16);
       this.size  = zoneData ? base * rand(1.1, 1.45) : base;
 
       this.opacity    = 0;
@@ -247,9 +390,7 @@
         }
         if (audioState.highs > 0.30 && Math.random() < audioState.highs * 0.07)
           this.glitch();
-        this.pulse = this.zone
-          ? Math.min(1, audioState.mids * 3.8 * s)
-          : 0;
+        this.pulse = this.zone ? Math.min(1, audioState.mids * 3.8 * s) : 0;
       } else {
         this.pulse = 0;
       }
@@ -300,6 +441,7 @@
       this.x += this.vx;
       this.y += this.vy;
 
+      /* [6] Repousse douce des bords */
       const m = 70;
       if (this.x < m)     this.vx += 0.040;
       if (this.x > W - m) this.vx -= 0.040;
@@ -347,7 +489,7 @@
       }, rand(500, 1100));
     }
 
-    /* Detection de hit pour navigation */
+    /* [6] hitTest — coordonnées viewport directes (canvas fixe 0,0) */
     hitTest(px, py) {
       const approxW = this.size * this.text.length * 0.60;
       return px > this.x - 4        && px < this.x + approxW + 4 &&
@@ -365,20 +507,16 @@
       else if (this.zone)                   { r=255; g=255; b=255; }
       else                                  { r=244; g=240; b=226; }
 
-      /* Emergence: teinte rouge sur zones searching */
       if (this.pulse > 0 && this.zone && this.state === "searching") {
         g = Math.max(0, Math.round(g * (1 - this.pulse * 0.72)));
         b = Math.max(0, Math.round(b * (1 - this.pulse * 0.90)));
       }
 
-      const alpha = this.hovered
-        ? Math.min(1, this.opacity * 1.40)
-        : this.opacity;
+      const alpha = this.hovered ? Math.min(1, this.opacity * 1.40) : this.opacity;
 
       ctx.globalAlpha = alpha;
       ctx.fillStyle   = `rgb(${r},${g},${b})`;
 
-      /* Glow zones en emergence ou hover */
       if (this.zone && (this.pulse > 0.18 || this.hovered)) {
         if (this.hovered) {
           ctx.shadowColor = "rgba(255,255,255,0.85)";
@@ -399,7 +537,6 @@
         this.y + rand(-jitter, jitter)
       );
 
-      /* Soulignement discret au hover sur les zones */
       if (this.hovered && this.href) {
         const tw = ctx.measureText(this.display).width;
         ctx.globalAlpha = alpha * 0.55;
@@ -407,7 +544,6 @@
         ctx.fillRect(this.x, this.y + 2.5, tw, 0.8);
       }
 
-      /* Fil de tracking locking */
       if (this.state === "locking" && this.target) {
         ctx.globalAlpha = this.opacity * 0.11;
         ctx.strokeStyle = "#ff3000";
@@ -424,7 +560,7 @@
   }
 
   /* =====================================================
-     ECOSYSTEME
+     ÉCOSYSTÈME
      ===================================================== */
 
   function seed() {
@@ -458,6 +594,7 @@
     });
   }
 
+  /* [6] checkHover utilise coordonnées viewport (canvas fixe = pas d'offset) */
   function checkHover(px, py) {
     hoveredEntity = null;
     for (const e of entities) {
@@ -467,7 +604,8 @@
       }
     }
     entities.forEach(e => { e.hovered = (e === hoveredEntity); });
-    canvas.style.cursor = hoveredEntity ? "pointer" : "default";
+    /* Curseur pointeur sur le document entier si survol d'une zone */
+    document.documentElement.style.cursor = hoveredEntity ? "pointer" : "";
   }
 
   function updateStatus() {
@@ -475,9 +613,9 @@
     const locking    = entities.filter(e => e.state === "locking").length;
     const destroying = entities.filter(e => e.state === "destroying").length;
     status.textContent =
-      `ENT ${String(entities.length).padStart(2, "0")} / ` +
-      `LOCK ${String(locking).padStart(2, "0")} / ` +
-      `DES ${String(destroying).padStart(2, "0")}`;
+      `ENT ${String(entities.length).padStart(2,"0")} / ` +
+      `LOCK ${String(locking).padStart(2,"0")} / ` +
+      `DES ${String(destroying).padStart(2,"0")}`;
   }
 
   function drawMouseField() {
@@ -517,48 +655,110 @@
   }
 
   /* =====================================================
-     EVENEMENTS
+     ÉVÉNEMENTS
+     [6] Tous au niveau document → clics valides même
+         au-dessus de l'article .about-home
      ===================================================== */
 
-  btn.addEventListener("click", toggleSound);
-
-  canvas.addEventListener("mousemove", e => {
-    mx = e.clientX; my = e.clientY;
-    checkHover(e.clientX, e.clientY);
+  /* Bouton NOISE */
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    toggleSound();
   });
 
-  canvas.addEventListener("mouseleave", () => {
+  /* [6] Suivi de la souris au niveau document */
+  document.addEventListener("mousemove", e => {
+    mx = e.clientX; my = e.clientY;
+    checkHover(mx, my);
+  });
+
+  document.addEventListener("mouseleave", () => {
     mx = -999; my = -999;
     hoveredEntity = null;
     entities.forEach(e => { e.hovered = false; });
-    canvas.style.cursor = "default";
+    document.documentElement.style.cursor = "";
   });
 
-  canvas.addEventListener("click", e => {
+  /* [6] Clic global — navigue vers zone même si clic sur l'article */
+  document.addEventListener("click", e => {
+    /* Ignorer le bouton NOISE et la zone de scroll */
+    if (e.target.closest("#homeNoiseToggle")) return;
+    if (e.target.closest(".about-scroll-outer")) return;
+
     if (hoveredEntity && hoveredEntity.href) {
       window.location.href = hoveredEntity.href;
       return;
     }
-    disturb(e.clientX, e.clientY);
+    /* Perturbe le champ uniquement hors de l'article */
+    if (!e.target.closest(".about-home")) {
+      disturb(e.clientX, e.clientY);
+    }
   });
 
-  canvas.addEventListener("touchstart", e => {
+  /* Touch — suivi global + navigation + disturb */
+  let touchSX = 0, touchSY = 0;
+
+  document.addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    if (!t) return;
+    touchSX = t.clientX;
+    touchSY = t.clientY;
+    mx = t.clientX; my = t.clientY;
+
+    /* Ne pas interférer avec le scroll de l'article */
+    if (e.target.closest(".about-scroll-outer")) return;
+
+    checkHover(mx, my);
+
+    /* Disturb si hors de l'article */
+    if (!e.target.closest(".about-home")) {
+      disturb(mx, my);
+    }
+  }, { passive: true });
+
+  document.addEventListener("touchmove", e => {
     const t = e.touches[0];
     if (!t) return;
     mx = t.clientX; my = t.clientY;
-    disturb(mx, my);
+    if (!e.target.closest(".about-scroll-outer")) {
+      checkHover(mx, my);
+    }
+  }, { passive: true });
+
+  document.addEventListener("touchend", e => {
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const dx = Math.abs(t.clientX - touchSX);
+    const dy = Math.abs(t.clientY - touchSY);
+
+    /* Navigation uniquement sur un vrai tap (pas de scroll) */
+    if (dx < 12 && dy < 12) {
+      if (hoveredEntity && hoveredEntity.href) {
+        window.location.href = hoveredEntity.href;
+        return;
+      }
+    }
+
+    /* Reset hover après le tap */
+    window.setTimeout(() => {
+      mx = -999; my = -999;
+      hoveredEntity = null;
+      entities.forEach(e2 => { e2.hovered = false; });
+      document.documentElement.style.cursor = "";
+    }, 200);
   }, { passive: true });
 
   window.addEventListener("resize", () => { resize(); seed(); });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden && AC && soundOn)  AC.suspend();
+    if (document.hidden  && AC && soundOn) AC.suspend();
     if (!document.hidden && AC && soundOn) AC.resume();
   });
 
-  /* START */
+  /* ── START ──────────────────────────────────────────── */
   resize();
   seed();
   updateStatus();
   loop();
+
 })();
