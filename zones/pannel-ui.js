@@ -1,20 +1,18 @@
 /* ==========================================================
-   EC@RT — INTERFACE UNIFIÉE v9
+   EC@RT — INTERFACE UNIFIÉE v10
    ========================================================== */
 
 (function () {
-  const STORAGE_KEY = "ecart_visited_zones";
-  const LIGHT_KEY   = "ecart_light_mode";
-  const FOCUS_KEY   = "ecart_focus_mode";
+  const LIGHT_KEY  = "ecart_light_mode";
+  const FOCUS_KEY  = "ecart_focus_mode";
 
-  /* ── Icônes SVG — [6] identiques desktop/tablette/phone ── */
+  /* ── Icônes SVG ── */
   const SVG_EYE_OPEN = `<svg class="eye-open" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
 
   const SVG_EYE_CLOSED = `<svg class="eye-closed" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
 
   const SVG_SUN = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>`;
 
-  /* [5][6] SVG play/pause — rendu identique sur tous les appareils */
   const SVG_PLAY  = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><polygon points="6,3 20,12 6,21"/></svg>`;
   const SVG_PAUSE = `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><rect x="5"  y="4" width="4.5" height="16" rx="1"/><rect x="14.5" y="4" width="4.5" height="16" rx="1"/></svg>`;
 
@@ -34,31 +32,16 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     ZONES VISITÉES
+     [3] Zones visitées supprimées — seule la zone courante
+         est marquée (is-current / active), aucune mémorisation
      ────────────────────────────────────────────────────── */
 
-  function getVisitedZones() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-    catch { return []; }
-  }
-
-  function addVisitedZone(id) {
-    if (!id) return;
-    const visited = getVisitedZones();
-    if (!visited.includes(id)) {
-      visited.push(id);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(visited));
-    }
-  }
-
-  function applyVisitedZones(zones, currentZone) {
-    const visited = getVisitedZones();
+  function applyCurrentZone(zones, currentZone) {
     zones.forEach(zone => {
       const id = zone.dataset.miniZone;
       const isCurrent = id === currentZone;
       zone.classList.toggle("is-current", isCurrent);
       zone.classList.toggle("active",     isCurrent);
-      zone.classList.toggle("is-visited", visited.includes(id) && !isCurrent);
     });
   }
 
@@ -90,7 +73,6 @@
 
   /* ──────────────────────────────────────────────────────
      TOAST — "SURFACE PHOTOSENSIBLE : ON / OFF"
-     [3] Taille réduite, positionné à gauche du bouton œil
      ────────────────────────────────────────────────────── */
 
   function showToast(message) {
@@ -182,8 +164,7 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     SOUND — [5] chaque piste = lecteur indépendant
-     [6] SVG play/pause identique partout
+     SOUND — chaque piste = lecteur indépendant
      ────────────────────────────────────────────────────── */
 
   function initSoundDirect() {
@@ -204,7 +185,6 @@
     const audio = new Audio();
     audio.preload = "metadata";
 
-    /* ── Création du panel — sans lecteur global ── */
     const panel = document.createElement("div");
     panel.id = "ecartAudioPanel";
     panel.setAttribute("aria-hidden", "true");
@@ -220,14 +200,12 @@
 
     const tracklist = qs("#ecartAudioTracklist", panel);
 
-    /* ── État panel ── */
     function setPanelVisible(on) {
       panel.classList.toggle("is-visible", on);
       panel.setAttribute("aria-hidden", on ? "false" : "true");
       btn.classList.toggle("is-open", on);
     }
 
-    /* ── [5][6] Met à jour tous les boutons pp ── */
     function setPlaying(on) {
       btn.classList.toggle("is-playing", on);
       panel.classList.toggle("is-playing", on);
@@ -256,7 +234,6 @@
       });
     }
 
-    /* ── Lecture ── */
     function play() {
       if (!audio.src) { loadTrack(currentIndex, true); return; }
       audio.play()
@@ -289,19 +266,16 @@
       if (autoplay) play(); else setPlaying(false);
     }
 
-    /* ── [5] Génération des pistes — lecteur par piste ── */
     sounds.forEach((sound, index) => {
       const item = document.createElement("div");
       item.className = "ecart-audio-track";
 
-      /* Bouton play/pause propre à cette piste */
       const ppBtn = document.createElement("button");
       ppBtn.type      = "button";
       ppBtn.className = "ecart-track-pp";
       ppBtn.innerHTML = SVG_PLAY;
       ppBtn.setAttribute("aria-label", "Lecture");
 
-      /* Corps : titre + barre de progression */
       const body = document.createElement("div");
       body.className = "ecart-track-body";
 
@@ -325,25 +299,21 @@
       item.appendChild(body);
       tracklist.appendChild(item);
 
-      /* Références stockées sur l'objet sound */
       sound._ppEl   = ppBtn;
       sound._fillEl = fill;
       sound._strip  = strip;
 
-      /* Clic sur le bouton pp */
       ppBtn.addEventListener("click", e => {
         e.stopPropagation();
         if (currentIndex === index) togglePlay();
         else loadTrack(index, true);
       });
 
-      /* Clic sur le corps de piste */
       body.addEventListener("click", () => {
         if (currentIndex === index) togglePlay();
         else loadTrack(index, true);
       });
 
-      /* Seek sur la barre — pointer */
       strip.addEventListener("click", e => {
         e.stopPropagation();
         if (!audio.duration || currentIndex !== index) return;
@@ -351,7 +321,6 @@
         audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * audio.duration;
       });
 
-      /* Seek tactile */
       strip.addEventListener("touchend", e => {
         e.stopPropagation();
         if (!audio.duration || currentIndex !== index) return;
@@ -361,13 +330,12 @@
       }, { passive: true });
     });
 
-    /* ── Événements audio ── */
     audio.addEventListener("loadedmetadata", resetProgress);
 
     audio.addEventListener("timeupdate", () => {
       if (!audio.duration) return;
-      const pct  = (audio.currentTime / audio.duration) * 100;
-      const s    = sounds[currentIndex];
+      const pct = (audio.currentTime / audio.duration) * 100;
+      const s   = sounds[currentIndex];
       if (s?._fillEl) s._fillEl.style.width = `${pct}%`;
     });
 
@@ -383,14 +351,12 @@
       resetProgress();
     });
 
-    /* ── Bouton cluster SOUND ── */
     btn.addEventListener("click", () => {
       panel.classList.contains("is-visible")
         ? setPanelVisible(false)
         : (closeAllPanelsExcept("sound"), setPanelVisible(true), updateActiveTrack(), emitPanelOpen("sound"));
     });
 
-    /* ── Fermeture ── */
     panel.addEventListener("click", e => { if (e.target === panel) setPanelVisible(false); });
 
     document.addEventListener("ecart:panel-close-others", e => {
@@ -430,7 +396,7 @@
       refBox.innerHTML = "<h3>Références</h3>" + data.references.map(r => `<div class="info-ref-item">${r}</div>`).join("");
     }
 
-    function openPanel()  {
+    function openPanel() {
       closeAllPanelsExcept("info");
       panel.classList.add("is-open");    btn.classList.add("is-open");
       panel.setAttribute("aria-hidden", "false"); btn.setAttribute("aria-expanded", "true");
@@ -448,9 +414,10 @@
   }
 
   /* ──────────────────────────────────────────────────────
-     MAP — navigation simplifiée
-     · Flèches SVG grand angle (prev / next)
-     · 1 tap sur une zone = navigation directe
+     MAP
+     [3] Pas de mémorisation des zones visitées
+     [4] Flèches + label injectés dans .mobile-map-status-wrap
+         (position visuelle gérée par CSS order: 2)
      ────────────────────────────────────────────────────── */
 
   function initMapPanel() {
@@ -462,8 +429,6 @@
     const zones       = qsa(".mini-zone", overlay);
     const currentZone = document.body.dataset.zone || "";
 
-    if (currentZone) addVisitedZone(currentZone);
-
     const zoneList = [...zones]
       .map(z => ({ id: z.dataset.miniZone, name: z.dataset.zoneName || `Zone ${z.dataset.miniZone}`, href: z.getAttribute("href") }))
       .filter(z => z.id && z.href)
@@ -472,7 +437,6 @@
     const curIdx       = zoneList.findIndex(z => z.id === currentZone);
     const defaultLabel = curIdx >= 0 ? zoneList[curIdx].name : "—";
 
-    /* Flèches grand angle */
     const SVG_PREV = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 3 L4 12 L20 21"/></svg>`;
     const SVG_NEXT = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3 L20 12 L4 21"/></svg>`;
 
@@ -491,10 +455,8 @@
     const navPrev = qs("#mapNavPrev");
     const navNext = qs("#mapNavNext");
 
-    /* Index de la zone actuellement sélectionnée dans la map */
-    let selectedIdx = curIdx; /* −1 si page hors zones */
+    let selectedIdx = curIdx;
 
-    /* Met à jour le label + surligne la zone sur la minimap */
     function selectZone(idx) {
       selectedIdx = idx;
       if (status) status.textContent = zoneList[idx]?.name || defaultLabel;
@@ -506,7 +468,6 @@
       }
     }
 
-    /* Flèches — cyclent la sélection, ne naviguent PAS */
     if (navPrev && zoneList.length > 1) {
       navPrev.addEventListener("click", e => {
         e.stopPropagation();
@@ -534,8 +495,8 @@
       closeAllPanelsExcept("map");
       overlay.classList.add("is-open");
       setToggleState(true);
-      applyVisitedZones(zones, currentZone);
-      /* Remet la sélection sur la zone courante à l'ouverture */
+      /* [3] Seule la zone courante est marquée, pas les visitées */
+      applyCurrentZone(zones, currentZone);
       selectedIdx = curIdx;
       zones.forEach(z => z.classList.remove("is-selected"));
       if (curIdx >= 0) selectZone(curIdx);
@@ -559,13 +520,11 @@
       if (e.detail?.panel !== "map") closeMap();
     });
 
-    /* Zones — 1er tap = sélectionner, 2ème tap = naviguer */
     zones.forEach(zone => {
       zone.addEventListener("mouseenter", () => {
         if (status) status.textContent = zone.dataset.zoneName || `Zone ${zone.dataset.miniZone}`;
       });
       zone.addEventListener("mouseleave", () => {
-        /* Reaffiche la zone sélectionnée ou le label par défaut */
         if (status) status.textContent = selectedIdx >= 0
           ? (zoneList[selectedIdx]?.name || defaultLabel)
           : defaultLabel;
@@ -577,12 +536,10 @@
         if (idx < 0) return;
 
         if (idx !== selectedIdx) {
-          /* 1er tap : sélectionner — bloquer le lien <a> par défaut */
           e.preventDefault();
           selectZone(idx);
         } else {
-          /* 2ème tap : naviguer */
-          addVisitedZone(id);
+          /* [3] Navigation directe — plus de mémorisation */
           window.location.href = zoneList[idx].href;
         }
       });
@@ -594,7 +551,8 @@
       if (id) link.classList.toggle("active", id === currentZone);
     });
 
-    applyVisitedZones(zones, currentZone);
+    /* [3] Marquer seulement la zone courante */
+    applyCurrentZone(zones, currentZone);
     setToggleState(false);
   }
 
