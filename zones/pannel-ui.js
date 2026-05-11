@@ -191,8 +191,6 @@
     if (!btn) return;
 
     let sounds = Array.isArray(window.ECART_SOUND) ? [...window.ECART_SOUND] : [];
-    const hasVoice = sounds.some(s => s.type === "voice");
-    if (!hasVoice) sounds.push({ title: "Voix de l'écran", type: "voice" });
 
     if (!sounds.length) {
       btn.disabled = true;
@@ -202,7 +200,6 @@
     }
 
     let currentIndex = 0;
-    let currentMode  = "audio";
 
     const audio = new Audio();
     audio.preload = "metadata";
@@ -250,7 +247,6 @@
 
     function stopAll() {
       audio.pause();
-      window.speechSynthesis.cancel();
       setPlaying(false);
     }
 
@@ -260,57 +256,20 @@
       });
     }
 
-    /* ── Voix ── */
-    function collectScreenText() {
-      const info  = window.ECART_INFO || {};
-      const texts = [];
-      if (info.title)       texts.push(info.title);
-      if (info.subtitle)    texts.push(info.subtitle);
-      if (info.description) texts.push(info.description);
-      if (info.gameplay)    texts.push(info.gameplay);
-      if (Array.isArray(info.references)) texts.push(...info.references);
-      const clean = texts.map(t => String(t).replace(/\s+/g, " ").trim()).filter(Boolean);
-      return clean.length ? clean.join(". ") : "Aucune information disponible.";
-    }
-
-    function speakText(text) {
-      const content = text?.trim() || "Aucun texte lisible détecté.";
-      const utterance = new SpeechSynthesisUtterance(content);
-      utterance.lang = "fr-FR"; utterance.rate = 0.88; utterance.pitch = 0.92; utterance.volume = 1;
-      utterance.onstart = () => {
-        currentMode = "voice";
-        setPlaying(true);
-        const s = sounds[currentIndex];
-        if (s?._fillEl) s._fillEl.style.width = "100%";
-      };
-      utterance.onend = utterance.onerror = () => { setPlaying(false); resetProgress(); };
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-    }
-
     /* ── Lecture ── */
     function play() {
-      const sound = sounds[currentIndex];
-      if (sound?.type === "voice") { speakText(collectScreenText()); return; }
       if (!audio.src) { loadTrack(currentIndex, true); return; }
-      window.speechSynthesis.cancel();
       audio.play()
-        .then(() => { currentMode = "audio"; setPanelVisible(true); setPlaying(true); })
+        .then(() => { setPanelVisible(true); setPlaying(true); })
         .catch(err => { console.warn("[EC@RT] Lecture bloquée :", err); setPlaying(false); });
     }
 
     function pause() {
-      if (currentMode === "voice") window.speechSynthesis.cancel();
-      else audio.pause();
+      audio.pause();
       setPlaying(false);
     }
 
     function togglePlay() {
-      const sound = sounds[currentIndex];
-      if (sound?.type === "voice") {
-        panel.classList.contains("is-playing") ? pause() : play();
-        return;
-      }
       audio.paused ? play() : pause();
     }
 
@@ -321,14 +280,6 @@
       updateActiveTrack();
       setPanelVisible(true);
 
-      if (sound.type === "voice") {
-        currentMode = "voice";
-        audio.removeAttribute("src");
-        if (autoplay) speakText(collectScreenText());
-        return;
-      }
-
-      currentMode = "audio";
       if (!sound.file) {
         console.warn("[EC@RT] Piste sans fichier :", sound);
         setPlaying(false);
@@ -395,7 +346,7 @@
       /* Seek sur la barre — pointer */
       strip.addEventListener("click", e => {
         e.stopPropagation();
-        if (currentMode === "voice" || !audio.duration || currentIndex !== index) return;
+        if (!audio.duration || currentIndex !== index) return;
         const rect = strip.getBoundingClientRect();
         audio.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * audio.duration;
       });
@@ -403,7 +354,7 @@
       /* Seek tactile */
       strip.addEventListener("touchend", e => {
         e.stopPropagation();
-        if (currentMode === "voice" || !audio.duration || currentIndex !== index) return;
+        if (!audio.duration || currentIndex !== index) return;
         const rect  = strip.getBoundingClientRect();
         const touch = e.changedTouches[0];
         audio.currentTime = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width)) * audio.duration;
