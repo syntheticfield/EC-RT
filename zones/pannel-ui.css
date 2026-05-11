@@ -1231,3 +1231,395 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   #infoPanel.is-open .info-description { font-size: 0.96rem !important; line-height: 1.52 !important; }
   #infoPanel.is-open .info-ref-item    { font-size: 0.88rem !important; }
 }
+/* ==========================================================
+   EC@RT — PANEL UI FIX FINAL MOBILE / TABLETTE
+   Portrait : LIGHT + EYE haut droite / INFO MAP SOUND bas gauche
+   Paysage : 5 boutons colonne droite
+   Panels au-dessus joystick + web content
+   ========================================================== */
+
+:root {
+  --ecart-z-panel: 100300;
+  --ecart-z-button: 100420;
+}
+
+/* Panels toujours au-dessus du joystick, canvas, Unity, contenus */
+#infoPanel,
+#mobileMapOverlay,
+#ecartAudioPanel {
+  z-index: 100300 !important;
+}
+
+/* Boutons toujours au-dessus des panels */
+.ecart-ui-cluster,
+#ecartTopRight,
+.ecart-focus-btn,
+.ecart-light-btn {
+  z-index: 100420 !important;
+}
+
+/* Joystick et contrôles Unity derrière les panels */
+.joystick,
+.joystick-container,
+.fixed-joystick,
+#joystick,
+#fixedJoystick,
+.joystick-ui,
+.mobile-joystick,
+.touch-joystick,
+[class*="joystick"],
+[class*="Joystick"] {
+  z-index: 40 !important;
+}
+
+body:has(#infoPanel.is-open) .joystick,
+body:has(#mobileMapOverlay.is-open) .joystick,
+body:has(#ecartAudioPanel.is-visible) .joystick,
+body:has(#infoPanel.is-open) [class*="joystick"],
+body:has(#mobileMapOverlay.is-open) [class*="joystick"],
+body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
+  opacity: 0.18 !important;
+  pointer-events: none !important;
+}
+
+/* Sécurité : les contenus internes de la map n’apparaissent jamais hors overlay ouvert */
+#mobileMapOverlay:not(.is-open),
+#mobileMapOverlay:not(.is-open) * {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Quand INFO ou SOUND est ouvert, la map est forcée derrière/invisible */
+#infoPanel.is-open ~ #mobileMapOverlay,
+#ecartAudioPanel.is-visible ~ #mobileMapOverlay {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+
+/* ==========================================================
+   TÉLÉPHONE PORTRAIT
+   haut droite : LIGHT + EYE
+   bas gauche : INFO + MAP + SOUND
+   ========================================================== */
+
+@media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
+
+  :root {
+    --ecart-ui-size: 46px;
+    --ecart-ui-gap: 8px;
+    --ecart-ui-right: 12px;
+    --ecart-ui-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* LIGHT + EYE en haut à droite */
+  #ecartTopRight {
+    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+    right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    gap: var(--ecart-ui-gap) !important;
+    transform: none !important;
+  }
+
+  .ecart-light-btn { order: 1 !important; }
+  .ecart-focus-btn { order: 2 !important; }
+
+  /* INFO MAP SOUND en bas gauche */
+  .ecart-ui-cluster {
+    left: calc(14px + env(safe-area-inset-left, 0px)) !important;
+    right: auto !important;
+    bottom: var(--ecart-ui-bottom) !important;
+    top: auto !important;
+
+    width: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: var(--ecart-ui-gap) !important;
+    transform: none !important;
+  }
+
+  #infoToggle { order: 1 !important; }
+  #mobileMapToggle { order: 2 !important; }
+  #soundToggle { order: 3 !important; }
+
+  .ecart-focus-btn,
+  .ecart-light-btn,
+  .ecart-ui-cluster > button {
+    width: var(--ecart-ui-size) !important;
+    height: var(--ecart-ui-size) !important;
+    font-size: 0.48rem !important;
+  }
+
+  #infoPanel,
+  #mobileMapOverlay,
+  #ecartAudioPanel {
+    left: 0 !important;
+    right: 0 !important;
+    padding:
+      calc(72px + env(safe-area-inset-top, 0px))
+      14px
+      calc(74px + env(safe-area-inset-bottom, 0px))
+      14px !important;
+  }
+
+  .info-panel-inner,
+  .ecart-audio-panel-inner,
+  .mobile-map-panel-inner {
+    width: 100% !important;
+    max-height: calc(100dvh - 150px) !important;
+  }
+
+  .mobile-map-panel {
+    width: 100% !important;
+    height: calc(100dvh - 150px) !important;
+  }
+
+  .mobile-mini-map-wrap {
+    width: min(100%, 78vw) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    max-height: calc(100dvh - 230px) !important;
+  }
+}
+
+
+/* ==========================================================
+   TÉLÉPHONE PAYSAGE
+   5 boutons colonne droite :
+   LIGHT / EYE / SOUND / MAP / INFO
+   ========================================================== */
+
+@media (pointer: coarse) and (max-width: 767px) and (orientation: landscape) {
+
+  :root {
+    --ecart-ui-size: clamp(36px, 10vmin, 44px);
+    --ecart-ui-gap: 5px;
+    --ecart-ui-right: calc(10px + env(safe-area-inset-right, 0px));
+  }
+
+  #ecartTopRight {
+    position: fixed !important;
+    top: calc(10px + env(safe-area-inset-top, 0px)) !important;
+    right: var(--ecart-ui-right) !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--ecart-ui-gap) !important;
+    transform: none !important;
+  }
+
+  .ecart-ui-cluster {
+    position: fixed !important;
+    top: calc(
+      10px + env(safe-area-inset-top, 0px)
+      + (var(--ecart-ui-size) * 2)
+      + (var(--ecart-ui-gap) * 2)
+    ) !important;
+    right: var(--ecart-ui-right) !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--ecart-ui-gap) !important;
+    transform: none !important;
+    width: auto !important;
+  }
+
+  .ecart-light-btn { order: 1 !important; }
+  .ecart-focus-btn { order: 2 !important; }
+
+  #soundToggle { order: 1 !important; }
+  #mobileMapToggle { order: 2 !important; }
+  #infoToggle { order: 3 !important; }
+
+  .ecart-focus-btn,
+  .ecart-light-btn,
+  .ecart-ui-cluster > button {
+    width: var(--ecart-ui-size) !important;
+    height: var(--ecart-ui-size) !important;
+    font-size: 0.38rem !important;
+  }
+
+  #infoPanel,
+  #mobileMapOverlay,
+  #ecartAudioPanel {
+    left: 0 !important;
+    right: 0 !important;
+    padding:
+      8px
+      calc(var(--ecart-ui-size) + 24px + env(safe-area-inset-right, 0px))
+      8px
+      calc(54px + env(safe-area-inset-left, 0px)) !important;
+  }
+
+  .info-panel-inner,
+  .ecart-audio-panel-inner,
+  .mobile-map-panel-inner {
+    max-height: calc(100dvh - 16px) !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+  }
+
+  .mobile-map-panel {
+    width: 100% !important;
+    height: calc(100dvh - 16px) !important;
+  }
+
+  .mobile-map-panel-inner {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    grid-template-rows: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .mobile-map-figure {
+    order: initial !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .mobile-map-status-wrap {
+    order: initial !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: min(34vw, 180px) !important;
+  }
+
+  .map-nav-bar {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .map-nav-label {
+    white-space: normal !important;
+    font-size: clamp(0.58rem, 1.5vw, 0.76rem) !important;
+    line-height: 1.15 !important;
+    max-width: 100% !important;
+  }
+
+  .map-nav-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .mobile-mini-map-wrap {
+    width: auto !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    max-height: calc(100dvh - 42px) !important;
+  }
+
+  .ecart-audio-tracklist {
+    max-height: calc(100dvh - 82px) !important;
+  }
+}
+
+
+/* ==========================================================
+   TABLETTE PORTRAIT
+   ========================================================== */
+
+@media (pointer: coarse) and (min-width: 768px) and (orientation: portrait) {
+
+  :root {
+    --ecart-ui-size: 56px;
+    --ecart-ui-gap: 10px;
+  }
+
+  #ecartTopRight {
+    top: calc(18px + env(safe-area-inset-top, 0px)) !important;
+    right: calc(18px + env(safe-area-inset-right, 0px)) !important;
+    flex-direction: row !important;
+    transform: none !important;
+  }
+
+  .ecart-ui-cluster {
+    left: calc(22px + env(safe-area-inset-left, 0px)) !important;
+    right: auto !important;
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+    top: auto !important;
+    flex-direction: row !important;
+    transform: none !important;
+  }
+
+  #infoToggle { order: 1 !important; }
+  #mobileMapToggle { order: 2 !important; }
+  #soundToggle { order: 3 !important; }
+
+  #infoPanel,
+  #mobileMapOverlay,
+  #ecartAudioPanel {
+    left: 0 !important;
+    padding:
+      calc(88px + env(safe-area-inset-top, 0px))
+      34px
+      calc(90px + env(safe-area-inset-bottom, 0px))
+      34px !important;
+  }
+}
+
+
+/* ==========================================================
+   TABLETTE PAYSAGE
+   ========================================================== */
+
+@media (pointer: coarse) and (min-width: 768px) and (orientation: landscape) {
+
+  :root {
+    --ecart-ui-size: 52px;
+    --ecart-ui-gap: 8px;
+  }
+
+  #ecartTopRight {
+    top: calc(18px + env(safe-area-inset-top, 0px)) !important;
+    right: calc(18px + env(safe-area-inset-right, 0px)) !important;
+    flex-direction: column !important;
+    transform: none !important;
+  }
+
+  .ecart-ui-cluster {
+    top: calc(
+      18px + env(safe-area-inset-top, 0px)
+      + (var(--ecart-ui-size) * 2)
+      + (var(--ecart-ui-gap) * 2)
+    ) !important;
+    right: calc(18px + env(safe-area-inset-right, 0px)) !important;
+    left: auto !important;
+    bottom: auto !important;
+    flex-direction: column !important;
+    transform: none !important;
+  }
+
+  #soundToggle { order: 1 !important; }
+  #mobileMapToggle { order: 2 !important; }
+  #infoToggle { order: 3 !important; }
+
+  #infoPanel,
+  #mobileMapOverlay,
+  #ecartAudioPanel {
+    left: 0 !important;
+    padding:
+      24px
+      calc(var(--ecart-ui-size) + 42px + env(safe-area-inset-right, 0px))
+      24px
+      calc(64px + env(safe-area-inset-left, 0px)) !important;
+  }
+}

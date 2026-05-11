@@ -60,9 +60,9 @@
     cluster.className = "ecart-ui-cluster";
     cluster.id = "ecartUiCluster";
 
-    if (soundBtn) cluster.appendChild(soundBtn);
-    if (mapBtn)   cluster.appendChild(mapBtn);
     if (infoBtn)  cluster.appendChild(infoBtn);
+if (mapBtn)   cluster.appendChild(mapBtn);
+if (soundBtn) cluster.appendChild(soundBtn);
 
     document.body.appendChild(cluster);
 
