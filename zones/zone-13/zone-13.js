@@ -522,7 +522,7 @@ function initCanvas() {
 async function startTransmission(btn, label) {
   if (transmitting) return;
   btn.disabled = true;
-  label.textContent = 'CHARGEMENT';
+  label.textContent = '+(...)+';
   try {
     engine = new Zone13Audio();
     await engine.init();
@@ -535,7 +535,7 @@ async function startTransmission(btn, label) {
     transmitting = true;
     btn.disabled = false;
     btn.classList.add('is-active');
-    label.textContent = 'TRANSMISSION';
+    label.textContent = 'NOISY-CODE:ON';
     btn.setAttribute('aria-label', 'Couper la transmission');
     chaos.setMode('THERMAL'); lastMode = 'THERMAL';
     tick();
@@ -543,7 +543,7 @@ async function startTransmission(btn, label) {
     console.error('[Z13]', err);
     btn.disabled = false;
     label.textContent = 'ERREUR';
-    setTimeout(() => { label.textContent = 'TRANSMISSION'; }, 2200);
+    setTimeout(() => { label.textContent = 'Active Mode'; }, 2200);
   }
 }
 
@@ -554,7 +554,7 @@ function stopTransmission(btn, label) {
   glitch?.clear();
   chaos.setMode('THERMAL'); lastMode = 'THERMAL';
   btn.classList.remove('is-active', 'is-firing');
-  label.textContent = 'TRANSMISSION';
+  label.textContent = 'ACTIVE-MODE';
   btn.setAttribute('aria-label', 'Activer la transmission');
 }
 
@@ -566,7 +566,7 @@ function createTransmissionBtn() {
   btn.setAttribute('aria-label', 'Activer la transmission');
   btn.setAttribute('data-chaos-exclude', '');
   btn.innerHTML = '<span class="z13-tx-ring" aria-hidden="true"></span>'
-                + '<span class="z13-tx-label">TRANSMISSION</span>';
+                + '<span class="z13-tx-label">ACTIVE-NOISY-CODE</span>';
   document.body.appendChild(btn);
   return btn;
 }

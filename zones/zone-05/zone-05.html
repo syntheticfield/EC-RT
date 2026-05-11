@@ -21,7 +21,7 @@
       radial-gradient(circle at 70% 75%, rgba(95, 58, 26, 0.12), transparent 42%),
       linear-gradient(180deg, #080806, #020202 75%);
     touch-action: none;
-    isolation: isolate;
+    isolation: auto;
   }
 
   .bad-zone::before {
@@ -141,79 +141,55 @@
     mix-blend-mode: screen;
   }
 
+  /* ── NoisyLivingCode button ────────────────────────── */
   .bad-reset {
-    position: fixed;
+  position: fixed !important;
+  left: 18px;
+  bottom: 18px;
+  z-index: 2147483647 !important;
 
-    left: 18px;
-    bottom: 18px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.42);
+  color: rgba(255,255,255,0.60);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
-    z-index: 99960;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 9px 13px;
+  cursor: pointer;
 
-    border: 1px solid rgba(255,255,255,0.22);
-    background: rgba(0,0,0,0.36);
-    color: rgba(255,255,255,0.62);
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-
-    padding: 9px 12px;
-
-    cursor: pointer;
-
-    transition:
-      left 0.28s ease,
-      opacity 0.18s ease,
-      border-color 0.18s ease,
-      color 0.18s ease,
-      background 0.18s ease;
-  }
+  pointer-events: auto;
+}
 
   .bad-reset:hover {
-    color: white;
-    border-color: rgba(255,255,255,0.48);
+    color: rgba(255,255,255,0.92);
+    border-color: rgba(255,255,255,0.44);
   }
 
-  /* Quand la sidebar desktop/tablette est ouverte,
-     le bouton reset se décale après la sidebar */
-  body.sidebar-open .bad-reset,
-  body.menu-open .bad-reset,
-  body.nav-open .bad-reset {
-    left: calc(var(--ecart-sidebar-col, 320px) + 18px);
-  }
+  .bad-reset:active { transform: scale(0.96); }
 
-  /* Sécurité si ta sidebar utilise aria-expanded au lieu d'une classe body */
-  body:has(.menu-toggle[aria-expanded="true"]) .bad-reset {
-    left: calc(var(--ecart-sidebar-col, 320px) + 18px);
-  }
-
-  @media (max-width: 768px) {
+  /* Desktop — petit décalage pour la marge de la sidebar */
+  @media (pointer: fine) {
     .bad-reset {
-      left: 14px;
-      bottom: 72px;
-      font-size: 9px;
-      z-index: 99960;
+      left:   26px;
+      bottom: 22px;
     }
+  }
 
-    body.sidebar-open .bad-reset,
-    body.menu-open .bad-reset,
-    body.nav-open .bad-reset,
-    body:has(.menu-toggle[aria-expanded="true"]) .bad-reset {
-      left: 14px;
+  /* Mobile/tablette — remonte au-dessus des boutons UI bas */
+  @media (pointer: coarse) {
+    .bad-reset {
+      bottom: clamp(72px, 12vh, 96px);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .bad-fragment {
-      will-change: auto;
-    }
-
-    .bad-reset {
-      transition: none;
-    }
+    .bad-fragment { will-change: auto; }
+    .bad-reset    { transition: none; }
   }
 </style>
 </head>
@@ -261,12 +237,19 @@
 
       <div id="badArchiveSurface" class="bad-archive-surface"></div>
 
-      <button id="badReset" class="bad-reset" type="button">
-        reset archive
-      </button>
+    <section class="bad-zone" aria-label="Table d'archives vivante — Zone 05 BAD">
+  <svg id="badThreads" class="bad-threads" aria-hidden="true"></svg>
+  <div id="badArchiveSurface" class="bad-archive-surface"></div>
+</section>
     </section>
 
   </main>
+
+  </main>
+
+<button id="badReset" class="bad-reset" type="button">
+  RANDOM-ARCHIVES
+</button>
 
   <button
     id="mobileMapToggle"

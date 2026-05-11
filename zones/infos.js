@@ -4,6 +4,26 @@
    ========================================================= */
 
 window.ECART_DATA = {
+   "0": {
+    title: "About EC@RT",
+    subtitle: "Archive / Zoom / Audio-description",
+    description: `Dans le cadre de l’exposition Quickkopy Conceptualism: Bay Area Dada to Bay Area Punk au MAMCO, la plateforme EC@RT — Virtual Dada Noisy Quickkopy propose un espace de médiation numérique dédié aux archives de l’exposition.
+
+Elle réunit une sélection de documents — affiches, publications, correspondances — adaptés par le son, l’audio-description, la transcription et des environnements numériques. La navigation s’apparente à un environnement situé entre archéologie numérique et conservation infidèle.
+
+Pensée comme une déambulation alternative, elle permet d’explorer ces archives autrement, par fragments, récits et ambiances. Le parcours invite à produire sa propre lecture, entre écoute, interprétation et recomposition.
+
+La plateforme EC@RT se présente comme un territoire parallèle, développé par Hugo Lemahieu et Noemy Rubio Meau. Les œuvres et documents y deviennent consultables de manière immatérielle, selon des modalités alternatives de lecture et de perception. Il s’agit de déplacer les modes d’accès aux archives.
+
+Composées en grande partie de documents visuels, les archives d’Écart reposent habituellement sur le regard. EC@RT propose de les ouvrir à d’autres formes d’expérience en mobilisant des outils liés à l’accessibilité : audio-description, transcription, voix de synthèse, dispositifs de médiation, son — envisagés ici comme des formes actives de transformation.
+
+En écho à l’esprit expérimental et subversif qui traverse l’histoire d’Écart — du mail art aux esthétiques punk — EC@RT interroge les formes contemporaines de circulation des images, des textes et des voix. Plutôt que de fixer les documents dans une forme définitive, le projet les considère comme des matières à réactiver, à transformer, à réinterpréter, des espaces d’écoute, d’imagination et de lecture plurielle."
+    `,
+    references: [
+      `MAMCO X HEAD, Noemy Rubio Meau, Hugo Lemahieu`
+    ]
+  },
+
   "1": {
     title: "ENTRÉE",
     subtitle: "Archive / Zoom / Audio-description",

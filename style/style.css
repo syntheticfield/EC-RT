@@ -200,45 +200,56 @@ body.home .plan-caption {
 /* ===============================
    SOUND NOISE BUTTON
    =============================== */
+/* ─── NOISYLIVINGCODE BUTTON (home) ──────────────────── */
 #homeNoiseToggle {
   position: fixed;
-
-  left: calc(var(--ecart-sidebar-col, 320px) + 22px);
-  bottom: 22px;
-
-  z-index: 40;
+  left:   18px;
+  bottom: 18px;
+  z-index: 100070; /* passe au-dessus de la sidebar */
 
   font-family: "Courier New", Courier, monospace;
   font-size: 10px;
+  font-weight: 400;
   letter-spacing: 0.18em;
-  color: rgba(244,240,226,0.72);
+  color: rgba(244,240,226,0.60);
 
-  background: rgba(0,0,0,0.48);
   border: 1px solid rgba(244,240,226,0.22);
+  background: rgba(0,0,0,0.42);
+  backdrop-filter: blur(12px);
 
-  padding: 7px 14px;
-
+  padding: 9px 13px;
   cursor: pointer;
   text-transform: uppercase;
 
-  backdrop-filter: blur(8px);
-
-  transition:
-    color 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease,
-    opacity 0.18s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 #homeNoiseToggle:hover {
-  color: rgba(255,255,255,0.96);
-  border-color: rgba(255,255,255,0.58);
+  color: rgba(255,255,255,0.92);
+  border-color: rgba(255,255,255,0.44);
 }
+
+#homeNoiseToggle:active { transform: scale(0.96); }
 
 #homeNoiseToggle.is-on {
   color: #ff3000;
-  border-color: #ff3000;
-  background: rgba(35, 0, 0, 0.46);
+  border-color: rgba(255,48,0,0.55);
+  background: rgba(35,0,0,0.46);
+}
+
+/* Desktop — petit décalage pour la marge de la sidebar */
+@media (pointer: fine) {
+  #homeNoiseToggle {
+    left:   26px;
+    bottom: 22px;
+  }
+}
+
+/* Mobile/tablette — remonte au-dessus des boutons UI bas */
+@media (pointer: coarse) {
+  #homeNoiseToggle {
+    bottom: clamp(72px, 12vh, 96px);
+  }
 }
 
 /* Statut discret */
@@ -312,13 +323,6 @@ body.home .plan-caption {
     overflow-y: visible;
   }
   .about-scroll-outer::after { display: none; }
-
-  #homeNoiseToggle {
-    right: 18px;
-    bottom: 84px;
-    padding: 7px 12px;
-    font-size: 9px;
-  }
 
   .home-noise-status {
     display: none;

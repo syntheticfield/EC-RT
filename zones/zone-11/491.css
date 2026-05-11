@@ -196,41 +196,63 @@ html, body {
 .fade-out { opacity: 0 !important; }
 
 /* ═══════════════════════════
-   BOUTON TRANSMISSION
+   NOISYLIVINGCODE BUTTON
    ═══════════════════════════ */
 
 #transmissionToggle {
   position: fixed;
+  left:   18px;
   bottom: 18px;
-  left: 18px;
-  z-index: 200;
+  z-index: 100070; /* passe au-dessus de la sidebar */
 
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.28);
-  color: rgba(255,255,255,0.70);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(0,0,0,0.42);
+  color: rgba(255,255,255,0.60);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  font-family: "Courier New", Courier, monospace;
+  font-size: 10px;
+  font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 7px 13px;
+  padding: 9px 13px;
   cursor: pointer;
-  transition: border-color 0.3s, color 0.3s, background 0.3s;
-  pointer-events: all;
+
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 #transmissionToggle:hover {
-  border-color: rgba(255,255,255,0.65);
-  color: rgba(255,255,255,0.95);
+  color: rgba(255,255,255,0.92);
+  border-color: rgba(255,255,255,0.44);
 }
 
+#transmissionToggle:active { transform: scale(0.96); }
+
+/* État désactivé */
 #transmissionToggle.tx-off {
-  border-color: rgba(255,40,40,0.45);
-  color: rgba(255,40,40,0.60);
+  border-color: rgba(255,40,40,0.38);
+  color: rgba(255,40,40,0.55);
 }
 
 #transmissionToggle.tx-off:hover {
-  border-color: rgba(255,40,40,0.80);
-  color: rgba(255,40,40,0.90);
+  border-color: rgba(255,40,40,0.72);
+  color: rgba(255,40,40,0.88);
+}
+
+/* Desktop — petit décalage pour la marge de la sidebar */
+@media (pointer: fine) {
+  #transmissionToggle {
+    left:   26px;
+    bottom: 22px;
+  }
+}
+
+/* Mobile/tablette — remonte au-dessus des boutons UI bas */
+@media (pointer: coarse) {
+  #transmissionToggle {
+    bottom: clamp(72px, 12vh, 96px);
+  }
 }
 
 /* ═══════════════════════════

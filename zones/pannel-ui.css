@@ -1,34 +1,46 @@
 /* ==========================================================
-   EC@RT — PANEL UI  v9
+   EC@RT — PANEL UI  v10
+   Refactorisé — sans doublons ni contradictions
    ========================================================== */
 
 :root {
-  --ecart-ui-size:    52px;
-  --ecart-ui-gap:     8px;
-  --ecart-ui-right:   18px;
-  --ecart-ui-bottom:  calc(20px + env(safe-area-inset-bottom, 0px));
+  --ecart-ui-size:     52px;
+  --ecart-ui-gap:      8px;
+  --ecart-ui-right:    18px;
+  --ecart-ui-bottom:   calc(20px + env(safe-area-inset-bottom, 0px));
   --ecart-audio-bar-h: 59px;
-  --ecart-z-title:    100020;
-  --ecart-z-button:   100050;
-  --ecart-z-panel:    100015;
+  --ecart-z-title:     100020;
+  --ecart-z-button:    100050;
+  --ecart-z-panel:     100015;
   --ecart-z-audiobar:  99990;
 
-  /* Boutons rouge opaque — actif = blanc/noir */
-  --ecart-btn-bg:        rgba(160, 12, 12, 0.90);
-  --ecart-btn-border:    rgba(220, 55, 55, 0.75);
-  --ecart-btn-hover-bg:  rgba(180, 15, 15, 0.97);
-  --ecart-btn-hover-bd:  rgba(240, 75, 75, 0.88);
+  /* Boutons rouge — opacité légèrement réduite */
+  --ecart-btn-bg:        rgba(160, 12, 12, 0.76);
+  --ecart-btn-border:    rgba(220, 55, 55, 0.58);
+  --ecart-btn-hover-bg:  rgba(180, 15, 15, 0.86);
+  --ecart-btn-hover-bd:  rgba(240, 75, 75, 0.70);
   --ecart-btn-active-bg: #ffffff;
 }
+
+
+/* ==========================================================
+   ÉLÉMENTS NATIFS MASQUÉS
+   ========================================================== */
+
+#soundPanel,
+.info-close,
+.sound-close,
+.mobile-map-toggle__label--close { display: none !important; }
+
+
+/* ==========================================================
+   SIDEBAR / TITRE — z-index au-dessus des panels
+   ========================================================== */
 
 .sidebar, .site-title, .home-button {
   position: relative;
   z-index: var(--ecart-z-title) !important;
 }
-
-#soundPanel { display: none !important; }
-.info-close, .sound-close { display: none !important; }
-.mobile-map-toggle__label--close { display: none !important; }
 
 
 /* ==========================================================
@@ -53,7 +65,7 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 
 /* ==========================================================
-   BASE BOUTON — [7] rouge transparent
+   BASE BOUTON CLUSTER
    ========================================================== */
 
 .ecart-ui-cluster > button {
@@ -64,7 +76,7 @@ body.ecart-audio-active .ecart-ui-cluster {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid var(--ecart-btn-border);
+  border: 1px solid rgba(0,0,0,0.16);
   background: var(--ecart-btn-bg);
   color: rgba(255,255,255,0.90);
   font-size:      0.50rem;
@@ -74,7 +86,9 @@ body.ecart-audio-active .ecart-ui-cluster {
   cursor: pointer;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 1px 8px rgba(0,0,0,0.30);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 2px 10px rgba(0,0,0,0.20);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -89,15 +103,15 @@ body.ecart-audio-active .ecart-ui-cluster {
 .ecart-ui-cluster > button:hover {
   background:   var(--ecart-btn-hover-bg);
   color:        rgba(255,255,255,1);
-  border-color: var(--ecart-btn-hover-bd);
-  box-shadow:   0 2px 14px rgba(180,0,0,0.22);
+  border-color: rgba(0,0,0,0.24);
+  box-shadow:   0 2px 14px rgba(160,0,0,0.22);
 }
 
 .ecart-ui-cluster > button.is-open,
 .ecart-ui-cluster > button.is-playing {
   background:   #ffffff;
   color:        #000000;
-  border-color: transparent;
+  border:       1px solid rgba(0,0,0,0.22);
   box-shadow:   0 2px 14px rgba(255,255,255,0.22);
 }
 
@@ -105,7 +119,7 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 
 /* ==========================================================
-   CONTENEUR TOP-RIGHT — boutons ŒIL + LIGHT
+   CONTENEUR TOP-RIGHT — ŒIL + LIGHT
    ========================================================== */
 
 #ecartTopRight {
@@ -120,44 +134,31 @@ body.ecart-audio-active .ecart-ui-cluster {
   pointer-events: auto;
 }
 
-@media (max-width: 480px) and (orientation: portrait) {
-  #ecartTopRight { right: 12px; }
-}
-
 
 /* ==========================================================
    TOAST — "SURFACE PHOTOSENSIBLE : ON / OFF"
-   [3] Taille réduite + positionné à GAUCHE du cluster boutons
    ========================================================== */
 
 .ecart-toast {
   position: fixed;
   top:   calc(18px + env(safe-area-inset-top, 0px));
-
-  /* [3] Décalé à gauche des boutons top-right */
   right: calc(var(--ecart-ui-right) + var(--ecart-ui-size) + 10px);
   left:  auto;
   transform: none;
   text-align: right;
   z-index: 100200;
-
   font-family: Arial, Helvetica, sans-serif;
-
-  /* [4] Légèrement plus grand — harmonisation typo */
   font-size: clamp(0.62rem, 1.4vw, 0.82rem);
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-
   color: rgba(255,255,255,0.88);
   text-shadow:
     0 0 14px rgba(255,255,255,0.30),
     0 0 32px rgba(255,255,255,0.14);
-
   pointer-events: none;
   white-space: nowrap;
   user-select: none;
-
   animation: ecartToastAnim 2.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
@@ -170,13 +171,11 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 
 /* ==========================================================
-   BOUTONS ŒIL + LIGHT — [7] rouge transparent
-   [2] Même taille que cluster sur touch
+   BOUTONS ŒIL + LIGHT
    ========================================================== */
 
 .ecart-focus-btn,
 .ecart-light-btn {
-  /* [2] base desktop : même taille entre eux */
   width:  var(--ecart-ui-size);
   height: var(--ecart-ui-size);
   flex-shrink: 0;
@@ -184,12 +183,15 @@ body.ecart-audio-active .ecart-ui-cluster {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  border: 1px solid var(--ecart-btn-border);
+  border: 1px solid rgba(0,0,0,0.16);
   background: var(--ecart-btn-bg);
   color: rgba(255,255,255,0.90);
   cursor: pointer;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 2px 10px rgba(0,0,0,0.20);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -197,6 +199,7 @@ body.ecart-audio-active .ecart-ui-cluster {
     background   0.18s ease,
     border-color 0.18s ease,
     color        0.18s ease,
+    box-shadow   0.18s ease,
     transform    0.14s ease;
   pointer-events: auto;
 }
@@ -204,7 +207,7 @@ body.ecart-audio-active .ecart-ui-cluster {
 .ecart-focus-btn:hover,
 .ecart-light-btn:hover {
   background:   var(--ecart-btn-hover-bg);
-  border-color: var(--ecart-btn-hover-bd);
+  border-color: rgba(0,0,0,0.24);
 }
 
 .ecart-focus-btn:active,
@@ -212,25 +215,18 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 .ecart-focus-btn.is-active,
 .ecart-light-btn.is-active {
-
-  background: #ffffff;
-
-  /* léger contour noir */
-  border: 1px solid rgba(0,0,0,0.22);
-
-  color: #000000;
-
+  background:   #ffffff;
+  border:       1px solid rgba(0,0,0,0.22);
+  color:        #000000;
   box-shadow:
     0 2px 10px rgba(255,255,255,0.18),
     0 0 0 1px rgba(0,0,0,0.04);
-
 }
 
 /* Bascule icône œil ouvert / fermé */
-.ecart-focus-btn .eye-open  { display: block; }
-.ecart-focus-btn .eye-closed { display: none; }
-
-body.ecart-focus-mode .ecart-focus-btn .eye-open  { display: none; }
+.ecart-focus-btn .eye-open   { display: block; }
+.ecart-focus-btn .eye-closed { display: none;  }
+body.ecart-focus-mode .ecart-focus-btn .eye-open   { display: none;  }
 body.ecart-focus-mode .ecart-focus-btn .eye-closed { display: block; }
 
 
@@ -246,9 +242,7 @@ body.ecart-focus-mode .zone-identity {
 }
 
 body.ecart-focus-mode #mobileMapToggle,
-body.ecart-focus-mode #infoToggle {
-  display: none !important;
-}
+body.ecart-focus-mode #infoToggle { display: none !important; }
 
 body.ecart-focus-mode #mobileMapOverlay,
 body.ecart-focus-mode #infoPanel {
@@ -257,13 +251,11 @@ body.ecart-focus-mode #infoPanel {
   visibility: hidden !important;
 }
 
-body.ecart-focus-mode #ecartTopRight {
-  z-index: 100200;
-}
+body.ecart-focus-mode #ecartTopRight { z-index: 100200; }
 
 
 /* ==========================================================
-   MODE JOUR (LIGHT)
+   MODE JOUR (LIGHT) — invert global
    ========================================================== */
 
 html.ecart-light-mode {
@@ -279,99 +271,64 @@ html.ecart-light-mode .mini-map-image {
   filter: invert(0.88) grayscale(1) contrast(1.00) brightness(0.96);
 }
 
-
-/* ==========================================================
-   MODE JOUR — boutons lisibles après invert(0.88)
-   ========================================================== */
-
-html.ecart-light-mode .ecart-ui-cluster > button {
-  background:   rgba(0,0,0,0.80) !important;
-  color:        rgba(255,255,255,0.96) !important;
-  border-color: rgba(0,0,0,0.40) !important;
-  box-shadow:   0 1px 8px rgba(0,0,0,0.36) !important;
+/* Boutons lisibles après invert */
+html.ecart-light-mode .ecart-ui-cluster > button,
+html.ecart-light-mode .ecart-focus-btn,
+html.ecart-light-mode .ecart-light-btn {
+  background:   rgba(0,0,0,0.80);
+  color:        rgba(255,255,255,0.96);
+  border-color: rgba(255,255,255,0.14);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 2px 10px rgba(0,0,0,0.28);
 }
 
-html.ecart-light-mode .ecart-ui-cluster > button:hover {
-  background:   rgba(0,0,0,0.92) !important;
-  border-color: rgba(0,0,0,0.60) !important;
-  color:        #fff !important;
+html.ecart-light-mode .ecart-ui-cluster > button:hover,
+html.ecart-light-mode .ecart-focus-btn:hover,
+html.ecart-light-mode .ecart-light-btn:hover {
+  background:   rgba(0,0,0,0.92);
+  border-color: rgba(255,255,255,0.22);
+  color:        #fff;
 }
 
 html.ecart-light-mode .ecart-ui-cluster > button.is-open,
-html.ecart-light-mode .ecart-ui-cluster > button.is-playing {
-  background:   #000 !important;
-  color:        #fff !important;
-  border-color: transparent !important;
-  box-shadow:   0 2px 12px rgba(0,0,0,0.30) !important;
-}
-
-html.ecart-light-mode .ecart-focus-btn,
-html.ecart-light-mode .ecart-light-btn {
-  background:   rgba(0,0,0,0.80) !important;
-  border-color: rgba(0,0,0,0.40) !important;
-  color:        rgba(255,255,255,0.96) !important;
-}
-
-html.ecart-light-mode .ecart-focus-btn:hover,
-html.ecart-light-mode .ecart-light-btn:hover {
-  background:   rgba(0,0,0,0.92) !important;
-  border-color: rgba(0,0,0,0.60) !important;
-}
+html.ecart-light-mode .ecart-ui-cluster > button.is-playing,
 html.ecart-light-mode .ecart-focus-btn.is-active,
 html.ecart-light-mode .ecart-light-btn.is-active {
-
-  background: #000 !important;
-
-  /* léger contour clair */
-  border: 1px solid rgba(255,255,255,0.18) !important;
-
-  color: #fff !important;
-
-  box-shadow:
-    0 2px 10px rgba(0,0,0,0.22),
-    0 0 0 1px rgba(255,255,255,0.03) !important;
-
+  background:   #000;
+  color:        #fff;
+  border:       1px solid rgba(255,255,255,0.20);
+  box-shadow:   0 2px 12px rgba(0,0,0,0.30);
 }
 
 
 /* ==========================================================
-   OVERLAYS — INFO + MAP + SOUND (structure identique)
+   OVERLAYS — INFO + MAP + SOUND (structure commune)
    ========================================================== */
 
 #infoPanel,
 #mobileMapOverlay,
 #ecartAudioPanel {
   position: fixed !important;
-  top:    0 !important;
-  right:  0 !important;
-  bottom: 0 !important;
-  left:   0 !important; /* couvre toute la page y compris sous la sidebar
-                           la sidebar reste visible grâce à son z-index supérieur (100060) */
-
+  inset: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-
   padding:
     clamp(12px, 3vw, 28px)
     calc(var(--ecart-ui-right) + var(--ecart-ui-size) + 18px)
     clamp(12px, 3vw, 28px)
     clamp(12px, 3vw, 28px) !important;
-
   box-sizing: border-box;
   overflow: hidden !important;
-
   background: rgba(0,0,0,0.66) !important;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-
   z-index: var(--ecart-z-panel) !important;
-
   opacity: 0;
   pointer-events: none;
   visibility: hidden;
   transition: opacity 0.22s ease, visibility 0s linear 0.22s;
-
   width:  auto !important;
   height: auto !important;
   border: none !important;
@@ -391,88 +348,121 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   CARDS INTÉRIEURES — [4] même taille pour les 3 panels
+   CARDS INTÉRIEURES — taille unifiée
    ========================================================== */
 
 .info-panel-inner,
 .mobile-map-panel-inner,
 .ecart-audio-panel-inner {
   box-sizing: border-box;
-  width: min(100%, 560px) !important;   /* [4] taille unifiée */
-  max-height: calc(100dvh - clamp(28px, 8vw, 64px)) !important;
+  width: min(100%, 560px);
+  max-height: calc(100dvh - clamp(28px, 8vw, 64px));
   overflow-y: auto;
-  padding: 24px;
-  border-radius: 22px;
+  padding: 22px;
+  border-radius: 20px;
   background: rgba(8,8,8,0.96);
-  color: #fff;
+  color: rgba(255,255,255,0.88);
   border: 1px solid rgba(255,255,255,0.09);
   box-shadow: 0 16px 56px rgba(0,0,0,0.56), 0 0 0 1px rgba(255,255,255,0.025);
   transform: scale(0.96);
   transition: transform 0.22s ease;
 }
 
-#infoPanel.is-open      .info-panel-inner,
+#infoPanel.is-open       .info-panel-inner,
 #mobileMapOverlay.is-open .mobile-map-panel-inner,
 #ecartAudioPanel.is-visible .ecart-audio-panel-inner { transform: scale(1); }
 
 
 /* ==========================================================
-   TITRE PANEL — [1] taille lisible
+   TITRE PANEL
    ========================================================== */
 
 .info-title,
 .ecart-audio-panel-title {
-  margin: 0 0 20px;
-  font-size: 0.95rem;
-  letter-spacing: 0.14em;
+  margin: 0 0 16px;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.48);
+  color: rgba(255,255,255,0.38);
+  line-height: 1.2;
 }
 
 
 /* ==========================================================
-   INFO — contenu  [1] tailles agrandies
+   INFO — contenu typographique amélioré
    ========================================================== */
 
-.info-description { font-size: 1.00rem; line-height: 1.65; }
+/* Description : paragraphes condensés en un seul bloc fluide */
+.info-description {
+  font-size: 0.90rem;
+  line-height: 1.62;
+  color: rgba(255,255,255,0.80);
+  letter-spacing: 0.012em;
+}
 
+.info-description p {
+  margin: 0;
+}
+
+.info-description p + p {
+  margin-top: 0.50em;
+}
+
+/* Notice de gameplay */
 .info-gameplay {
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid rgba(255,255,255,0.07);
 }
+
 .info-gameplay h3 {
-  margin: 0 0 8px;
-  font-size: 0.65rem;
-  letter-spacing: 0.16em;
+  margin: 0 0 7px;
+  font-size: 0.60rem;
+  letter-spacing: 0.17em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.48);
+  color: rgba(255,255,255,0.34);
 }
+
 .info-gameplay p {
   margin: 0;
-  font-size: 0.78rem;
-  line-height: 1.40;
-  color: rgba(255,255,255,0.72);
+  font-size: 0.76rem;
+  line-height: 1.46;
+  color: rgba(255,255,255,0.64);
 }
-.info-ref { margin-top: 24px; }
+
+/* Références — écriture légère, non noire pure */
+.info-ref {
+  margin-top: 18px;
+}
+
 .info-ref h3 {
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+  font-size: 0.58rem;
+  letter-spacing: 0.17em;
   text-transform: uppercase;
-  opacity: 0.6;
-  margin: 0 0 12px;
+  color: rgba(255,255,255,0.30);
+  margin: 0 0 9px;
 }
+
 .info-ref-item {
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  font-size: 0.90rem;
-  line-height: 1.50;
+  margin-bottom: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.80rem;
+  line-height: 1.48;
+  color: rgba(255,255,255,0.52);
+  font-style: italic;
+  letter-spacing: 0.012em;
+}
+
+.info-ref-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 
 /* ==========================================================
-   SOUND — card intérieure
+   SOUND — tracklist : chaque piste = lecteur complet
    ========================================================== */
 
 .ecart-audio-panel-inner {
@@ -480,11 +470,6 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   flex-direction: column;
   gap: 10px;
 }
-
-
-/* ==========================================================
-   SOUND — tracklist  [5] chaque piste = lecteur complet
-   ========================================================== */
 
 .ecart-audio-tracklist {
   display: flex;
@@ -496,7 +481,6 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 .ecart-audio-tracklist::-webkit-scrollbar { display: none; }
 
-/* Conteneur de piste */
 .ecart-audio-track {
   display: flex;
   align-items: center;
@@ -510,17 +494,17 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 
 .ecart-audio-track:hover {
-  background: rgba(255,255,255,0.04);
-  color: rgba(255,255,255,0.76);
+  background:   rgba(255,255,255,0.04);
+  color:        rgba(255,255,255,0.76);
 }
 
 .ecart-audio-track.is-active {
-  background: rgba(255,255,255,0.05);
+  background:   rgba(255,255,255,0.05);
   border-color: rgba(255,255,255,0.09);
-  color: rgba(255,255,255,0.92);
+  color:        rgba(255,255,255,0.92);
 }
 
-/* [5] Bouton play/pause par piste */
+/* Bouton play/pause par piste */
 .ecart-track-pp {
   width:  34px;
   height: 34px;
@@ -546,7 +530,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   color:        #111;
 }
 
-/* Corps de piste (titre + barre) */
+/* Corps de piste */
 .ecart-track-body {
   flex: 1;
   min-width: 0;
@@ -576,7 +560,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   letter-spacing: 0.04em;
 }
 
-/* [5] Barre de progression par piste */
+/* Barre de progression */
 .ecart-track-progress-strip {
   position: relative;
   height: 2px;
@@ -619,13 +603,13 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   MAP — panneau intérieur  [4] taille unifiée
+   MAP — panneau intérieur
    ========================================================== */
 
 .mobile-map-panel {
-  width: min(100%, 560px) !important;  /* [4] aligné sur les autres */
-  height: min(80dvh, 700px) !important;
-  max-height: calc(100dvh - 32px) !important;
+  width: min(100%, 560px);
+  height: min(80dvh, 700px);
+  max-height: calc(100dvh - 32px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -648,7 +632,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 
 /* ==========================================================
-   MAP — barre nav flèches  [1] textes agrandis
+   MAP — barre navigation flèches
    ========================================================== */
 
 .mobile-map-status-wrap {
@@ -656,7 +640,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   position: relative;
   z-index: 10;
   margin-top: 4px;
-  margin-bottom: 12px !important;
+  margin-bottom: 12px;
 }
 
 .map-nav-bar {
@@ -666,7 +650,6 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   min-height: 48px;
 }
 
-/* Grosses flèches grand angle */
 .map-nav-btn {
   width:  56px;
   height: 56px;
@@ -696,7 +679,6 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 .map-nav-btn:active { transform: scale(0.88); }
 
-/* Label zone — grand, lisible */
 .map-nav-label {
   flex: 1;
   min-width: 0;
@@ -735,10 +717,10 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 
 .mobile-mini-map-wrap {
   position: relative;
-  width: min(100%, 520px) !important;
-  height: auto !important;
+  width: min(100%, 520px);
+  height: auto;
   aspect-ratio: 1 / 1;
-  max-height: calc(100dvh - 150px) !important;
+  max-height: calc(100dvh - 150px);
   background: #000;
   border: 1px solid rgba(255,255,255,0.07);
   overflow: hidden;
@@ -758,6 +740,8 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   opacity: 0.80;
 }
 
+.mobile-zone-hint { display: none !important; }
+
 
 /* ==========================================================
    MINI-ZONES — états visuels
@@ -768,10 +752,8 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   z-index: 2;
   display: block;
   border-radius: 8px;
-  /* État par défaut : jamais visité — blanc 25% + contour visible */
   border: 1.5px solid rgba(255,255,255,0.40);
   background: rgba(255,255,255,0.25);
-  /* Pas d'opacity globale — les dots preload ne sont pas affectés */
   transition:
     background   0.20s ease,
     box-shadow   0.20s ease,
@@ -790,47 +772,49 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 .mobile-mini-map-wrap .mini-zone-11 { z-index: 6 !important; }
 .mobile-mini-map-wrap .mini-zone-9  { z-index: 4 !important; }
 
-/* Survol souris — léger */
 .mobile-mini-map-wrap .mini-zone:hover {
-  background: rgba(255,255,255,0.62) !important;
+  background:   rgba(255,255,255,0.62) !important;
   border-color: rgba(255,255,255,0.72) !important;
-  transform: scale(1.03) !important;
+  transform:    scale(1.03) !important;
 }
 
 .mobile-mini-map-wrap .mini-zone.is-visited {
-  /* État visité — blanc 50% + contour visible */
-  background: rgba(255,255,255,0.50);
+  background:   rgba(255,255,255,0.50);
   border-color: rgba(255,255,255,0.62);
 }
 
-/* Zone courante — blanc 100% (zone HTML d'origine) */
 .mobile-mini-map-wrap .mini-zone.is-current,
 .mobile-mini-map-wrap .mini-zone.active {
-  animation: miniZoneCurrentBreath 3.2s ease-in-out infinite !important;
-  background: rgba(255,255,255,1.00) !important;
+  animation:    miniZoneCurrentBreath 3.2s ease-in-out infinite !important;
+  background:   rgba(255,255,255,1.00) !important;
   border-color: rgba(255,255,255,0.90) !important;
 }
 
-.mobile-zone-hint { display: none !important; }
+.mobile-mini-map-wrap .mini-zone.is-selected {
+  background:   rgba(255,255,255,0.90) !important;
+  border-color: rgba(255,255,255,0.80) !important;
+  transform:    scale(1.06) !important;
+  box-shadow:   0 0 0 2px rgba(255,255,255,0.50) !important;
+}
 
 
 /* ==========================================================
    POSITIONS ZONES
    ========================================================== */
 
-.mobile-mini-map-wrap .mini-zone-1  { top:50%;    left:5%;     width:10%;    height:13%;    }
-.mobile-mini-map-wrap .mini-zone-2  { top:45%;    left:30%;    width:10%;    height:18%;    }
-.mobile-mini-map-wrap .mini-zone-3  { top:45%;    left:42%;    width:15%;    height:18%;    }
-.mobile-mini-map-wrap .mini-zone-4  { top:38%;    left:58.64%; width:8%;     height:8%;     }
-.mobile-mini-map-wrap .mini-zone-5  { top:26%;    left:51.24%; width:20.89%; height:7%;     }
-.mobile-mini-map-wrap .mini-zone-6  { top:25%;    left:8%;     width:12%;    height:10%;    }
-.mobile-mini-map-wrap .mini-zone-7  { top:37%;    left:9%;     width:18%;    height:12%;    }
-.mobile-mini-map-wrap .mini-zone-8  { top:36%;    left:32%;    width:8%;     height:6%;     }
-.mobile-mini-map-wrap .mini-zone-9  { top:36%;    left:40%;    width:12%;    height:6%;     }
-.mobile-mini-map-wrap .mini-zone-10 { top:26.25%; left:71.05%; width:15.13%; height:16.95%; }
-.mobile-mini-map-wrap .mini-zone-11 { top:26.2%;  left:71.05%; width:8.41%;  height:8.45%;  }
-.mobile-mini-map-wrap .mini-zone-12 { top:46.78%; left:82.65%; width:5.56%;  height:20.70%; }
-.mobile-mini-map-wrap .mini-zone-13 { top:68.07%; left:72.12%; width:17.97%; height:8.86%;  }
+.mobile-mini-map-wrap .mini-zone-1  { top:52%;    left:16%;     width:16%;    height:10%;    }
+.mobile-mini-map-wrap .mini-zone-2  { top:43%;    left:33%;     width:9%;     height:18%;    }
+.mobile-mini-map-wrap .mini-zone-3  { top:43%;    left:43%;     width:13%;    height:18%;    }
+.mobile-mini-map-wrap .mini-zone-4  { top:37%;    left:62%;     width:10%;    height:10%;    }
+.mobile-mini-map-wrap .mini-zone-5  { top:22%;    left:40%;     width:30.89%; height:10%;    }
+.mobile-mini-map-wrap .mini-zone-6  { top:22%;    left:24%;     width:9%;     height:10%;    }
+.mobile-mini-map-wrap .mini-zone-7  { top:35%;    left:6%;      width:16%;    height:12%;    }
+.mobile-mini-map-wrap .mini-zone-8  { top:33%;    left:32%;     width:11%;    height:7%;     }
+.mobile-mini-map-wrap .mini-zone-9  { top:33%;    left:44%;     width:11%;    height:7%;     }
+.mobile-mini-map-wrap .mini-zone-10 { top:22.25%; left:84.05%;  width:10.13%; height:16.95%; }
+.mobile-mini-map-wrap .mini-zone-11 { top:22.2%;  left:75.05%;  width:8.41%;  height:8.45%;  }
+.mobile-mini-map-wrap .mini-zone-12 { top:47.78%; left:88.65%;  width:7.56%;  height:16.70%; }
+.mobile-mini-map-wrap .mini-zone-13 { top:6.07%;  left:77.12%;  width:19.97%; height:10.86%; }
 
 
 /* ==========================================================
@@ -922,15 +906,6 @@ html.ecart-light-mode .ecart-light-btn.is-active {
    ANIMATIONS
    ========================================================== */
 
-/* Zone sélectionnée (1er tap / flèche) — blanc 90%, en attente de confirmation */
-.mobile-mini-map-wrap .mini-zone.is-selected {
-  background: rgba(255,255,255,0.90) !important;
-  border-color: rgba(255,255,255,0.80) !important;
-  transform: scale(1.06) !important;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.50) !important;
-}
-
-/* Zone courante — pulsation douce, halo réduit */
 @keyframes miniZoneCurrentBreath {
   0%,100% {
     transform: scale(1.010);
@@ -942,57 +917,108 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   }
 }
 
+@keyframes ecartDotPulse {
+  0%, 100% { transform: scale(1);   opacity: 0.5; }
+  50%       { transform: scale(1.5); opacity: 1;   }
+}
+
 
 /* ==========================================================
-   RESPONSIVE
+   PRÉCHARGEMENT — dots de cache sur minimap
+   ========================================================== */
+
+.ecart-preload-dot {
+  position: absolute;
+  top: 7px; right: 7px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: none;
+  user-select: none;
+  z-index: 10;
+  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+}
+
+.ecart-preload-dot.is-loading {
+  background: rgba(255,255,255,0.45);
+  animation: ecartDotPulse 1.4s ease-in-out infinite;
+}
+
+.ecart-preload-dot.is-ready {
+  background: #ffffff;
+  box-shadow: 0 0 4px rgba(255,255,255,0.70), 0 0 10px rgba(255,255,255,0.35);
+  transform: scale(1.15);
+}
+
+.ecart-preload-dot.is-error { background: transparent; }
+
+/* Masqué sur la zone courante */
+.mini-zone.is-current .ecart-preload-dot,
+.mini-zone.active     .ecart-preload-dot { display: none !important; }
+
+
+/* ==========================================================
+   TRANSITION NAVIGATION
+   ========================================================== */
+
+.ecart-nav-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  will-change: opacity;
+}
+
+.ecart-nav-transition.is-active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+
+/* ==========================================================
+   Z-INDEX FINAUX
+   ========================================================== */
+
+.ecart-ui-cluster { z-index: 100050 !important; }
+
+.sidebar, .sidebar-top, .site-title, .menu-toggle, .home-button, .ecart-focus-btn {
+  z-index: 100060 !important;
+}
+
+#infoPanel, #mobileMapOverlay, #ecartAudioPanel {
+  z-index: 100000 !important;
+}
+
+
+/* ==========================================================
+   RESPONSIVE — TABLETTE (481 – 1024 px)
    ========================================================== */
 
 @media (min-width: 481px) and (max-width: 1024px) {
   :root { --ecart-ui-size: 48px; }
 }
 
-@media (max-width: 480px) and (orientation: portrait) {
+
+/* ==========================================================
+   RESPONSIVE — GRAND ÉCRAN (≥ 1440 px)
+   ========================================================== */
+
+@media (min-width: 1440px) {
   :root {
-    --ecart-ui-size:     48px;
-    --ecart-ui-gap:       7px;
-    --ecart-ui-right:    12px;
-    --ecart-ui-bottom:   calc(14px + env(safe-area-inset-bottom, 0px));
-    --ecart-audio-bar-h: 55px;
+    --ecart-ui-size:  50px;
+    --ecart-ui-right: 24px;
+    --ecart-ui-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   }
-
-  #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
-    left: 0 !important;
-    padding:
-      calc(70px + env(safe-area-inset-top,0px))
-      12px
-      calc(16px + env(safe-area-inset-bottom,0px))
-      12px !important;
-  }
-
-  .info-panel-inner, .ecart-audio-panel-inner {
-    width: 100% !important;
-    max-height: calc(100dvh - 102px) !important;
-    border-radius: 20px !important;
-    padding: 16px !important;
-  }
-
-  .mobile-map-panel-inner {
-    width: 100% !important;
-    max-height: calc(100dvh - 102px) !important;
-    border-radius: 20px !important;
-    padding: 14px !important;
-  }
-
-  .mobile-map-panel { width: 100% !important; height: calc(100dvh - 102px) !important; }
-
-  .mobile-mini-map-wrap {
-    width: auto !important;
-    height: min(66dvh, 78vw) !important;
-    max-height: min(66dvh, 78vw) !important;
-  }
-
-  .map-nav-btn { width: 34px !important; height: 34px !important; font-size: 0.88rem !important; }
 }
+
+
+/* ==========================================================
+   RESPONSIVE — PAYSAGE COURT (tous devices ≤ 620 px haut)
+   Panels et barre audio compactés
+   ========================================================== */
 
 @media (max-height: 620px) and (orientation: landscape) {
   :root {
@@ -1007,7 +1033,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
       8px
       calc(var(--ecart-ui-right) + var(--ecart-ui-size) + 12px)
       8px
-      clamp(8px,2vw,20px) !important;
+      clamp(8px, 2vw, 20px) !important;
   }
 
   .info-panel-inner, .mobile-map-panel-inner, .ecart-audio-panel-inner {
@@ -1028,72 +1054,203 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   .ecart-audio-body { height: 45px; }
 }
 
-@media (min-width: 1440px) {
-  :root {
-    --ecart-ui-size: 50px;
-    --ecart-ui-right: 24px;
-    --ecart-ui-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  }
-}
-
 
 /* ==========================================================
-   Z-INDEX FINAUX
+   RESPONSIVE — TÉLÉPHONE PORTRAIT (≤ 480 px portrait)
    ========================================================== */
 
-.ecart-ui-cluster { z-index: 100050 !important; }
-
-.sidebar, .sidebar-top, .site-title, .menu-toggle, .home-button, .ecart-focus-btn {
-  z-index: 100060 !important;
-}
-
-#infoPanel, #mobileMapOverlay, #ecartAudioPanel {
-  z-index: 100000 !important;
-}
-
-
-/* ==========================================================
-   INFO — compact petits écrans
-   ========================================================== */
-
-#infoPanel.is-open .info-panel-inner {
-  width: min(100%, 560px) !important;
-  padding: 18px !important;
-  border-radius: 18px !important;
-}
-#infoPanel.is-open .info-title {
-  margin-bottom: 12px !important;
-  font-size: 0.78rem !important;
-  letter-spacing: 0.16em !important;
-  line-height: 1.15 !important;
-}
-#infoPanel.is-open .info-description {
-  font-size: 0.84rem !important;
-  line-height: 1.44 !important;
-  letter-spacing: 0.01em !important;
-}
-#infoPanel.is-open .info-description p { margin: 0 !important; }
-#infoPanel.is-open .info-ref { margin-top: 16px !important; }
-#infoPanel.is-open .info-ref h3 { font-size: 0.66rem !important; margin-bottom: 8px !important; }
-#infoPanel.is-open .info-ref-item {
-  font-size: 0.76rem !important;
-  line-height: 1.38 !important;
-  margin-bottom: 8px !important;
-  padding-bottom: 8px !important;
-}
-
-
-/* ==========================================================
-   TOUCH / TABLETTE — [1][2][6] textes, boutons, play
-   ========================================================== */
-
-@media (pointer: coarse) {
+@media (max-width: 480px) and (orientation: portrait) {
 
   :root {
-    --ecart-ui-size: 68px;
+    --ecart-ui-size:     48px;
+    --ecart-ui-gap:       7px;
+    --ecart-ui-right:    12px;
+    --ecart-ui-bottom:   calc(14px + env(safe-area-inset-bottom, 0px));
+    --ecart-audio-bar-h: 55px;
   }
 
-  /* [1] Textes panel agrandis */
+  /* Panels pleine largeur */
+  #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
+    left: 0 !important;
+    padding:
+      calc(70px + env(safe-area-inset-top, 0px))
+      12px
+      calc(16px + env(safe-area-inset-bottom, 0px))
+      12px !important;
+  }
+
+  .info-panel-inner, .ecart-audio-panel-inner {
+    width: 100% !important;
+    max-height: calc(100dvh - 102px) !important;
+    border-radius: 18px !important;
+    padding: 15px !important;
+  }
+
+  .mobile-map-panel-inner {
+    width: 100% !important;
+    max-height: calc(100dvh - 102px) !important;
+    border-radius: 18px !important;
+    padding: 13px !important;
+  }
+
+  .mobile-map-panel { width: 100% !important; height: calc(100dvh - 102px) !important; }
+
+  .mobile-mini-map-wrap {
+    width: auto !important;
+    height: min(66dvh, 78vw) !important;
+    max-height: min(66dvh, 78vw) !important;
+  }
+
+  .map-nav-btn {
+    width:  34px !important;
+    height: 34px !important;
+    font-size: 0.88rem !important;
+  }
+
+  /* Cluster horizontal bas — entre joystick et bord droit */
+  .ecart-ui-cluster {
+    flex-direction:  row;
+    align-items:     center;
+    justify-content: space-evenly;
+    left:   clamp(136px, 34vw, 190px);
+    right:  var(--ecart-ui-right);
+    bottom: var(--ecart-ui-bottom);
+    width:  auto;
+  }
+
+  /* Ordre gauche → droite : INFO · SOUND · MAP */
+  #infoToggle      { order: 1; }
+  #soundToggle     { order: 2; }
+  #mobileMapToggle { order: 3; }
+
+  /* #ecartTopRight : LIGHT · ŒIL côte à côte en haut à droite */
+  body:not(.ecart-focus-mode) #ecartTopRight {
+    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+    right: var(--ecart-ui-right) !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: var(--ecart-ui-gap) !important;
+  }
+
+  body:not(.ecart-focus-mode) .ecart-light-btn { order: 1 !important; }
+  body:not(.ecart-focus-mode) .ecart-focus-btn { order: 2 !important; }
+}
+
+
+/* ==========================================================
+   TÉLÉPHONE PAYSAGE — COLONNE DROITE UNIFIÉE
+   5 boutons de haut en bas : ŒIL · LIGHT · SOUND · MAP · INFO
+   ========================================================== */
+
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+
+  :root {
+    --ecart-ui-size:   38px;
+    --ecart-ui-gap:     6px;
+    --ecart-ui-right:  12px;
+    --ecart-ui-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    --ecart-audio-bar-h: 48px;
+  }
+
+  /*
+   * Calcul de la colonne :
+   *   5 boutons × 38px + 4 gaps × 6px = 214px de haut
+   *   moitié = 107px → centrage vertical parfait
+   *
+   *   #ecartTopRight (ŒIL + LIGHT = 82px) commence à top: calc(50% - 107px)
+   *   .ecart-ui-cluster (SOUND + MAP + INFO) commence à top: calc(50% - 19px)
+   *   Résultat : une colonne de 214px centrée sur l'axe vertical
+   */
+
+  /* ŒIL + LIGHT — partie haute de la colonne */
+  #ecartTopRight {
+    top:   calc(50% - 107px) !important;
+    right: calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px)) !important;
+    bottom: auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--ecart-ui-gap) !important;
+  }
+
+  /* SOUND + MAP + INFO — partie basse de la colonne */
+  .ecart-ui-cluster {
+    top:    calc(50% - 19px) !important;
+    bottom: auto !important;
+    right:  calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px)) !important;
+    left:   auto !important;
+    width:  auto !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--ecart-ui-gap) !important;
+    transition: none !important;
+  }
+
+  /* Taille réduite pour les 5 boutons */
+  .ecart-focus-btn,
+  .ecart-light-btn,
+  .ecart-ui-cluster > button {
+    width:     var(--ecart-ui-size) !important;
+    height:    var(--ecart-ui-size) !important;
+    font-size: 0.44rem !important;
+  }
+
+  /* Ordre dans le cluster : SOUND · MAP · INFO (DOM order, rien à changer) */
+
+  /* Panels adaptés paysage court */
+  #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
+    padding:
+      8px
+      calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px) + var(--ecart-ui-size) + 10px)
+      8px
+      clamp(8px, 2vw, 16px) !important;
+  }
+
+  .info-panel-inner, .mobile-map-panel-inner, .ecart-audio-panel-inner {
+    max-height: calc(100dvh - 16px) !important;
+    padding: 13px !important;
+    border-radius: 16px !important;
+  }
+
+  .mobile-map-panel { height: calc(100dvh - 16px) !important; }
+
+  .mobile-mini-map-wrap {
+    width: auto !important;
+    height: min(100%, calc(100dvh - 96px)) !important;
+    max-height: calc(100dvh - 96px) !important;
+  }
+
+  /* Textes compacts */
+  .info-title,
+  .ecart-audio-panel-title { font-size: 0.68rem !important; letter-spacing: 0.14em !important; }
+  .info-description        { font-size: 0.78rem !important; line-height: 1.48 !important; }
+  .info-gameplay p         { font-size: 0.70rem !important; }
+  .info-ref-item           { font-size: 0.72rem !important; }
+
+  .map-nav-label, .mobile-map-status {
+    font-size: clamp(0.72rem, 1.8vw, 0.90rem) !important;
+  }
+
+  .map-nav-btn {
+    width:  44px !important;
+    height: 44px !important;
+    border-radius: 11px !important;
+  }
+
+  .ecart-audio-body { height: 44px; }
+  .ecart-track-pp { width: 30px !important; height: 30px !important; }
+}
+
+
+/* ==========================================================
+   TOUCH / TABLETTE — boutons et textes agrandis
+   S'applique aux tablettes et phones en portrait (pas en paysage phone)
+   ========================================================== */
+
+@media (pointer: coarse) and (min-height: 501px) {
+
+  :root { --ecart-ui-size: 68px; }
+
   .info-title,
   .ecart-audio-panel-title {
     font-size: 1.10rem !important;
@@ -1115,30 +1272,17 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   .ecart-audio-track-title { font-size: 0.82rem !important; }
   .ecart-audio-track-index { font-size: 0.62rem !important; }
 
-  /* [1] Cluster boutons — label texte */
   .ecart-ui-cluster > button {
     font-size: 0.62rem !important;
     letter-spacing: 0.14em;
-    border-width: 1.4px;
   }
 
-  /* [2] Boutons œil + light : même taille que cluster */
-  .ecart-focus-btn,
-  .ecart-light-btn {
-    width:  var(--ecart-ui-size) !important;
-    height: var(--ecart-ui-size) !important;
-  }
-
-  /* [6] Bouton play/pause par piste : taille touch */
   .ecart-track-pp {
     width:  44px !important;
     height: 44px !important;
   }
 
-  /* [6] Barre de progression plus épaisse sur touch */
-  .ecart-track-progress-strip {
-    height: 3px !important;
-  }
+  .ecart-track-progress-strip { height: 3px !important; }
   .ecart-track-progress-strip:hover { height: 5px !important; }
 
   .ecart-audio-track { padding: 12px 14px !important; }
@@ -1150,231 +1294,9 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   }
 
   #infoPanel.is-open .info-panel-inner {
-    padding: 18px !important;
     max-height: calc(100dvh - 110px) !important;
   }
   #infoPanel.is-open .info-title       { font-size: 1.00rem !important; }
   #infoPanel.is-open .info-description { font-size: 0.96rem !important; line-height: 1.52 !important; }
   #infoPanel.is-open .info-ref-item    { font-size: 0.88rem !important; }
-}
-
-
-/* ==========================================================
-   EC@RT — PRÉCHARGEMENT & NAVIGATION
-   Intégré depuis ecart-preloader.css
-   (supprime le fichier ecart-preloader.css si tu l'avais ajouté)
-   ========================================================== */
-
-/* Dot indicateur de cache sur les vignettes minimap
-   Injecté automatiquement par ECARTPreloader — pas de HTML à modifier.
-   États : is-loading (pulsant) | is-ready (blanc) | is-error (caché) */
-
-.ecart-preload-dot {
-  position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: transparent;
-  pointer-events: none;
-  user-select: none;
-  z-index: 10;
-  transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
-}
-
-.ecart-preload-dot.is-loading {
-  background: rgba(255, 255, 255, 0.45);
-  animation: ecartDotPulse 1.4s ease-in-out infinite;
-}
-
-.ecart-preload-dot.is-ready {
-  background: #ffffff;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 255, 255, 0.35);
-  transform: scale(1.15);
-}
-
-.ecart-preload-dot.is-error {
-  background: transparent;
-}
-
-/* 2/ Dot masqué sur la zone courante (inutile + visuellement gênant) */
-.mini-zone.is-current .ecart-preload-dot,
-.mini-zone.active     .ecart-preload-dot { display: none !important; }
-
-/* Overlay fade-to-black lors de la navigation entre zones */
-
-.ecart-nav-transition {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  background: #000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease;
-  will-change: opacity;
-}
-
-.ecart-nav-transition.is-active {
-  opacity: 1;
-  pointer-events: all;
-}
-
-@keyframes ecartDotPulse {
-  0%, 100% { transform: scale(1);   opacity: 0.5; }
-  50%       { transform: scale(1.5); opacity: 1;   }
-}
-
-
-/* ==========================================================
-   TÉLÉPHONE PORTRAIT — cluster horizontal bas
-   Entre le joystick (gauche) et le coin (droite)
-   Ordre : INFO · SOUND · MAP
-   ========================================================== */
-
-@media (pointer: coarse) and (max-width: 480px) and (orientation: portrait) {
-
-  .ecart-ui-cluster {
-    /* Étirement horizontal entre joystick et bord droit */
-    flex-direction:  row;
-    align-items:     center;
-    justify-content: space-evenly;
-
-    /* Gauche = après le joystick (~110px) + son offset (~18px) + marge */
-    left:   clamp(136px, 34vw, 190px);
-    right:  var(--ecart-ui-right);
-    bottom: var(--ecart-ui-bottom);
-
-    /* Retire le right fixe hérité — width auto pour s'étirer */
-    width: auto;
-  }
-
-  /* Boutons légèrement plus petits pour tenir en ligne */
-  .ecart-ui-cluster > button {
-    width:  52px !important;
-    height: 52px !important;
-    font-size: 0.55rem !important;
-  }
-
-  /* Ordre gauche → droite : INFO · SOUND · MAP */
-  #infoToggle      { order: 1; }
-  #soundToggle     { order: 2; }
-  #mobileMapToggle { order: 3; }
-
-}
-/* ==========================================================
-   EC@RT — FIX CONTOUR ACTIF BOUTONS
-   SOUND / INFO / MAP / ŒIL / LIGHT
-   À COLLER TOUT EN BAS DE pannel-ui.css
-   ========================================================== */
-/* ==========================================================
-   EC@RT — CONTOUR PERMANENT BOUTONS UI
-   SOUND / INFO / MAP / ŒIL / LIGHT
-   ========================================================== */
-
-/* Boutons normaux */
-.ecart-ui-cluster > button,
-#soundToggle,
-#infoToggle,
-#mobileMapToggle,
-.ecart-focus-btn,
-.ecart-light-btn {
-
-  border: 1px solid rgba(0,0,0,0.16) !important;
-
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.03),
-    0 2px 10px rgba(0,0,0,0.12);
-
-}
-
-/* Hover */
-.ecart-ui-cluster > button:hover,
-#soundToggle:hover,
-#infoToggle:hover,
-#mobileMapToggle:hover,
-.ecart-focus-btn:hover,
-.ecart-light-btn:hover {
-
-  border-color: rgba(0,0,0,0.24) !important;
-
-}
-
-/* Boutons actifs */
-.ecart-ui-cluster > button.is-open,
-.ecart-ui-cluster > button.is-playing,
-#soundToggle.is-playing,
-#soundToggle.is-open,
-#infoToggle.is-open,
-#mobileMapToggle.is-open,
-.ecart-focus-btn.is-active,
-.ecart-light-btn.is-active {
-
-  border: 1px solid rgba(0,0,0,0.22) !important;
-
-}
-
-/* LIGHT MODE */
-html.ecart-light-mode .ecart-ui-cluster > button,
-html.ecart-light-mode #soundToggle,
-html.ecart-light-mode #infoToggle,
-html.ecart-light-mode #mobileMapToggle,
-html.ecart-light-mode .ecart-focus-btn,
-html.ecart-light-mode .ecart-light-btn {
-
-  border: 1px solid rgba(255,255,255,0.14) !important;
-
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.02),
-    0 2px 10px rgba(0,0,0,0.18);
-
-}
-
-/* LIGHT MODE ACTIF */
-html.ecart-light-mode .ecart-ui-cluster > button.is-open,
-html.ecart-light-mode .ecart-ui-cluster > button.is-playing,
-html.ecart-light-mode #soundToggle.is-playing,
-html.ecart-light-mode #soundToggle.is-open,
-html.ecart-light-mode #infoToggle.is-open,
-html.ecart-light-mode #mobileMapToggle.is-open,
-html.ecart-light-mode .ecart-focus-btn.is-active,
-html.ecart-light-mode .ecart-light-btn.is-active {
-
-  border: 1px solid rgba(255,255,255,0.20) !important;
-
-}
-/* ==========================================================
-   PHONE PORTRAIT — LIGHT + ŒIL EN HAUT À DROITE
-   Ordre gauche → droite : LIGHT · ŒIL
-   Même taille que INFO / SOUND / MAP phone
-   ========================================================== */
-
-@media (pointer: coarse) and (max-width: 480px) and (orientation: portrait) {
-
-  body:not(.ecart-focus-mode) #ecartTopRight {
-    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
-    right: var(--ecart-ui-right) !important;
-
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-
-    gap: var(--ecart-ui-gap) !important;
-    z-index: 100060 !important;
-  }
-
-  body:not(.ecart-focus-mode) .ecart-light-btn,
-  body:not(.ecart-focus-mode) .ecart-focus-btn {
-    width: 52px !important;
-    height: 52px !important;
-  }
-
-  body:not(.ecart-focus-mode) .ecart-light-btn {
-    order: 1 !important;
-  }
-
-  body:not(.ecart-focus-mode) .ecart-focus-btn {
-    order: 2 !important;
-  }
 }

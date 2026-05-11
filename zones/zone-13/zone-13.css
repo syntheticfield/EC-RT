@@ -220,34 +220,38 @@ html, body {
 
 .z13-cross.is-hovered .z13-cross-hint { opacity: 1; }
 
-/* ─── BOUTON TRANSMISSION ─────────────────────────── */
+/* ─── NOISYLIVINGCODE BUTTON ──────────────────────────── */
 
 .z13-transmission-btn {
   position: fixed;
-  left:   clamp(14px, 2.5vw, 28px);
-  bottom: clamp(14px, 2.5vw, 28px);
-  z-index: 99960;
+  left:   18px;
+  bottom: 18px;
+  z-index: 100070; /* passe au-dessus de la sidebar */
+
   display: flex;
   align-items: center;
   gap: 10px;
+
   border: 1px solid rgba(255,255,255,0.22);
   background: rgba(0,0,0,0.42);
   color: rgba(255,255,255,0.60);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+
+  font-family: "Courier New", Courier, monospace;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 9px 14px;
+  padding: 9px 13px;
   cursor: pointer;
-  transition: color 0.2s, border-color 0.2s, background 0.2s;
+
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .z13-transmission-btn:hover {
   color: rgba(255,255,255,0.92);
   border-color: rgba(255,255,255,0.44);
-  background: rgba(255,255,255,0.05);
 }
 
 .z13-transmission-btn:active { transform: scale(0.96); }
@@ -288,8 +292,15 @@ html, body {
   100% { transform: scale(1);   opacity: 0.6; }
 }
 
-/* ─── MOBILE ──────────────────────────────────────── */
+/* Desktop — petit décalage pour la marge de la sidebar */
+@media (pointer: fine) {
+  .z13-transmission-btn {
+    left:   26px;
+    bottom: 22px;
+  }
+}
 
+/* Mobile/tablette — remonte au-dessus des boutons UI bas */
 @media (pointer: coarse) {
   .z13-transmission-btn {
     bottom: clamp(72px, 12vh, 96px);
