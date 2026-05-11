@@ -10,181 +10,212 @@
   <link rel="stylesheet" href="../pannel-ui.css" />
 
   <style>
-    .bad-zone {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100dvh;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 30% 20%, rgba(125, 90, 45, 0.10), transparent 38%),
-        radial-gradient(circle at 70% 75%, rgba(95, 58, 26, 0.12), transparent 42%),
-        linear-gradient(180deg, #080806, #020202 75%);
-      touch-action: none;
-      isolation: isolate;
+  .bad-zone {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(125, 90, 45, 0.10), transparent 38%),
+      radial-gradient(circle at 70% 75%, rgba(95, 58, 26, 0.12), transparent 42%),
+      linear-gradient(180deg, #080806, #020202 75%);
+    touch-action: none;
+    isolation: isolate;
+  }
+
+  .bad-zone::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.18;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 44px 44px;
+    z-index: 0;
+  }
+
+  .bad-threads {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .bad-archive-surface {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    transform-origin: 0 0;
+    will-change: transform;
+    touch-action: none;
+  }
+
+  .bad-fragment {
+    position: absolute;
+    width: var(--w);
+    height: var(--h);
+    transform-origin: center;
+    user-select: none;
+    touch-action: none;
+    cursor: grab;
+    opacity: 0.9;
+    will-change: transform;
+  }
+
+  .bad-fragment.is-dragging {
+    cursor: grabbing;
+    z-index: 80 !important;
+  }
+
+  .bad-fragment__paper {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+
+    background-image: var(--img);
+    background-size: var(--bgw) var(--bgh);
+    background-position: var(--bgx) var(--bgy);
+
+    border-radius: 1px 7px 3px 10px;
+
+    clip-path: polygon(
+      var(--p1x) var(--p1y),
+      var(--p2x) var(--p2y),
+      var(--p3x) var(--p3y),
+      var(--p4x) var(--p4y),
+      var(--p5x) var(--p5y),
+      var(--p6x) var(--p6y),
+      var(--p7x) var(--p7y),
+      var(--p8x) var(--p8y),
+      var(--p9x) var(--p9y),
+      var(--p10x) var(--p10y),
+      var(--p11x) var(--p11y),
+      var(--p12x) var(--p12y)
+    );
+
+    box-shadow:
+      0 14px 32px rgba(0, 0, 0, 0.72),
+      0 0 1px rgba(255, 245, 210, 0.22),
+      inset 0 0 22px rgba(0, 0, 0, 0.32);
+  }
+
+  .bad-fragment__paper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.12;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.10), transparent 42%, rgba(0,0,0,0.20)),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,0.06) 0px,
+        rgba(0,0,0,0.06) 1px,
+        transparent 1px,
+        transparent 7px
+      );
+    mix-blend-mode: multiply;
+  }
+
+  .bad-fragment__paper::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    border: 1px solid rgba(255, 235, 190, 0.14);
+    opacity: 0.45;
+  }
+
+  .bad-fragment__halo {
+    position: absolute;
+    inset: -18px;
+    pointer-events: none;
+    opacity: var(--halo, 0);
+    background: radial-gradient(circle, rgba(255, 155, 70, 0.22), transparent 70%);
+    mix-blend-mode: screen;
+  }
+
+  .bad-reset {
+    position: fixed;
+
+    left: 18px;
+    bottom: 18px;
+
+    z-index: 99960;
+
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(0,0,0,0.36);
+    color: rgba(255,255,255,0.62);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+
+    padding: 9px 12px;
+
+    cursor: pointer;
+
+    transition:
+      left 0.28s ease,
+      opacity 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease,
+      background 0.18s ease;
+  }
+
+  .bad-reset:hover {
+    color: white;
+    border-color: rgba(255,255,255,0.48);
+  }
+
+  /* Quand la sidebar desktop/tablette est ouverte,
+     le bouton reset se décale après la sidebar */
+  body.sidebar-open .bad-reset,
+  body.menu-open .bad-reset,
+  body.nav-open .bad-reset {
+    left: calc(var(--ecart-sidebar-col, 320px) + 18px);
+  }
+
+  /* Sécurité si ta sidebar utilise aria-expanded au lieu d'une classe body */
+  body:has(.menu-toggle[aria-expanded="true"]) .bad-reset {
+    left: calc(var(--ecart-sidebar-col, 320px) + 18px);
+  }
+
+  @media (max-width: 768px) {
+    .bad-reset {
+      left: 14px;
+      bottom: 72px;
+      font-size: 9px;
+      z-index: 99960;
     }
 
-    .bad-zone::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.18;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-      background-size: 44px 44px;
-      z-index: 0;
+    body.sidebar-open .bad-reset,
+    body.menu-open .bad-reset,
+    body.nav-open .bad-reset,
+    body:has(.menu-toggle[aria-expanded="true"]) .bad-reset {
+      left: 14px;
     }
+  }
 
-    .bad-threads {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-      overflow: visible;
-    }
-
-    .bad-archive-surface {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      transform-origin: 0 0;
-      will-change: transform;
-      touch-action: none;
-    }
-
+  @media (prefers-reduced-motion: reduce) {
     .bad-fragment {
-      position: absolute;
-      width: var(--w);
-      height: var(--h);
-      transform-origin: center;
-      user-select: none;
-      touch-action: none;
-      cursor: grab;
-      opacity: 0.9;
-      will-change: transform;
-    }
-
-    .bad-fragment.is-dragging {
-      cursor: grabbing;
-      z-index: 80 !important;
-    }
-.bad-fragment__paper {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-
-  background-image: var(--img);
-  background-size: var(--bgw) var(--bgh);
-  background-position: var(--bgx) var(--bgy);
-
-  border-radius: 1px 7px 3px 10px;
-
-  clip-path: polygon(
-    var(--p1x) var(--p1y),
-    var(--p2x) var(--p2y),
-    var(--p3x) var(--p3y),
-    var(--p4x) var(--p4y),
-    var(--p5x) var(--p5y),
-    var(--p6x) var(--p6y),
-    var(--p7x) var(--p7y),
-    var(--p8x) var(--p8y),
-    var(--p9x) var(--p9y),
-    var(--p10x) var(--p10y),
-    var(--p11x) var(--p11y),
-    var(--p12x) var(--p12y)
-  );
-
-  box-shadow:
-    0 14px 32px rgba(0, 0, 0, 0.72),
-    0 0 1px rgba(255, 245, 210, 0.22),
-    inset 0 0 22px rgba(0, 0, 0, 0.32);
-}
-
-    .bad-fragment__paper::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.12;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.10), transparent 42%, rgba(0,0,0,0.20)),
-        repeating-linear-gradient(
-          90deg,
-          rgba(0,0,0,0.06) 0px,
-          rgba(0,0,0,0.06) 1px,
-          transparent 1px,
-          transparent 7px
-        );
-      mix-blend-mode: multiply;
-    }
-
-    .bad-fragment__paper::after {
-      content: "";
-      position: absolute;
-      inset: -1px;
-      pointer-events: none;
-      border: 1px solid rgba(255, 235, 190, 0.14);
-      opacity: 0.45;
-    }
-
-    .bad-fragment__halo {
-      position: absolute;
-      inset: -18px;
-      pointer-events: none;
-      opacity: var(--halo, 0);
-      background: radial-gradient(circle, rgba(255, 155, 70, 0.22), transparent 70%);
-      mix-blend-mode: screen;
+      will-change: auto;
     }
 
     .bad-reset {
-      position: fixed;
-      left: clamp(14px, 2.5vw, 28px);
-      bottom: clamp(14px, 2.5vw, 28px);
-      z-index: 99960;
-
-      border: 1px solid rgba(255,255,255,0.22);
-      background: rgba(0,0,0,0.36);
-      color: rgba(255,255,255,0.62);
-
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      padding: 9px 12px;
-      cursor: pointer;
+      transition: none;
     }
-
-    .bad-reset:hover {
-      color: white;
-      border-color: rgba(255,255,255,0.48);
-    }
-
-    @media (pointer: fine) {
-      .bad-reset {
-        left: calc(48px + clamp(14px, 2.5vw, 28px));
-      }
-    }
-
-    @media (max-width: 768px) {
-      .bad-reset {
-        left: 14px;
-        bottom: 72px;
-        font-size: 9px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .bad-fragment {
-        will-change: auto;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 
 <body data-zone="5" class="has-mobile-menu">

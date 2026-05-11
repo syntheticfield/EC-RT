@@ -1,7 +1,7 @@
 window.ECART_SOUND = [
   {
     title: "About - EC@RT (FR)",
-    file: "../../assets/son/FR/CONTEXTE_FR.mp3"
+    file: "../../assets/son/CONTEXTE_FR.mp3"
   },
   {
     title: "About - EC@RT (ENG)",

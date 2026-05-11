@@ -212,9 +212,18 @@ body.ecart-audio-active .ecart-ui-cluster {
 
 .ecart-focus-btn.is-active,
 .ecart-light-btn.is-active {
-  background:   #ffffff;
-  border-color: transparent;
-  color:        #000000;
+
+  background: #ffffff;
+
+  /* léger contour noir */
+  border: 1px solid rgba(0,0,0,0.22);
+
+  color: #000000;
+
+  box-shadow:
+    0 2px 10px rgba(255,255,255,0.18),
+    0 0 0 1px rgba(0,0,0,0.04);
+
 }
 
 /* Bascule icône œil ouvert / fermé */
@@ -308,12 +317,20 @@ html.ecart-light-mode .ecart-light-btn:hover {
   background:   rgba(0,0,0,0.92) !important;
   border-color: rgba(0,0,0,0.60) !important;
 }
-
 html.ecart-light-mode .ecart-focus-btn.is-active,
 html.ecart-light-mode .ecart-light-btn.is-active {
-  background:   #000 !important;
-  color:        #fff !important;
-  border-color: transparent !important;
+
+  background: #000 !important;
+
+  /* léger contour clair */
+  border: 1px solid rgba(255,255,255,0.18) !important;
+
+  color: #fff !important;
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,0.22),
+    0 0 0 1px rgba(255,255,255,0.03) !important;
+
 }
 
 
@@ -1244,4 +1261,120 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   #soundToggle     { order: 2; }
   #mobileMapToggle { order: 3; }
 
+}
+/* ==========================================================
+   EC@RT — FIX CONTOUR ACTIF BOUTONS
+   SOUND / INFO / MAP / ŒIL / LIGHT
+   À COLLER TOUT EN BAS DE pannel-ui.css
+   ========================================================== */
+/* ==========================================================
+   EC@RT — CONTOUR PERMANENT BOUTONS UI
+   SOUND / INFO / MAP / ŒIL / LIGHT
+   ========================================================== */
+
+/* Boutons normaux */
+.ecart-ui-cluster > button,
+#soundToggle,
+#infoToggle,
+#mobileMapToggle,
+.ecart-focus-btn,
+.ecart-light-btn {
+
+  border: 1px solid rgba(0,0,0,0.16) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 2px 10px rgba(0,0,0,0.12);
+
+}
+
+/* Hover */
+.ecart-ui-cluster > button:hover,
+#soundToggle:hover,
+#infoToggle:hover,
+#mobileMapToggle:hover,
+.ecart-focus-btn:hover,
+.ecart-light-btn:hover {
+
+  border-color: rgba(0,0,0,0.24) !important;
+
+}
+
+/* Boutons actifs */
+.ecart-ui-cluster > button.is-open,
+.ecart-ui-cluster > button.is-playing,
+#soundToggle.is-playing,
+#soundToggle.is-open,
+#infoToggle.is-open,
+#mobileMapToggle.is-open,
+.ecart-focus-btn.is-active,
+.ecart-light-btn.is-active {
+
+  border: 1px solid rgba(0,0,0,0.22) !important;
+
+}
+
+/* LIGHT MODE */
+html.ecart-light-mode .ecart-ui-cluster > button,
+html.ecart-light-mode #soundToggle,
+html.ecart-light-mode #infoToggle,
+html.ecart-light-mode #mobileMapToggle,
+html.ecart-light-mode .ecart-focus-btn,
+html.ecart-light-mode .ecart-light-btn {
+
+  border: 1px solid rgba(255,255,255,0.14) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.02),
+    0 2px 10px rgba(0,0,0,0.18);
+
+}
+
+/* LIGHT MODE ACTIF */
+html.ecart-light-mode .ecart-ui-cluster > button.is-open,
+html.ecart-light-mode .ecart-ui-cluster > button.is-playing,
+html.ecart-light-mode #soundToggle.is-playing,
+html.ecart-light-mode #soundToggle.is-open,
+html.ecart-light-mode #infoToggle.is-open,
+html.ecart-light-mode #mobileMapToggle.is-open,
+html.ecart-light-mode .ecart-focus-btn.is-active,
+html.ecart-light-mode .ecart-light-btn.is-active {
+
+  border: 1px solid rgba(255,255,255,0.20) !important;
+
+}
+/* ==========================================================
+   PHONE PORTRAIT — LIGHT + ŒIL EN HAUT À DROITE
+   Ordre gauche → droite : LIGHT · ŒIL
+   Même taille que INFO / SOUND / MAP phone
+   ========================================================== */
+
+@media (pointer: coarse) and (max-width: 480px) and (orientation: portrait) {
+
+  body:not(.ecart-focus-mode) #ecartTopRight {
+    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
+    right: var(--ecart-ui-right) !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    gap: var(--ecart-ui-gap) !important;
+    z-index: 100060 !important;
+  }
+
+  body:not(.ecart-focus-mode) .ecart-light-btn,
+  body:not(.ecart-focus-mode) .ecart-focus-btn {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  body:not(.ecart-focus-mode) .ecart-light-btn {
+    order: 1 !important;
+  }
+
+  body:not(.ecart-focus-mode) .ecart-focus-btn {
+    order: 2 !important;
+  }
 }
