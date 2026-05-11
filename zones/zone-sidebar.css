@@ -834,3 +834,66 @@ body,
     transform: none !important;
   }
 }
+/* ==========================================================
+   TABLETTE — typographie +20 %
+   Cible : pointer coarse ≥ 768px (tablette, pas téléphone)
+   Les valeurs sont des surcharges des blocs coarse existants.
+   ========================================================== */
+
+/* ── Portrait tablette ──────────────────────────────────── */
+@media (pointer: coarse) and (min-width: 768px) and (orientation: portrait) {
+
+  /* Bouton ⌂ — taille +20 % */
+  .home-button {
+    width:  41px !important;
+    height: 41px !important;
+    flex:   0 0 41px !important;
+    font-size: 1.05em !important;
+  }
+
+  /* Liens de zones dans le menu — +20 % */
+  .zone-link,
+  .section-link {
+    font-size:   1.08rem !important;
+    line-height: 1.38   !important;
+  }
+
+  /* Titre de zone (top-left) — +20 % */
+  .zone-identity-title {
+    font-size: 0.86rem !important;
+  }
+
+  /* Description de zone (top-left) — +20 % */
+  .zone-identity-desc {
+    font-size: 0.58rem !important;
+  }
+}
+
+/* ── Paysage tablette (min-height évite iPhone landscape) ── */
+@media (pointer: coarse) and (min-width: 768px) and (orientation: landscape) and (min-height: 600px) {
+
+  /* Bouton ⌂ — taille +20 % */
+  .home-button {
+    width:  38px !important;
+    height: 38px !important;
+    flex:   0 0 38px !important;
+    font-size: 1.05em !important;
+  }
+
+  /* Liens de zones dans le menu — +20 % */
+  .zone-link,
+  .section-link {
+    font-size:   1.01rem !important;
+    line-height: 1.32   !important;
+  }
+
+  /* Titre de zone (top-left) — +20 % */
+  .zone-identity-title {
+    font-size: 0.86rem !important;
+  }
+
+  /* Description de zone (top-left) — +20 % */
+  .zone-identity-desc {
+    font-size: 0.58rem !important;
+  }
+}
