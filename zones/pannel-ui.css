@@ -935,330 +935,39 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 }
 .ecart-nav-transition.is-active { opacity: 1; pointer-events: all; }
 
-
 /* ==========================================================
-   Z-INDEX FINAUX
-   ========================================================== */
-
-.ecart-ui-cluster { z-index: 100050 !important; }
-
-.sidebar, .sidebar-top, .site-title, .menu-toggle, .home-button, .ecart-focus-btn {
-  z-index: 100060 !important;
-}
-
-#infoPanel, #mobileMapOverlay, #ecartAudioPanel { z-index: 100000 !important; }
-
-
-/* ==========================================================
-   TABLETTE (481 – 1024 px)
-   ========================================================== */
-
-@media (min-width: 481px) and (max-width: 1024px) {
-  :root { --ecart-ui-size: 48px; }
-}
-
-
-/* ==========================================================
-   GRAND ÉCRAN (≥ 1440 px)
-   ========================================================== */
-
-@media (min-width: 1440px) {
-  :root {
-    --ecart-ui-size:   50px;
-    --ecart-ui-right:  24px;
-    --ecart-ui-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  }
-}
-
-
-/* ==========================================================
-   PAYSAGE COURT — tous devices (hauteur ≤ 620 px)
-   ========================================================== */
-
-@media (max-height: 620px) and (orientation: landscape) {
-  :root {
-    --ecart-ui-size:     44px;
-    --ecart-ui-gap:       5px;
-    --ecart-ui-bottom:   calc(10px + env(safe-area-inset-bottom, 0px));
-    --ecart-audio-bar-h: 48px;
-  }
-
-  #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
-    padding:
-      8px
-      calc(var(--ecart-ui-right) + var(--ecart-ui-size) + 12px)
-      8px
-      clamp(8px, 2vw, 20px) !important;
-  }
-
-  .info-panel-inner, .mobile-map-panel-inner, .ecart-audio-panel-inner {
-    max-height: calc(100dvh - 18px) !important;
-    padding: 14px !important;
-    border-radius: 18px !important;
-  }
-
-  .mobile-map-panel { height: calc(100dvh - 18px) !important; }
-
-  .mobile-mini-map-wrap {
-    width: auto !important;
-    height: min(100%, calc(100dvh - 100px)) !important;
-    max-height: calc(100dvh - 100px) !important;
-  }
-
-  .ecart-audio-body { height: 45px; }
-}
-
-
-/* ==========================================================
-   TÉLÉPHONE PORTRAIT (≤ 480 px portrait)
-   ========================================================== */
-
-@media (max-width: 480px) and (orientation: portrait) {
-
-  :root {
-    /* [2.1] vmin = largeur en portrait — valeur cohérente avec le paysage */
-    --ecart-ui-size:   clamp(40px, 11vmin, 52px);
-    --ecart-ui-gap:    7px;
-    --ecart-ui-right:  12px;
-    --ecart-ui-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-    --ecart-audio-bar-h: 55px;
-  }
-
-  #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
-    left: 0 !important;
-    padding:
-      calc(70px + env(safe-area-inset-top, 0px))
-      12px
-      calc(16px + env(safe-area-inset-bottom, 0px))
-      12px !important;
-  }
-
-  .info-panel-inner, .ecart-audio-panel-inner {
-    width: 100% !important;
-    max-height: calc(100dvh - 102px) !important;
-    border-radius: 18px !important;
-    padding: 15px !important;
-  }
-
-  .mobile-map-panel-inner {
-    width: 100% !important;
-    max-height: calc(100dvh - 102px) !important;
-    border-radius: 18px !important;
-    padding: 13px !important;
-  }
-
-  .mobile-map-panel { width: 100% !important; height: calc(100dvh - 102px) !important; }
-
-  .mobile-mini-map-wrap {
-    width: auto !important;
-    height: min(66dvh, 78vw) !important;
-    max-height: min(66dvh, 78vw) !important;
-  }
-
-  .map-nav-btn { width: 40px !important; height: 40px !important; }
-
-  /* Cluster horizontal bas : INFO · SOUND · MAP */
-  .ecart-ui-cluster {
-    flex-direction:  row;
-    align-items:     center;
-    justify-content: space-evenly;
-    left:   clamp(136px, 34vw, 190px);
-    right:  var(--ecart-ui-right);
-    bottom: var(--ecart-ui-bottom);
-    width:  auto;
-  }
-  #infoToggle      { order: 1; }
-  #soundToggle     { order: 2; }
-  #mobileMapToggle { order: 3; }
-
-  /* [6] Toast : décalé à gauche des 2 boutons en ligne */
-  .ecart-toast {
-    right: calc(var(--ecart-ui-right) + 2 * var(--ecart-ui-size) + var(--ecart-ui-gap) + 10px) !important;
-  }
-
-  /* ŒIL + LIGHT côte à côte en haut à droite */
-  body:not(.ecart-focus-mode) #ecartTopRight {
-    top: calc(14px + env(safe-area-inset-top, 0px)) !important;
-    right: var(--ecart-ui-right) !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: var(--ecart-ui-gap) !important;
-  }
-  body:not(.ecart-focus-mode) .ecart-light-btn { order: 1 !important; }
-  body:not(.ecart-focus-mode) .ecart-focus-btn { order: 2 !important; }
-}
-
-
-/* ==========================================================
-   TÉLÉPHONE PAYSAGE — COLONNE DROITE UNIFIÉE
-   [2] Taille vmin cohérente avec portrait (vmin = hauteur ici)
-   [2.2] Colonne en bord droit avec safe-area
-   5 boutons : ŒIL · LIGHT · SOUND · MAP · INFO
-   ========================================================== */
-
-@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
-
-  :root {
-    /* vmin = hauteur en paysage = même dimension qu'en portrait → boutons identiques */
-    --ecart-ui-size:   clamp(40px, 11vmin, 52px);
-    --ecart-ui-gap:    6px;
-    --ecart-ui-right:  12px;
-    --ecart-ui-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    --ecart-audio-bar-h: 48px;
-  }
-
-  /* ŒIL + LIGHT — haut de la colonne centrée */
-  #ecartTopRight {
-    top:       50% !important;
-    right:     calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px)) !important;
-    bottom:    auto !important;
-    transform: translateY(calc(-100% - var(--ecart-ui-size) / 2 - var(--ecart-ui-gap) * 1.5)) !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: var(--ecart-ui-gap) !important;
-  }
-
-  /* SOUND + MAP + INFO — bas de la colonne centrée */
-  .ecart-ui-cluster {
-    top:       50% !important;
-    bottom:    auto !important;
-    right:     calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px)) !important;
-    left:      auto !important;
-    width:     auto !important;
-    transform: translateY(calc(var(--ecart-ui-size) / 2 + var(--ecart-ui-gap) / 2)) !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: var(--ecart-ui-gap) !important;
-    transition: none !important;
-  }
-
-  .ecart-focus-btn,
-  .ecart-light-btn,
-  .ecart-ui-cluster > button {
-    width:     var(--ecart-ui-size) !important;
-    height:    var(--ecart-ui-size) !important;
-    font-size: clamp(0.38rem, 1vmin, 0.50rem) !important;
-  }
-
-  /* [6] Toast à gauche de la colonne */
-  .ecart-toast {
-    right: calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px) + var(--ecart-ui-size) + 12px) !important;
-  }
-
-  /* Panels */
-  #infoPanel, #mobileMapOverlay, #ecartAudioPanel {
-    padding:
-      8px
-      calc(var(--ecart-ui-right) + env(safe-area-inset-right, 0px) + var(--ecart-ui-size) + 10px)
-      8px
-      clamp(8px, 2vw, 16px) !important;
-  }
-
-  .info-panel-inner, .mobile-map-panel-inner, .ecart-audio-panel-inner {
-    max-height: calc(100dvh - 16px) !important;
-    padding: 13px !important;
-    border-radius: 16px !important;
-  }
-
-  /* [1] Tracklist prend toute la hauteur disponible en paysage */
-  .ecart-audio-tracklist {
-    max-height: calc(100dvh - 80px) !important;
-  }
-
-  .mobile-map-panel { height: calc(100dvh - 16px) !important; }
-
-  /* [4.1] Mini-map libérée du ratio carré en paysage */
-  .mobile-mini-map-wrap {
-    aspect-ratio: auto !important;
-    width:      auto !important;
-    height:     100% !important;
-    max-height: 100% !important;
-  }
-
-  .info-title,
-  .ecart-audio-panel-title { font-size: 0.68rem !important; letter-spacing: 0.14em !important; }
-  .info-description        { font-size: 0.78rem !important; line-height: 1.48 !important; }
-  .info-gameplay p         { font-size: 0.70rem !important; }
-  .info-ref-item           { font-size: 0.72rem !important; }
-
-  .map-nav-label, .mobile-map-status {
-    font-size: clamp(0.68rem, 1.8vw, 0.86rem) !important;
-  }
-
-  .map-nav-btn { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
-  .ecart-audio-body  { height: 44px; }
-  .ecart-track-pp    { width: 30px !important; height: 30px !important; }
-}
-
-
-/* ==========================================================
-   TOUCH / TABLETTE (pointer: coarse, hauteur > 500 px)
-   ========================================================== */
-
-@media (pointer: coarse) and (min-height: 501px) {
-
-  :root { --ecart-ui-size: 68px; }
-
-  .info-title,
-  .ecart-audio-panel-title { font-size: 1.10rem !important; letter-spacing: 0.12em !important; }
-  .info-description        { font-size: 1.05rem !important; line-height: 1.60 !important; }
-  .info-gameplay p         { font-size: 0.88rem !important; }
-  .info-gameplay h3        { font-size: 0.72rem !important; }
-  .info-ref h3             { font-size: 0.86rem !important; }
-  .info-ref-item           { font-size: 0.96rem !important; line-height: 1.50 !important; }
-
-  .map-nav-label, .mobile-map-status {
-    font-size: clamp(0.82rem, 2vw, 1.00rem) !important;
-  }
-
-  .ecart-audio-panel-title { font-size: 1.05rem !important; }
-  .ecart-audio-track-title { font-size: 0.82rem !important; }
-  .ecart-audio-track-index { font-size: 0.62rem !important; }
-
-  .ecart-ui-cluster > button { font-size: 0.62rem !important; letter-spacing: 0.14em; }
-
-  .ecart-track-pp { width: 44px !important; height: 44px !important; }
-  .ecart-track-progress-strip { height: 3px !important; }
-  .ecart-track-progress-strip:hover { height: 5px !important; }
-  .ecart-audio-track { padding: 12px 14px !important; }
-
-  .map-nav-btn { width: 64px !important; height: 64px !important; border-radius: 16px !important; }
-
-  #infoPanel.is-open .info-panel-inner {
-    max-height: calc(100dvh - 110px) !important;
-  }
-  #infoPanel.is-open .info-title       { font-size: 1.00rem !important; }
-  #infoPanel.is-open .info-description { font-size: 0.96rem !important; line-height: 1.52 !important; }
-  #infoPanel.is-open .info-ref-item    { font-size: 0.88rem !important; }
-}
-/* ==========================================================
-   EC@RT — PANEL UI FIX FINAL MOBILE / TABLETTE
-   Portrait : LIGHT + EYE haut droite / INFO MAP SOUND bas gauche
-   Paysage : 5 boutons colonne droite
-   Panels au-dessus joystick + web content
+   Z-INDEX / RESPONSIVE FINAL PROPRE
    ========================================================== */
 
 :root {
-  --ecart-z-panel: 100300;
-  --ecart-z-button: 100420;
+  --ecart-z-title:    100060;
+  --ecart-z-panel:    100300;
+  --ecart-z-button:   100420;
+  --ecart-z-audiobar: 99990;
 }
 
-/* Panels toujours au-dessus du joystick, canvas, Unity, contenus */
+.sidebar,
+.sidebar-top,
+.site-title,
+.menu-toggle,
+.home-button {
+  z-index: var(--ecart-z-title) !important;
+}
+
 #infoPanel,
 #mobileMapOverlay,
 #ecartAudioPanel {
-  z-index: 100300 !important;
+  z-index: var(--ecart-z-panel) !important;
 }
 
-/* Boutons toujours au-dessus des panels */
 .ecart-ui-cluster,
 #ecartTopRight,
 .ecart-focus-btn,
 .ecart-light-btn {
-  z-index: 100420 !important;
+  z-index: var(--ecart-z-button) !important;
 }
 
-/* Joystick et contrôles Unity derrière les panels */
+/* Joystick derrière les panels */
 .joystick,
 .joystick-container,
 .fixed-joystick,
@@ -1272,17 +981,17 @@ html.ecart-light-mode .ecart-light-btn.is-active {
   z-index: 40 !important;
 }
 
-body:has(#infoPanel.is-open) .joystick,
-body:has(#mobileMapOverlay.is-open) .joystick,
-body:has(#ecartAudioPanel.is-visible) .joystick,
 body:has(#infoPanel.is-open) [class*="joystick"],
 body:has(#mobileMapOverlay.is-open) [class*="joystick"],
-body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
+body:has(#ecartAudioPanel.is-visible) [class*="joystick"],
+body:has(#infoPanel.is-open) [class*="Joystick"],
+body:has(#mobileMapOverlay.is-open) [class*="Joystick"],
+body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
   opacity: 0.18 !important;
   pointer-events: none !important;
 }
 
-/* Sécurité : les contenus internes de la map n’apparaissent jamais hors overlay ouvert */
+/* Map totalement invisible quand fermée */
 #mobileMapOverlay:not(.is-open),
 #mobileMapOverlay:not(.is-open) * {
   opacity: 0 !important;
@@ -1290,12 +999,36 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
   pointer-events: none !important;
 }
 
-/* Quand INFO ou SOUND est ouvert, la map est forcée derrière/invisible */
-#infoPanel.is-open ~ #mobileMapOverlay,
-#ecartAudioPanel.is-visible ~ #mobileMapOverlay {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+
+/* ==========================================================
+   DESKTOP
+   ========================================================== */
+
+@media (pointer: fine) {
+  :root {
+    --ecart-ui-size: 52px;
+    --ecart-ui-gap: 8px;
+    --ecart-ui-right: 18px;
+    --ecart-ui-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ecart-ui-cluster {
+    right: var(--ecart-ui-right) !important;
+    bottom: var(--ecart-ui-bottom) !important;
+    left: auto !important;
+    top: auto !important;
+    flex-direction: column !important;
+    transform: none !important;
+  }
+
+  #ecartTopRight {
+    top: calc(18px + env(safe-area-inset-top, 0px)) !important;
+    right: var(--ecart-ui-right) !important;
+    left: auto !important;
+    bottom: auto !important;
+    flex-direction: column !important;
+    transform: none !important;
+  }
 }
 
 
@@ -1306,7 +1039,6 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
    ========================================================== */
 
 @media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
-
   :root {
     --ecart-ui-size: 46px;
     --ecart-ui-gap: 8px;
@@ -1314,14 +1046,11 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
     --ecart-ui-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   }
 
-  /* LIGHT + EYE en haut à droite */
   #ecartTopRight {
     top: calc(14px + env(safe-area-inset-top, 0px)) !important;
     right: calc(12px + env(safe-area-inset-right, 0px)) !important;
     left: auto !important;
     bottom: auto !important;
-
-    display: flex !important;
     flex-direction: row !important;
     gap: var(--ecart-ui-gap) !important;
     transform: none !important;
@@ -1330,19 +1059,15 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
   .ecart-light-btn { order: 1 !important; }
   .ecart-focus-btn { order: 2 !important; }
 
-  /* INFO MAP SOUND en bas gauche */
   .ecart-ui-cluster {
     left: calc(14px + env(safe-area-inset-left, 0px)) !important;
     right: auto !important;
     bottom: var(--ecart-ui-bottom) !important;
     top: auto !important;
-
-    width: auto !important;
-    display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: flex-start !important;
     gap: var(--ecart-ui-gap) !important;
+    width: auto !important;
     transform: none !important;
   }
 
@@ -1393,51 +1118,39 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
 
 /* ==========================================================
    TÉLÉPHONE PAYSAGE
-   5 boutons colonne droite :
-   LIGHT / EYE / SOUND / MAP / INFO
+   haut droite : LIGHT + EYE
+   bas droite : SOUND + MAP + INFO
    ========================================================== */
 
 @media (pointer: coarse) and (max-width: 767px) and (orientation: landscape) {
-
   :root {
     --ecart-ui-size: clamp(36px, 10vmin, 44px);
     --ecart-ui-gap: 5px;
     --ecart-ui-right: calc(10px + env(safe-area-inset-right, 0px));
+    --ecart-ui-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
 
   #ecartTopRight {
-    position: fixed !important;
     top: calc(10px + env(safe-area-inset-top, 0px)) !important;
     right: var(--ecart-ui-right) !important;
     left: auto !important;
     bottom: auto !important;
-
-    display: flex !important;
     flex-direction: column !important;
     gap: var(--ecart-ui-gap) !important;
     transform: none !important;
   }
 
   .ecart-ui-cluster {
-    position: fixed !important;
-    top: calc(
-      10px + env(safe-area-inset-top, 0px)
-      + (var(--ecart-ui-size) * 2)
-      + (var(--ecart-ui-gap) * 2)
-    ) !important;
-    right: var(--ecart-ui-right) !important;
+    top: auto !important;
     left: auto !important;
-    bottom: auto !important;
-
-    display: flex !important;
+    right: var(--ecart-ui-right) !important;
+    bottom: var(--ecart-ui-bottom) !important;
     flex-direction: column !important;
+    align-items: center !important;
     gap: var(--ecart-ui-gap) !important;
-    transform: none !important;
     width: auto !important;
+    transform: none !important;
   }
-
-  .ecart-light-btn { order: 1 !important; }
-  .ecart-focus-btn { order: 2 !important; }
 
   #soundToggle { order: 1 !important; }
   #mobileMapToggle { order: 2 !important; }
@@ -1484,22 +1197,21 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
   }
 
   .mobile-map-figure {
-    order: initial !important;
     grid-column: 1 !important;
     grid-row: 1 !important;
+    order: initial !important;
     min-width: 0 !important;
   }
 
   .mobile-map-status-wrap {
-    order: initial !important;
     grid-column: 2 !important;
     grid-row: 1 !important;
+    order: initial !important;
     margin: 0 !important;
-
+    width: min(34vw, 180px) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: min(34vw, 180px) !important;
   }
 
   .map-nav-bar {
@@ -1512,7 +1224,6 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
     white-space: normal !important;
     font-size: clamp(0.58rem, 1.5vw, 0.76rem) !important;
     line-height: 1.15 !important;
-    max-width: 100% !important;
   }
 
   .map-nav-btn {
@@ -1538,7 +1249,6 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
    ========================================================== */
 
 @media (pointer: coarse) and (min-width: 768px) and (orientation: portrait) {
-
   :root {
     --ecart-ui-size: 56px;
     --ecart-ui-gap: 10px;
@@ -1557,6 +1267,7 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
     bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
     top: auto !important;
     flex-direction: row !important;
+    gap: var(--ecart-ui-gap) !important;
     transform: none !important;
   }
 
@@ -1579,10 +1290,11 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
 
 /* ==========================================================
    TABLETTE PAYSAGE
+   haut droite : LIGHT + EYE
+   bas droite : SOUND + MAP + INFO
    ========================================================== */
 
 @media (pointer: coarse) and (min-width: 768px) and (orientation: landscape) {
-
   :root {
     --ecart-ui-size: 52px;
     --ecart-ui-gap: 8px;
@@ -1596,15 +1308,14 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
   }
 
   .ecart-ui-cluster {
-    top: calc(
-      18px + env(safe-area-inset-top, 0px)
-      + (var(--ecart-ui-size) * 2)
-      + (var(--ecart-ui-gap) * 2)
-    ) !important;
-    right: calc(18px + env(safe-area-inset-right, 0px)) !important;
+    top: auto !important;
     left: auto !important;
-    bottom: auto !important;
+    right: calc(18px + env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
     flex-direction: column !important;
+    align-items: center !important;
+    gap: var(--ecart-ui-gap) !important;
+    width: auto !important;
     transform: none !important;
   }
 
@@ -1621,5 +1332,18 @@ body:has(#ecartAudioPanel.is-visible) [class*="joystick"] {
       calc(var(--ecart-ui-size) + 42px + env(safe-area-inset-right, 0px))
       24px
       calc(64px + env(safe-area-inset-left, 0px)) !important;
+  }
+}
+
+
+/* ==========================================================
+   GRANDS ÉCRANS
+   ========================================================== */
+
+@media (pointer: fine) and (min-width: 1440px) {
+  :root {
+    --ecart-ui-size: 50px;
+    --ecart-ui-right: 24px;
+    --ecart-ui-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   }
 }
