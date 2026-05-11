@@ -19,6 +19,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
 
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="zones/zone-core.css" />
   <link rel="stylesheet" href="zones/zone-sidebar.css" />
   <link rel="stylesheet" href="style/style.css" />
@@ -83,7 +84,9 @@
 
         <h2>EC@RT — Virtual Dada Noisy Quickkopy</h2>
 
-        <div class="about-text">
+        <div class="about-scroll-outer">
+          <div class="about-scroll">
+            <div class="about-text">
           <p>
             Dans le cadre de l’exposition <em>Quickkopy Conceptualism: Bay Area Dada to Bay Area Punk</em> au MAMCO,
             la plateforme <strong>EC@RT — Virtual Dada Noisy Quickkopy</strong> propose un espace de médiation numérique
@@ -120,6 +123,8 @@
             les documents dans une forme définitive, le projet les considère comme des matières à réactiver, à transformer,
             à réinterpréter, des espaces d’écoute, d’imagination et de lecture plurielle.
           </p>
+            </div>
+          </div>
         </div>
       </article>
     </section>
@@ -192,14 +197,14 @@
     </div>
   </div>
 
-  <script src="zones/no-zoom.js"></script>
+  <script src="/zones/no-zoom.js"></script>
   <script src="./data-infos.js"></script>
   <script src="./data-sound.js"></script>
 
   <script src="script.js"></script>
   <script src="zones/pannel-ui.js"></script>
   <script src="zones/mobile-menu.js"></script>
-  <script src="home-archive-noise.js"></script>
+  <script src="/style/home-archive-noise.js"></script>
   <script src="/zones/ecart-preloader.js"></script>
 <script>
   ECARTPreloader.init({

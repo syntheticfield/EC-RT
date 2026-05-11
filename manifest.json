@@ -1,0 +1,19 @@
+{
+  "name": "EC@RT — Virtual Dada Noisy Quickkopy",
+  "short_name": "EC@RT",
+  "description": "Médiation numérique — Quickkopy Conceptualism · MAMCO x HEAD",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
