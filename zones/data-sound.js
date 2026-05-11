@@ -1,8 +1,4 @@
 window.ECART_SOUND = [
-    {
-    title: "Noisy Transmission",
-    file: "../../assets/son/AD_MAD.mp3"
-  },
   {
     title: "Audio Description (fr)",
     file: "../../assets/son/FR/FS.mp3"

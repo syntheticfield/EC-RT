@@ -1,7 +1,6 @@
 /* ===== ZONE 13 : SEARCH AND DESTROY ===== */
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   background: #000;
@@ -11,7 +10,7 @@ body {
   overflow-x: hidden;
 }
 
-/* CONTENU PRINCIPAL */
+/* ─── ZONE PRINCIPALE ─────────────────────────────── */
 
 .zone-content-image {
   position: relative;
@@ -20,7 +19,7 @@ body {
   background: #000;
 }
 
-/* CHAMP IMAGE */
+/* ─── CHAMP IMAGE ─────────────────────────────────── */
 
 #zone13ImageField {
   position: absolute;
@@ -29,7 +28,7 @@ body {
   overflow: hidden;
 }
 
-/* CANVAS GLITCH */
+/* ─── CANVAS GLITCH ───────────────────────────────── */
 
 #zone13GlitchCanvas {
   position: absolute;
@@ -41,75 +40,23 @@ body {
   mix-blend-mode: screen;
 }
 
-/* PANEL TEXTE */
-
-.zone13-overlay-panel {
-  position: relative;
-  z-index: 5;
-  width: min(100%, 620px);
-  min-height: 100vh;
-  padding: clamp(24px, 5vw, 72px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 18px;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,0.82) 0%,
-      rgba(0,0,0,0.48) 58%,
-      rgba(0,0,0,0) 100%
-    );
-  transition: opacity 0.35s ease;
-}
-
-.zone13-overlay-panel.is-hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* TYPO */
-
-.placeholder-kicker {
-  margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-
-.placeholder-title {
-  margin: 0;
-  font-size: clamp(2.6rem, 7vw, 6rem);
-  line-height: 0.9;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-}
-
-.placeholder-text {
-  margin: 0;
-  max-width: 460px;
-  font-size: 1rem;
-  line-height: 1.6;
-  opacity: 0.9;
-}
-
-.placeholder-note {
-  margin: 0;
-  font-size: 0.85rem;
-  opacity: 0.55;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* IMAGES FLOTTANTES */
+/* ─── ARCHIVES FLOTTANTES ─────────────────────────── */
 
 .zone13-archive {
   position: absolute;
   z-index: 3;
   will-change: transform, opacity;
-  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: pointer;
 }
+
+.zone13-archive:hover img {
+  outline: 1px solid rgba(255,255,255,0.18);
+}
+
+.zone13-archive:active { cursor: grabbing; }
 
 .zone13-floating-image {
   position: absolute;
@@ -119,985 +66,103 @@ body {
   object-fit: cover;
   box-shadow: 0 18px 42px rgba(0,0,0,0.35);
   user-select: none;
+  transition: filter 0.6s ease;
 }
 
-/* BARRE VITALITÉ */
+/* ─── BARRE DE VIE ────────────────────────────────── */
 
-.zone13-vitality {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: -10px;
-  height: 3px;
-  background: rgba(255,255,255,0.08);
-  overflow: hidden;
-}
-
-.zone13-vitality-bar {
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.82);
-  transform-origin: left center;
-}
-
-/* UI DOCK */
-
-.zone13-ui-dock {
-  position: fixed;
-  right: 28px;
-  bottom: 28px;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.zone13-ui-btn {
-  min-width: 92px;
-  height: 42px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(0,0,0,0.74);
-  color: #fff;
-  cursor: pointer;
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.25s ease;
-}
-
-.zone13-ui-btn:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(255,255,255,0.35);
-  transform: translateY(-2px);
-}
-
-.zone13-ui-btn.is-active {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.55);
-}
-
-/* MOBILE */
-
-@media (max-width: 980px) {
-
-  .zone13-overlay-panel {
-    width: 100%;
-    min-height: auto;
-    padding: 28px 20px 120px;
-    justify-content: flex-start;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(0,0,0,0.82) 0%,
-        rgba(0,0,0,0.42) 60%,
-        rgba(0,0,0,0) 100%
-      );
-  }
-
-  .placeholder-title {
-    font-size: clamp(2rem, 12vw, 4rem);
-  }
-
-  .zone13-ui-dock {
-    right: 16px;
-    bottom: 16px;
-    gap: 8px;
-  }
-
-  .zone13-ui-btn {
-    min-width: 74px;
-    height: 38px;
-    font-size: 0.72rem;
-  }
-
-  
-}.zone13-death-cross {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  pointer-events: none;
-  z-index: 4;
-  opacity: 0.75;
-  animation: zone13CrossFade 7s linear forwards;
-}
-
-.zone13-death-cross::before,
-.zone13-death-cross::after {
-  content: "";
-  position: absolute;
-  background: rgba(255,255,255,0.8);
-}
-
-.zone13-death-cross::before {
-  left: 8px;
-  top: 0;
-  width: 2px;
-  height: 18px;
-}
-
-.zone13-death-cross::after {
-  left: 3px;
-  top: 8px;
-  width: 12px;
-  height: 2px;
-}
-
-@keyframes zone13CrossFade {
-  0% {
-    opacity: 0.8;
-    transform: scale(0.7);
-  }
-  20% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.15);
-  }
-}
-/* ===== ZONE 13 — AJOUTS CSS =====
-   Ajouter à la fin de zone-13.css
-   ================================ */
-
-/* ─── ARCHIVES DÉPLAÇABLES ─── */
-
-.zone13-archive {
-  /* pointer-events géré inline par zone-13.js (auto pendant le drag) */
-  /* cursor: grab défini dynamiquement via makeDraggable() */
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none; /* nécessaire pour pointer events sur mobile */
-}
-
-.zone13-archive:active {
-  cursor: grabbing;
-}
-
-/* ─── SOUND PANEL — TRACKS ─── */
-
-.z13-track-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-.z13-track {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border: 1px solid rgba(255,255,255,0.08);
-  cursor: pointer;
-  user-select: none;
-  transition:
-    border-color 0.2s ease,
-    background   0.2s ease,
-    opacity      0.2s ease;
-}
-
-.z13-track:hover {
-  border-color: rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.03);
-}
-
-.z13-track.is-on {
-  border-color: rgba(255,255,255,0.32);
-  background: rgba(255,255,255,0.04);
-}
-
-.z13-track:not(.is-on) {
-  opacity: 0.42;
-}
-
-/* Indicateur d'état (dot) */
-.z13-track-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.2);
-  transition: background 0.2s ease;
-}
-
-.z13-track.is-on .z13-track-dot {
-  background: #fff;
-  box-shadow: 0 0 6px rgba(255,255,255,0.55);
-}
-
-/* Label */
-.z13-track-label {
-  flex: 1;
-  font-size: 0.72rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-/* VU-mètre */
-.z13-track-meter {
-  width: 56px;
-  height: 2px;
-  background: rgba(255,255,255,0.07);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.z13-track-meter-bar {
-  position: absolute;
-  left: 0; top: 0;
-  height: 100%;
-  width: 0%;
-  background: rgba(255,255,255,0.72);
-  transition: width 0.07s linear;
-}
-/* ===================================================
-   ZONE 13 — ADDITIONS CSS
-   Ajouter à la fin de zone-13.css
-   =================================================== */
-
-/* ─── ARCHIVES — DRAG ─────────────────────────────── */
-
-.zone13-archive {
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;     /* indispensable pour pointer events mobile */
-}
-
-/* ─── SOUND PANEL — GRAIN ENGINE ─────────────────── */
-
-.z13-grain-engine {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* Label titre engine */
-.z13-engine-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  opacity: 0.4;
-}
-
-/* ─── SOURCES ────────────────────────────────────── */
-
-.z13-sources {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.z13-source {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Bouton toggle source */
-.z13-src-btn {
-  min-width: 60px;
-  height: 30px;
-  padding: 0 10px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: transparent;
-  color: rgba(255,255,255,0.3);
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.18s, border-color 0.18s, background 0.18s;
-  flex-shrink: 0;
-}
-
-.z13-src-btn.is-on {
-  color: #fff;
-  border-color: rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.04);
-}
-
-.z13-src-btn:hover {
-  border-color: rgba(255,255,255,0.28);
-  color: rgba(255,255,255,0.75);
-}
-
-/* Dots d'activité grain */
-.z13-src-grains {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.z13-grain-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  transition: background 0.08s ease, transform 0.08s ease;
-}
-
-.z13-grain-dot.is-active {
-  background: #fff;
-  transform: scale(1.5);
-}
-
-/* Pulse flash (barre de feu grain) */
-.z13-src-pulse {
-  flex: 1;
-  height: 2px;
-  background: rgba(255,255,255,0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.z13-src-pulse::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #fff;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.06s ease;
-}
-
-.z13-src-pulse.is-firing::after {
-  transform: scaleX(1);
-  transition: none;
-}
-
-/* ─── SLIDERS PARAMÈTRES ────────────────────────── */
-
-.z13-params {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.z13-param {
-  display: grid;
-  grid-template-columns: 82px 1fr 34px;
-  align-items: center;
-  gap: 10px;
-}
-
-.z13-param-label {
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.5;
-}
-
-.z13-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 2px;
-  background: rgba(255,255,255,0.12);
-  outline: none;
-  cursor: pointer;
-}
-
-.z13-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #fff;
-  cursor: pointer;
-  transition: transform 0.12s ease;
-}
-
-.z13-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.4);
-}
-
-.z13-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
-  cursor: pointer;
-}
-
-.z13-param-val {
-  font-size: 0.62rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.06em;
-  opacity: 0.45;
-  text-align: right;
-}
-
-/* ═══════════════════════════════════════════════════════
-   ZONE 13 — CHANNEL STRIP
-   ═══════════════════════════════════════════════════════ */
-
-.z13-channel-strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 11px 14px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(255,255,255,0.018);
-  margin-bottom: 18px;
-}
-
-.z13-channel-label {
-  font-size: 0.60rem;
-  letter-spacing: 0.30em;
-  text-transform: uppercase;
-  opacity: 0.38;
-}
-
-.z13-channel-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.z13-channel-state {
-  font-size: 0.60rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  opacity: 0.38;
-  min-width: 32px;
-  text-align: right;
-  transition: color 0.25s ease, opacity 0.25s ease;
-}
-
-.z13-channel-state.is-cut {
-  color: #ff3c3c;
-  opacity: 1;
-}
-
-.z13-channel-btn {
-  height: 26px;
-  padding: 0 12px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: transparent;
-  color: rgba(255,255,255,0.52);
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background  0.20s ease,
-    border-color 0.20s ease,
-    color        0.20s ease;
-}
-
-.z13-channel-btn:hover {
-  border-color: rgba(255,255,255,0.35);
-  color: #fff;
-}
-
-.z13-channel-btn.is-cut {
-  border-color: rgba(255,60,60,0.45);
-  color: #ff3c3c;
-  background: rgba(255,0,0,0.05);
-}
-
-.z13-channel-btn.is-cut:hover {
-  border-color: rgba(255,60,60,0.75);
-  background: rgba(255,0,0,0.10);
-}
-/* ===================================================
-   ZONE 13 — ADDITIONS CSS
-   Ajouter à la fin de zone-13.css
-   =================================================== */
-
-/* ─── ARCHIVES — INTERACTION ─────────────────────── */
-
-.zone13-archive {
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  cursor: pointer;
-}
-
-/* Hover sur archives dormantes — indique l'interactivité */
-.zone13-archive:hover img {
-  outline: 1px solid rgba(255,255,255,0.18);
-}
-
-/* ─── SOUND PANEL — GRAIN ENGINE ─────────────────── */
-
-.z13-grain-engine {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.07);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.z13-engine-label {
-  font-size: 0.62rem;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  opacity: 0.35;
-}
-
-/* ─── BOUTON ACTIVER ────────────────────────────── */
-
-.z13-activate-btn {
-  width: 100%;
-  height: 46px;
-  border: 1px solid rgba(255,255,255,0.26);
-  background: rgba(255,255,255,0.03);
-  color: #fff;
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: background 0.22s ease, border-color 0.22s ease;
-}
-
-.z13-activate-btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.52);
-}
-
-.z13-activate-btn:disabled {
-  opacity: 0.45;
-  cursor: wait;
-}
-
-.z13-activate-ring {
-  display: block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.65);
-  animation: z13Ring 1.6s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
-@keyframes z13Ring {
-  0%, 100% { transform: scale(1);   opacity: 0.45; }
-  50%       { transform: scale(1.55); opacity: 1;   }
-}
-
-.z13-loading {
-  font-size: 0.63rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0.42;
-  text-align: center;
-  margin: 0;
-}
-
-/* ─── ÉTAT DÉSACTIVÉ (avant activation son) ──────── */
-
-.z13-block-disabled {
-  opacity: 0.22;
-  pointer-events: none;
-}
-
-.z13-ctrl-disabled {
-  pointer-events: none;
-}
-
-/* ─── SOURCES ────────────────────────────────────── */
-
-.z13-sources {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: opacity 0.3s ease;
-}
-
-.z13-source {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.z13-src-btn {
-  min-width: 60px;
-  height: 28px;
-  padding: 0 10px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: transparent;
-  color: rgba(255,255,255,0.28);
-  font-size: 0.67rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: color 0.18s, border-color 0.18s, background 0.18s;
-}
-
-.z13-src-btn.is-on {
-  color: #fff;
-  border-color: rgba(255,255,255,0.38);
-  background: rgba(255,255,255,0.04);
-}
-
-.z13-src-btn:not(.z13-ctrl-disabled):hover {
-  border-color: rgba(255,255,255,0.26);
-  color: rgba(255,255,255,0.72);
-}
-
-/* Dots activité grain */
-.z13-src-grains {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.z13-grain-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  transition: background 0.06s ease, transform 0.06s ease;
-  flex-shrink: 0;
-}
-
-.z13-grain-dot.is-active {
-  background: #fff;
-  transform: scale(1.65);
-}
-
-/* Barre pulse grain */
-.z13-src-pulse {
-  flex: 1;
-  height: 2px;
-  background: rgba(255,255,255,0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.z13-src-pulse::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #fff;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.06s ease;
-}
-
-.z13-src-pulse.is-firing::after {
-  transform: scaleX(1);
-  transition: none;
-}
-
-/* ─── SLIDERS ────────────────────────────────────── */
-
-.z13-params {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-  transition: opacity 0.3s ease;
-}
-
-.z13-param {
-  display: grid;
-  grid-template-columns: 80px 1fr 32px;
-  align-items: center;
-  gap: 10px;
-}
-
-.z13-param-label {
-  font-size: 0.61rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  opacity: 0.48;
-}
-
-.z13-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 2px;
-  background: rgba(255,255,255,0.14);
-  outline: none;
-  cursor: pointer;
-}
-
-.z13-slider:disabled { cursor: default; }
-
-.z13-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #fff;
-  cursor: pointer;
-  transition: transform 0.12s ease;
-}
-
-.z13-slider:not(:disabled)::-webkit-slider-thumb:hover {
-  transform: scale(1.4);
-}
-
-.z13-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
-  cursor: pointer;
-}
-
-.z13-param-val {
-  font-size: 0.61rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.06em;
-  opacity: 0.38;
-  text-align: right;
-}
-
-/* ─── HINT GAMEPLAY ──────────────────────────────── */
-
-.z13-ecosystem-hint {
-  font-size: 0.6rem;
-  line-height: 1.55;
-  letter-spacing: 0.07em;
-  opacity: 0.32;
-  text-transform: uppercase;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding-top: 12px;
-}
-/* ===================================================
-   ZONE 13 — ADDITIONS CSS
-   Ajouter à la fin de zone-13.css
-   =================================================== */
-
-/* ─── ARCHIVES — INTERACTION ─────────────────────── */
-
-.zone13-archive {
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  cursor: pointer;
-}
-
-.zone13-archive:hover img {
-  outline: 1px solid rgba(255,255,255,0.16);
-}
-
-/* ─── SÉPARATEUR dans #ecartAudioPanel ──────────── */
-
-.z13-grain-engine {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.z13-engine-label {
-  font-size: 0.6rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  opacity: 0.32;
-}
-
-/* ─── BOUTON ACTIVER ─────────────────────────────── */
-
-.z13-activate-btn {
-  width: 100%;
-  height: 44px;
-  border: 1px solid rgba(255,255,255,0.24);
-  background: rgba(255,255,255,0.02);
-  color: #fff;
-  font-size: 0.68rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.z13-activate-btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.5);
-}
-
-.z13-activate-btn:disabled { opacity: 0.42; cursor: wait; }
-
-.z13-activate-ring {
-  display: block; width: 8px; height: 8px;
-  border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.6);
-  animation: z13Ring 1.6s ease-in-out infinite; flex-shrink: 0;
-}
-
-@keyframes z13Ring {
-  0%,100% { transform:scale(1);   opacity:0.4; }
-  50%     { transform:scale(1.6); opacity:1;   }
-}
-
-.z13-loading {
-  font-size: 0.62rem; letter-spacing: 0.16em;
-  text-transform: uppercase; opacity: 0.4;
-  text-align: center; margin: 0;
-}
-
-/* ─── DISABLED BLOCK ─────────────────────────────── */
-
-.z13-block-disabled {
-  opacity: 0.2;
-  pointer-events: none;
-}
-
-.z13-ctrl-disabled { pointer-events: none; }
-
-/* ─── SOURCES ────────────────────────────────────── */
-
-.z13-sources { display:flex; flex-direction:column; gap:7px; }
-
-.z13-source { display:flex; align-items:center; gap:9px; }
-
-.z13-src-btn {
-  min-width: 58px; height: 28px; padding: 0 9px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: transparent;
-  color: rgba(255,255,255,0.28);
-  font-size: 0.65rem; letter-spacing: 0.18em;
-  text-transform: uppercase; cursor: pointer; flex-shrink: 0;
-  transition: color .18s, border-color .18s, background .18s;
-}
-
-.z13-src-btn.is-on {
-  color: #fff;
-  border-color: rgba(255,255,255,0.36);
-  background: rgba(255,255,255,0.04);
-}
-
-.z13-src-btn:not(.z13-ctrl-disabled):hover {
-  border-color: rgba(255,255,255,0.24);
-  color: rgba(255,255,255,0.7);
-}
-
-.z13-src-grains { display:flex; gap:4px; align-items:center; }
-
-.z13-grain-dot {
-  width:5px; height:5px; border-radius:50%;
-  background: rgba(255,255,255,0.1);
-  transition: background .06s, transform .06s;
-  flex-shrink: 0;
-}
-
-.z13-grain-dot.is-active { background:#fff; transform:scale(1.65); }
-
-.z13-src-pulse {
-  flex:1; height:2px; background:rgba(255,255,255,0.05);
-  position:relative; overflow:hidden;
-}
-
-.z13-src-pulse::after {
-  content:""; position:absolute; inset:0; background:#fff;
-  transform:scaleX(0); transform-origin:left; transition:transform .06s;
-}
-
-.z13-src-pulse.is-firing::after { transform:scaleX(1); transition:none; }
-
-/* ─── SLIDERS ────────────────────────────────────── */
-
-.z13-params { display:flex; flex-direction:column; gap:12px; }
-
-.z13-param {
-  display:grid; grid-template-columns:78px 1fr 30px;
-  align-items:center; gap:9px;
-}
-
-.z13-param-label {
-  font-size: 0.59rem; letter-spacing: 0.2em;
-  text-transform: uppercase; opacity: 0.45;
-}
-
-.z13-slider {
-  -webkit-appearance:none; appearance:none;
-  width:100%; height:2px;
-  background:rgba(255,255,255,0.13);
-  outline:none; cursor:pointer;
-}
-
-.z13-slider:disabled { cursor:default; }
-
-.z13-slider::-webkit-slider-thumb {
-  -webkit-appearance:none; appearance:none;
-  width:12px; height:12px; border-radius:50%; background:#fff;
-  cursor:pointer; transition:transform .12s;
-}
-
-.z13-slider:not(:disabled)::-webkit-slider-thumb:hover { transform:scale(1.4); }
-
-.z13-slider::-moz-range-thumb {
-  width:12px; height:12px; border-radius:50%;
-  border:none; background:#fff; cursor:pointer;
-}
-
-.z13-param-val {
-  font-size:0.59rem; font-variant-numeric:tabular-nums;
-  letter-spacing:0.06em; opacity:0.36; text-align:right;
-}
-
-/* ─── HINT ───────────────────────────────────────── */
-
-.z13-ecosystem-hint {
-  font-size: 0.58rem; line-height: 1.6;
-  letter-spacing: 0.07em; opacity: 0.28;
-  text-transform: uppercase; margin: 0;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding-top: 10px;
-}
-/* ===================================================
-   ZONE 13 — ADDITIONS CSS
-   Ajouter à la fin de zone-13.css
-   =================================================== */
-
-/* ─── ARCHIVES ───────────────────────────────────── */
-
-.zone13-archive {
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;
-  cursor: pointer;
-}
-
-/* ─── BARRE DE VITALITÉ — visible, color-codée ───── */
-
-.z13-vital-wrap {
+.z13-health-wrap {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  height: 8px;
-  background: rgba(0,0,0,0.55);
+  height: 3px;
+  background: rgba(0,0,0,0.38);
+  z-index: 11;
+  pointer-events: none;
   overflow: hidden;
 }
 
-.z13-vital-bar {
+.z13-health-bar {
   width: 100%;
   height: 100%;
-  background: rgb(80,255,80);
+  background: #b02020;
   transform-origin: left center;
-  transition: background 0.4s ease;
+  transform: scaleX(1);
+  transition: transform 0.18s ease, background 0.35s ease;
 }
 
-/* ─── CROIX PERMANENTE ───────────────────────────── */
+.z13-health-bar.is-low    { background: #e02020; }
+.z13-health-bar.is-critic { background: #ff1818; }
+
+/* ─── OVERLAY DE MORT ─────────────────────────────── */
+
+.z13-death-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  background: rgba(0,0,0,0.80);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.z13-death-overlay.is-dead {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.z13-dead-cross {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.z13-dead-cross::before,
+.z13-dead-cross::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  background: rgba(255,255,255,0.65);
+  transition: background 0.18s ease;
+}
+
+.z13-dead-cross::before {
+  width: 2px; height: 26px;
+  transform: translate(-50%, -50%);
+}
+
+.z13-dead-cross::after {
+  width: 26px; height: 2px;
+  transform: translate(-50%, -50%);
+}
+
+.z13-death-overlay:hover .z13-dead-cross::before,
+.z13-death-overlay:hover .z13-dead-cross::after {
+  background: #fff;
+}
+
+.z13-restore-label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: color 0.18s ease;
+}
+
+.z13-death-overlay:hover .z13-restore-label {
+  color: rgba(255,255,255,0.85);
+}
+
+/* ─── CROIX CHAOS ─────────────────────────────────── */
 
 .z13-cross {
   position: absolute;
@@ -1110,7 +175,6 @@ body {
   transition: opacity 0.4s ease;
 }
 
-/* Bras vertical */
 .z13-cross::before {
   content: "";
   position: absolute;
@@ -1119,7 +183,6 @@ body {
   background: rgba(255,255,255,0.85);
 }
 
-/* Bras horizontal */
 .z13-cross::after {
   content: "";
   position: absolute;
@@ -1128,25 +191,20 @@ body {
   background: rgba(255,255,255,0.85);
 }
 
-/* Hover — glow + hint visible */
 .z13-cross.is-hovered::before,
 .z13-cross.is-hovered::after {
   background: #fff;
   box-shadow: 0 0 6px 2px rgba(255,255,255,0.7);
 }
 
-/* Ghost après résurrection */
 .z13-cross.is-ghost {
   opacity: 0.18;
   pointer-events: none;
 }
 
-/* ─── HINT RÉSURRECTION ──────────────────────────── */
-
 .z13-cross-hint {
   position: absolute;
-  top: -24px;
-  left: 50%;
+  top: -24px; left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   font-size: 0.58rem;
@@ -1160,146 +218,80 @@ body {
   transition: opacity 0.18s ease;
 }
 
-.z13-cross.is-hovered .z13-cross-hint {
-  opacity: 1;
-}
+.z13-cross.is-hovered .z13-cross-hint { opacity: 1; }
 
-/* ─── SOUND PANEL — section injectée ─────────────── */
+/* ─── BOUTON TRANSMISSION ─────────────────────────── */
 
-.z13-sound-section {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.07);
+.z13-transmission-btn {
+  position: fixed;
+  left:   clamp(14px, 2.5vw, 28px);
+  bottom: clamp(14px, 2.5vw, 28px);
+  z-index: 99960;
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.z13-sound-label {
-  font-size: 0.6rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  opacity: 0.3;
-}
-
-/* ─── BOUTON ACTIVER ─────────────────────────────── */
-
-.z13-activate-btn {
-  width: 100%; height: 44px;
+  align-items: center;
+  gap: 10px;
   border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(255,255,255,0.02);
-  color: #fff;
-  font-size: 0.68rem; letter-spacing: 0.24em; text-transform: uppercase;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  transition: background 0.2s, border-color 0.2s;
-}
-
-.z13-activate-btn:hover:not(:disabled) {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.5);
-}
-
-.z13-activate-btn:disabled { opacity: 0.4; cursor: wait; }
-
-.z13-ring {
-  display: block; width: 8px; height: 8px;
-  border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.6);
-  animation: z13Ring 1.6s ease-in-out infinite; flex-shrink: 0;
-}
-
-@keyframes z13Ring {
-  0%,100% { transform:scale(1);    opacity:0.4; }
-  50%      { transform:scale(1.65); opacity:1;   }
-}
-
-.z13-loading-msg {
-  font-size: 0.62rem; letter-spacing: 0.14em;
-  text-transform: uppercase; opacity: 0.38;
-  text-align: center; margin: 0;
-}
-
-/* ─── SOURCES ────────────────────────────────────── */
-
-.z13-src-list {
-  display: flex; flex-direction: column; gap: 6px;
-  transition: opacity 0.3s;
-}
-
-.z13-locked { opacity: 0.2; pointer-events: none; }
-
-.z13-src-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 5px 0;
-  transition: opacity 0.2s;
-}
-
-.z13-src-row:not(.is-playing) { opacity: 0.4; }
-
-/* LED — indique la piste active */
-.z13-src-led {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  flex-shrink: 0;
-  transition: background 0.1s, box-shadow 0.1s;
-}
-
-.z13-src-row.is-playing .z13-src-led {
-  background: #fff;
-  box-shadow: 0 0 8px 2px rgba(255,255,255,0.7);
-  animation: z13LedPulse 0.6s ease-in-out infinite alternate;
-}
-
-@keyframes z13LedPulse {
-  from { box-shadow: 0 0 4px 1px rgba(255,255,255,0.5); }
-  to   { box-shadow: 0 0 12px 4px rgba(255,255,255,0.9); }
-}
-
-.z13-src-name {
-  font-size: 0.66rem; letter-spacing: 0.18em;
-  text-transform: uppercase; flex: 1;
-}
-
-/* Barre de lecture (future progression) */
-.z13-src-bar {
-  width: 40px; height: 2px;
-  background: rgba(255,255,255,0.08);
-}
-
-.z13-src-row.is-playing .z13-src-bar {
-  background: rgba(255,255,255,0.5);
-  animation: z13BarPulse 1.2s ease-in-out infinite alternate;
-}
-
-@keyframes z13BarPulse {
-  from { opacity: 0.4; }
-  to   { opacity: 1; }
-}
-
-/* ─── BOUTON DÉCLENCHER ──────────────────────────── */
-
-.z13-trigger-btn {
-  height: 36px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: transparent;
-  color: rgba(255,255,255,0.6);
-  font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+  background: rgba(0,0,0,0.42);
+  color: rgba(255,255,255,0.60);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 9px 14px;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
-.z13-trigger-btn:not(:disabled):hover {
-  color: #fff;
-  border-color: rgba(255,255,255,0.4);
+.z13-transmission-btn:hover {
+  color: rgba(255,255,255,0.92);
+  border-color: rgba(255,255,255,0.44);
+  background: rgba(255,255,255,0.05);
+}
+
+.z13-transmission-btn:active { transform: scale(0.96); }
+
+.z13-transmission-btn.is-active {
+  color: rgba(255,255,255,0.92);
+  border-color: rgba(255,255,255,0.44);
   background: rgba(255,255,255,0.04);
 }
 
-.z13-trigger-btn:disabled { opacity: 0.2; cursor: default; }
+.z13-tx-ring {
+  display: block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.40);
+  flex-shrink: 0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
 
-/* ─── HINT SIM ───────────────────────────────────── */
+.z13-transmission-btn.is-active .z13-tx-ring {
+  border-color: rgba(255,255,255,0.80);
+  animation: z13TxPulse 1.8s ease-in-out infinite;
+}
 
-.z13-sim-hint {
-  font-size: 0.56rem; letter-spacing: 0.1em;
-  text-transform: uppercase; opacity: 0.24;
-  margin: 0; line-height: 1.5;
+.z13-transmission-btn.is-firing .z13-tx-ring {
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 0 8px 2px rgba(255,255,255,0.50);
+  animation: z13TxFire 0.5s ease-out forwards;
+}
+
+@keyframes z13TxPulse {
+  0%,100% { transform: scale(1);    opacity: 0.45; }
+  50%     { transform: scale(1.55); opacity: 1;    }
+}
+
+@keyframes z13TxFire {
+  0%   { transform: scale(1.8); opacity: 1;   }
+  100% { transform: scale(1);   opacity: 0.6; }
+}
+
+/* ─── MOBILE ──────────────────────────────────────── */
+
+@media (pointer: coarse) {
+  .z13-transmission-btn {
+    bottom: clamp(72px, 12vh, 96px);
+  }
 }

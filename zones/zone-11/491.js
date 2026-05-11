@@ -196,7 +196,11 @@ let masterOut  = null;
 let reverbNode = null;
 
 function initAudioEngine() {
-  if (audioCtx) return;
+  if (audioCtx) {
+    /* Reprendre si suspendu (après un stopTransmission) */
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return;
+  }
 
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -261,7 +265,7 @@ function buildDrone() {
 }
 
 function scheduleAmbientCrackle() {
-  if (!audioCtx) return;
+  if (!audioCtx || !ttsEnabled) return;
   spawnCrackle(random(-0.9, 0.9), random(0.008, 0.044), random(200, 3200));
   setTimeout(scheduleAmbientCrackle, random(280, 1600));
 }
@@ -362,42 +366,90 @@ function vwToPan(leftVw) {
    ════════════════════════════ */
 
 let ttsReady   = false;
-let ttsEnabled = false;
+let ttsEnabled = true;   /* ON par défaut — démarre au 1er geste */
 
-function activateTTS() { ttsReady = true; }
+/* Premier geste utilisateur : lance tout */
+function activateTTS() {
+  if (ttsReady) return;
+  ttsReady = true;
+  initAudioEngine();
+  updateTransmissionBtn();
+}
+
 document.addEventListener("click",      activateTTS, { once: true, passive: true });
 document.addEventListener("touchstart", activateTTS, { once: true, passive: true });
 document.addEventListener("keydown",    activateTTS, { once: true, passive: true });
 
+
+/* ════════════════════════════
+   BOUTON TRANSMISSION
+   ════════════════════════════ */
+
+function updateTransmissionBtn() {
+  const btn = document.getElementById("transmissionToggle");
+  if (!btn) return;
+  if (ttsEnabled) {
+    btn.textContent = "TRANSMISSION";
+    btn.classList.remove("tx-off");
+    btn.title = "Couper la transmission";
+  } else {
+    btn.textContent = "TRANSMISSION OFF";
+    btn.classList.add("tx-off");
+    btn.title = "Relancer la transmission";
+  }
+}
+
+function stopAllVoices() {
+  ttsPool.forEach(slot => {
+    try { slot.iframe.contentWindow.speechSynthesis.cancel(); } catch (e) {}
+    slot.busy = false;
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  /* Construire le pool d'iframes dès que le DOM est prêt */
   buildTTSPool();
 
-  const soundBtn = document.getElementById("soundToggle");
-  if (!soundBtn) return;
+  /* Bouton TRANSMISSION — bas gauche */
+  const txBtn = document.getElementById("transmissionToggle");
+  if (txBtn) {
+    txBtn.addEventListener("click", () => {
+      ttsEnabled = !ttsEnabled;
 
-  if (!(window.ECART_SOUND || []).length) {
+      if (!ttsEnabled) {
+        stopAllVoices();
+        if (audioCtx) audioCtx.suspend();
+      } else {
+        ttsReady = true;
+        initAudioEngine();           /* reprend l'AudioContext */
+        scheduleAmbientCrackle();    /* relance les craquements */
+      }
+
+      updateTransmissionBtn();
+    });
+  }
+
+  /* soundToggle existant — reste compatible */
+  const soundBtn = document.getElementById("soundToggle");
+  if (soundBtn && !(window.ECART_SOUND || []).length) {
     soundBtn.disabled      = false;
     soundBtn.style.opacity = "";
     soundBtn.title         = "Activer / désactiver les voix 491";
+
+    soundBtn.addEventListener("click", () => {
+      ttsEnabled = !ttsEnabled;
+      if (!ttsEnabled) {
+        stopAllVoices();
+        if (audioCtx) audioCtx.suspend();
+      } else {
+        ttsReady = true;
+        initAudioEngine();
+        scheduleAmbientCrackle();
+      }
+      updateTransmissionBtn();
+    });
   }
 
-  soundBtn.addEventListener("click", () => {
-    ttsEnabled = !ttsEnabled;
-
-    if (!ttsEnabled) {
-      /* Couper toutes les voix en cours */
-      ttsPool.forEach(slot => {
-        try {
-          slot.iframe.contentWindow.speechSynthesis.cancel();
-        } catch (e) { /* iframe pas encore chargée */ }
-        slot.busy = false;
-      });
-    } else {
-      ttsReady = true;
-      initAudioEngine();
-    }
-  });
+  updateTransmissionBtn();
 });
 
 

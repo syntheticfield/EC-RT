@@ -1,150 +1,128 @@
 /* =========================
-   Zone13GlitchRenderer — Glitch agressif
+   Zone13GlitchRenderer — Glitch discret sur les images
    
    mix-blend-mode: screen sur le canvas.
-   Pour être visible avec screen blend : couleurs SATURÉES
-   et haute opacité. Noir = transparent, blanc/couleur = visible.
+   Noir = transparent → seuls les éléments clairs (blanc/gris)
+   affectent les images. Pas de couleurs saturées.
    
    Effets :
-   — Blocs cyan/magenta larges (datamosh)
-   — RGB split 40-80px sur les pics
-   — Lignes de scan épaisses colorées
-   — Flash blanc sur transient fort
-   — Drift horizontal synchronisé à la basse
-   — Noise burst large
+   — Lignes de déplacement horizontal (slices)
+   — RGB split monochrome léger (3-10px)
+   — Scan lines très fines, quasi invisibles
+   — Noise de pixels blanc très sparse
    ========================= */
 
 export class Zone13GlitchRenderer {
   constructor(canvas) {
     this.canvas = canvas;
-    this.ctx    = canvas.getContext("2d");
+    this.ctx    = canvas.getContext('2d');
     this.width  = 0;
     this.height = 0;
     this._t     = 0;
-    this._flash = 0;
   }
 
   resize() {
-    const r = this.canvas.getBoundingClientRect();
-    this.width  = this.canvas.width  = Math.floor(r.width);
-    this.height = this.canvas.height = Math.floor(r.height);
+    const r        = this.canvas.getBoundingClientRect();
+    this.width     = this.canvas.width  = Math.floor(r.width);
+    this.height    = this.canvas.height = Math.floor(r.height);
   }
 
   clear() { this.ctx.clearRect(0, 0, this.width, this.height); }
 
   render(audio) {
-    const { amplitude, bass, mids, highs, transient } = audio;
+    const { amplitude, bass, mids, transient } = audio;
     const { ctx, width: w, height: h } = this;
     this._t += 0.016;
 
     this.clear();
 
-    /* ── 1. BLOCS DATAMOSH COLORÉS ─────────────────────
-       Cyan / Magenta / Jaune — saturés, très visibles     */
-    const PALETTE = [
-      `rgba(0,255,255,`,    /* cyan    */
-      `rgba(255,0,200,`,    /* magenta */
-      `rgba(255,255,0,`,    /* jaune   */
-      `rgba(255,80,0,`,     /* orange  */
-    ];
+    /* Rien à rendre si le son est vraiment faible */
+    if (amplitude < 0.03 && transient < 0.08) return;
 
-    const blockCount = Math.floor(1 + amplitude * 20 + transient * 28);
-    const maxShift   = amplitude * 70 + transient * 100;
+    /* ── 1. SLICE HORIZONTAL — déplacement de bandes ──────
+       Bandes étroites décalées latéralement, blanc semi-opaque.
+       Crée l'illusion que les images se déchirent.           */
+    const sliceCount = Math.floor(amplitude * 8 + transient * 14);
 
-    ctx.save();
-    ctx.globalCompositeOperation = "screen";
-
-    for (let i = 0; i < blockCount; i++) {
-      const bh  = 3 + Math.random() * (20 + mids * 35);
-      const by  = Math.random() * h;
-      const bx  = (Math.random() - 0.5) * maxShift;
-      const col = PALETTE[Math.floor(Math.random() * PALETTE.length)];
-      const a   = 0.18 + amplitude * 0.45 + Math.random() * 0.15;
-      ctx.fillStyle = `${col}${a.toFixed(2)})`;
-      ctx.fillRect(bx, by, w, bh);
-    }
-    ctx.restore();
-
-    /* ── 2. RGB SPLIT AGRESSIF ─────────────────────────
-       Décalage de 40-80px sur les peaks                   */
-    if (highs > 0.06 || transient > 0.22) {
-      const shift = 40 + highs * 40 + transient * 40;
-      this._rgbSplit(Math.floor(shift));
-    }
-
-    /* ── 3. SCAN LINES ÉPAISSES ────────────────────────
-       Lignes cyan semi-opaques — vraiment visibles         */
-    if (amplitude > 0.04) {
-      const lineAlpha = 0.06 + amplitude * 0.14;
+    if (sliceCount > 0) {
       ctx.save();
-      ctx.fillStyle = `rgba(0,255,255,${lineAlpha})`;
-      const step = 4 + Math.floor((1 - amplitude) * 8);
-      for (let y = 0; y < h; y += step) {
-        ctx.fillRect(0, y, w, 1.5);
+      ctx.globalCompositeOperation = 'screen';
+
+      for (let i = 0; i < sliceCount; i++) {
+        const sy  = Math.random() * h;
+        const sh  = 1 + Math.random() * (3 + mids * 6);   /* 1-9px de haut */
+        const sx  = (Math.random() - 0.5) * (amplitude * 28 + transient * 44);
+        const a   = 0.04 + amplitude * 0.10 + Math.random() * 0.06;
+
+        ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+        ctx.fillRect(sx, sy, w, sh);
       }
+
       ctx.restore();
     }
 
-    /* ── 4. DRIFT HORIZONTAL (basse) ───────────────────
-       Le canvas entier se décale à droite/gauche           */
-    if (bass > 0.06) {
-      const drift = Math.sin(this._t * 1.2) * bass * 22;
+    /* ── 2. RGB SPLIT MONOCHROME ────────────────────────────
+       Décalage rouge / bleu de 3 à 10px — blanc uniquement,
+       pas de couleurs saturées.                             */
+    if (transient > 0.25 || amplitude > 0.18) {
+      const shift = Math.floor(3 + transient * 7 + amplitude * 4);
+      this._rgbSplitMono(shift, amplitude * 0.35 + transient * 0.25);
+    }
+
+    /* ── 3. SCAN LINES ULTRA-FINES ─────────────────────────
+       Grille presque invisible, juste un léger tissu.       */
+    if (amplitude > 0.06) {
+      const a    = 0.015 + amplitude * 0.025;
+      const step = 3;
       ctx.save();
-      ctx.globalAlpha = 0.3;
-      ctx.globalCompositeOperation = "screen";
-      ctx.drawImage(this.canvas, drift, 0, w, h);
+      ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+      for (let y = 0; y < h; y += step) ctx.fillRect(0, y, w, 0.8);
       ctx.restore();
     }
 
-    /* ── 5. NOISE BURST ────────────────────────────────
-       Pixels blancs / cyan sur les attaques               */
-    if (amplitude > 0.06 || transient > 0.3) {
-      const count = Math.floor(amplitude * 500 + transient * 380);
+    /* ── 4. NOISE PIXELS SPARSE ────────────────────────────
+       Quelques pixels blancs sur les attaques.             */
+    if (transient > 0.35 || amplitude > 0.22) {
+      const count = Math.floor(transient * 60 + amplitude * 40);
       ctx.save();
-      ctx.globalCompositeOperation = "screen";
+      ctx.globalCompositeOperation = 'screen';
       for (let i = 0; i < count; i++) {
-        const px = Math.random() * w;
-        const py = Math.random() * h;
-        const ps = 1.5 + Math.random() * 4;
-        const a  = 0.3 + Math.random() * 0.5;
-        ctx.fillStyle = Math.random() < 0.5
-          ? `rgba(255,255,255,${a})`
-          : `rgba(0,255,255,${a})`;
-        ctx.fillRect(px, py, ps, ps);
+        const a = 0.12 + Math.random() * 0.22;
+        ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+        ctx.fillRect(
+          Math.random() * w,
+          Math.random() * h,
+          1 + Math.random() * 2,
+          1 + Math.random() * 2
+        );
       }
       ctx.restore();
-    }
-
-    /* ── 6. FLASH BLANC ────────────────────────────────
-       Sur transient fort — lumière brutale                 */
-    if (transient > 0.65) {
-      this._flash = Math.min(1, this._flash + (transient - 0.65) * 2.2);
-    }
-    if (this._flash > 0.008) {
-      ctx.save();
-      ctx.globalAlpha = this._flash * 0.55;
-      ctx.fillStyle   = "#fff";
-      ctx.fillRect(0, 0, w, h);
-      ctx.restore();
-      this._flash *= 0.72;
     }
   }
 
-  /* RGB Split pixel-level — shift de 'amount' pixels */
-  _rgbSplit(amount) {
+  /* RGB split — shift du canal rouge vers la droite,
+     bleu vers la gauche, en niveaux de gris uniquement.   */
+  _rgbSplitMono(amount, strength) {
     const { ctx, width: w, height: h } = this;
-    if (amount < 1) return;
+    if (amount < 1 || strength < 0.01) return;
+
     const img  = ctx.getImageData(0, 0, w, h);
     const data = img.data;
     const copy = new Uint8ClampedArray(data);
+    const s    = Math.min(1, strength);
 
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const i  = (y * w + x) * 4;
+        /* Canal R : décalé vers la droite */
         const rx = Math.min(w - 1, x + amount);
-        const bx = Math.max(0,     x - amount);
-        data[i]     = copy[(y * w + rx) * 4];
-        data[i + 2] = copy[(y * w + bx) * 4 + 2];
+        const ri = (y * w + rx) * 4;
+        data[i]  = copy[i] + (copy[ri] - copy[i]) * s;
+
+        /* Canal B : décalé vers la gauche */
+        const bx = Math.max(0, x - amount);
+        const bi = (y * w + bx) * 4 + 2;
+        data[i + 2] = copy[i + 2] + (copy[bi] - copy[i + 2]) * s;
       }
     }
     ctx.putImageData(img, 0, 0);
