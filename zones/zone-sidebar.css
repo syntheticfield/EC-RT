@@ -897,3 +897,214 @@ body,
     font-size: 0.58rem !important;
   }
 }
+/* ==========================================================
+   EC@RT — UI SCALE FINAL (+15%)
+   Téléphone / tablette séparés proprement
+   ========================================================== */
+
+
+/* ==========================================================
+   DESKTOP
+   ========================================================== */
+
+@media (pointer: fine) {
+
+  .home-button {
+    width: 39px !important;
+    height: 39px !important;
+    flex: 0 0 39px !important;
+    font-size: 1rem !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: 1.62rem !important;
+  }
+
+  .zone-identity-title {
+    font-size: clamp(1rem, 1.35vw, 1.22rem) !important;
+  }
+
+  .zone-identity-desc {
+    font-size: clamp(0.58rem, 0.82vw, 0.72rem) !important;
+  }
+
+  .zone-link,
+  .section-link {
+    font-size: 0.86rem !important;
+  }
+
+  .zone-identity {
+    left: 78px !important;
+  }
+}
+
+
+/* ==========================================================
+   TÉLÉPHONE PORTRAIT
+   ========================================================== */
+
+@media (pointer: coarse)
+and (max-width: 767px)
+and (orientation: portrait) {
+
+  .home-button {
+    width: 39px !important;
+    height: 39px !important;
+    flex: 0 0 39px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: clamp(1.9rem, 7vw, 2.8rem) !important;
+  }
+
+  .zone-identity {
+    top: 82px !important;
+    left: 18px !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.84rem !important;
+    line-height: 1.08 !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.54rem !important;
+  }
+
+  .zone-link,
+  .section-link {
+    font-size: 0.96rem !important;
+    line-height: 1.34 !important;
+  }
+
+  .zones-nav,
+  .sections {
+    padding-top: 142px !important;
+  }
+}
+
+
+/* ==========================================================
+   TÉLÉPHONE PAYSAGE
+   ========================================================== */
+
+@media (pointer: coarse)
+and (max-width: 767px)
+and (orientation: landscape) {
+
+  .home-button {
+    width: 35px !important;
+    height: 35px !important;
+    flex: 0 0 35px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: 1.34rem !important;
+  }
+
+  .zone-identity {
+    top: 14px !important;
+    left: 68px !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.78rem !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.5rem !important;
+  }
+
+  .zone-link,
+  .section-link {
+    font-size: 0.84rem !important;
+  }
+}
+
+
+/* ==========================================================
+   TABLETTE PORTRAIT
+   ========================================================== */
+
+@media (pointer: coarse)
+and (min-width: 768px)
+and (orientation: portrait) {
+
+  .home-button {
+    width: 43px !important;
+    height: 43px !important;
+    flex: 0 0 43px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: clamp(2.2rem, 5vw, 3.4rem) !important;
+  }
+
+  .zone-identity {
+    top: 92px !important;
+    left: 22px !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.98rem !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.62rem !important;
+  }
+
+  .zone-link,
+  .section-link {
+    font-size: 1.05rem !important;
+    line-height: 1.38 !important;
+  }
+
+  .zones-nav,
+  .sections {
+    padding-top: 160px !important;
+  }
+}
+
+
+/* ==========================================================
+   TABLETTE PAYSAGE
+   ========================================================== */
+
+@media (pointer: coarse)
+and (min-width: 768px)
+and (orientation: landscape) {
+
+  .home-button {
+    width: 39px !important;
+    height: 39px !important;
+    flex: 0 0 39px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: 1.56rem !important;
+  }
+
+  .zone-identity {
+    top: 16px !important;
+    left: 76px !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.9rem !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.58rem !important;
+  }
+
+  .zone-link,
+  .section-link {
+    font-size: 0.96rem !important;
+    line-height: 1.34 !important;
+  }
+}
