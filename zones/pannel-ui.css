@@ -1059,18 +1059,20 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
   .ecart-light-btn { order: 1 !important; }
   .ecart-focus-btn { order: 2 !important; }
 
-  .ecart-ui-cluster {
-    left: calc(14px + env(safe-area-inset-left, 0px)) !important;
-    right: auto !important;
-    bottom: var(--ecart-ui-bottom) !important;
-    top: auto !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: var(--ecart-ui-gap) !important;
-    width: auto !important;
-    transform: none !important;
-  }
+ .ecart-ui-cluster {
+  left: auto !important;
+  right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+  bottom: var(--ecart-ui-bottom) !important;
+  top: auto !important;
 
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: var(--ecart-ui-gap) !important;
+
+  width: auto !important;
+  transform: none !important;
+}
   #infoToggle { order: 1 !important; }
   #mobileMapToggle { order: 2 !important; }
   #soundToggle { order: 3 !important; }
