@@ -1,6 +1,6 @@
 /* =========================
    EC@RT — LOADER UNITY UNIFIÉ
-   Version 1.1
+   Version 1.2
 
    USAGE dans chaque zone Unity :
    ─────────────────────────────
@@ -24,6 +24,17 @@
      warningId  : "ecartUnityWarning",             // défaut: "ecartUnityWarning"
      onReady    : (instance) => {}                 // callback optionnel
    });
+
+   CHANGELOG v1.2 :
+   ─────────────────────────────
+   - Resize handler centralisé ici (supprimé de unity-mobile-fix.js)
+   - Debounce augmenté à 250ms pour absorber les 2 resize successifs iOS
+   - Listener orientationchange ajouté : verrouille les resize parasites
+     pendant la rotation (iOS envoie des dimensions intermédiaires
+     incorrectes avant de stabiliser)
+   - webglcontextlost renforcé : timer de récupération automatique
+     si le contexte n'est pas restauré dans 3s
+   - visibilitychange ajouté : refocus canvas au retour en premier plan
    ========================= */
 
 window.ECARTLoader = (() => {
@@ -101,7 +112,16 @@ window.ECARTLoader = (() => {
     let isReady        = false;
     let progressTimer  = null;
 
-    /* ── Helpers DOM ── */
+    /* ── Verrou orientation ──
+       iOS envoie orientationchange PUIS 1 ou 2 resize avec des
+       dimensions intermédiaires incorrectes avant de stabiliser.
+       On bloque ensureCanvasSize pendant cette fenêtre. */
+    let orientationChanging = false;
+    let orientationTimer    = null;
+
+    /* ─────────────────────────────
+       Helpers DOM
+       ───────────────────────────── */
 
     function setBar(v) {
       if (bar)     bar.style.width     = `${Math.round(v * 100)}%`;
@@ -126,14 +146,20 @@ window.ECARTLoader = (() => {
     }
 
     function ensureCanvasSize() {
+      /* Ne rien faire si une rotation est en cours — les dimensions
+         seraient transitoires et incorrectes */
+      if (orientationChanging) return;
+
       canvas.style.width  = "100%";
       canvas.style.height = "100%";
     }
 
-    /* ── Boucle de progression lissée ──
+    /* ─────────────────────────────
+       Boucle de progression lissée
        Unity bloque souvent à ~90% pendant la compilation WASM.
        On interpole visuellement vers 98% même si ça stagne,
-       puis on saute à 100% quand Unity confirme. */
+       puis on saute à 100% quand Unity confirme.
+       ───────────────────────────── */
     function startProgressLoop() {
       if (progressTimer) return;
 
@@ -172,7 +198,49 @@ window.ECARTLoader = (() => {
       realProgress = p;
     }
 
-    /* ── Chargement du loader Unity ── */
+    /* ─────────────────────────────
+       Gestionnaire resize/orientation — CENTRALISÉ ICI
+       unity-mobile-fix.js ne gère plus le resize.
+
+       Stratégie :
+       1. orientationchange pose le verrou immédiatement
+       2. Le verrou est levé 350ms après le dernier resize reçu
+          (iOS envoie resize 1 puis resize 2 dans les ~200ms qui suivent)
+       3. ensureCanvasSize s'exécute une seule fois après stabilisation
+       ───────────────────────────── */
+    let resizeTimer = null;
+
+    window.addEventListener("orientationchange", () => {
+      orientationChanging = true;
+      clearTimeout(orientationTimer);
+      clearTimeout(resizeTimer);
+      console.log("[ECARTLoader] orientationchange — resize bloqué.");
+    });
+
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        /* Levée du verrou orientation si actif */
+        if (orientationChanging) {
+          orientationChanging = false;
+          console.log("[ECARTLoader] Dimensions stables après rotation.");
+        }
+        ensureCanvasSize();
+      }, 250); // 250ms absorbe les 2 resize successifs d'iOS
+    });
+
+    /* ── Refocus canvas au retour en premier plan ──
+       Évite un état "zombie" où Unity ne reçoit plus les inputs
+       après un aller-retour vers une autre app. */
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && isReady) {
+        setTimeout(() => canvas.focus({ preventScroll: true }), 100);
+      }
+    });
+
+    /* ─────────────────────────────
+       Chargement du loader Unity
+       ───────────────────────────── */
     function loadScript() {
       const script   = document.createElement("script");
       script.src     = loaderUrl;
@@ -190,16 +258,31 @@ window.ECARTLoader = (() => {
         return;
       }
 
-      /* ── Garde WebGL contre les pertes de contexte au changement d'orientation ──
-         e.preventDefault() signale au navigateur que l'app gère la récupération
-         elle-même, ce qui évite à Unity d'interpréter la perte comme fatale. */
+      /* ── Garde WebGL contre les pertes de contexte ──
+         e.preventDefault() signale au navigateur que l'app gère la
+         récupération elle-même. On ajoute un timer de sécurité : si le
+         contexte n'est pas restauré en 3s (cas iOS agressif), on affiche
+         une instruction pour que l'utilisateur recharge manuellement
+         plutôt qu'une page blanche inexpliquée. */
+      let contextLostTimer = null;
+
       canvas.addEventListener("webglcontextlost", (e) => {
         e.preventDefault();
         console.warn("[ECARTLoader] WebGL context lost — récupération en cours…");
+
+        contextLostTimer = setTimeout(() => {
+          console.error("[ECARTLoader] WebGL context non restauré après 3s.");
+          showWarning(
+            "La connexion à la scène 3D a été interrompue. " +
+            "Veuillez recharger la page pour continuer."
+          );
+        }, 3000);
       }, false);
 
       canvas.addEventListener("webglcontextrestored", () => {
+        clearTimeout(contextLostTimer);
         console.log("[ECARTLoader] WebGL context restored.");
+        ensureCanvasSize();
       }, false);
 
       createUnityInstance(canvas, unityConfig, onProgress)
@@ -244,17 +327,6 @@ window.ECARTLoader = (() => {
     /* ── Démarrage ── */
     ensureCanvasSize();
     startProgressLoop();
-
-    /* ── Resize dédoublonné ──
-       Sur iOS/iPadOS, orientationchange déclenche toujours un resize quelques ms
-       après. Un seul listener sur resize avec debounce suffit et évite les appels
-       en rafale avec des dimensions intermédiaires incohérentes. */
-    let resizeTimer = null;
-    window.addEventListener("resize", () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(ensureCanvasSize, 120);
-    });
-
     loadScript();
   }
 

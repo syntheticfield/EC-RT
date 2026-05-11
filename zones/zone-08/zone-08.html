@@ -257,6 +257,26 @@
   <!-- UI commune -->
   <script src="../pannel-ui.js"></script>
   <script src="../mobile-menu.js"></script>
+   <script src="../ecart-preloader.js"></script>
+<script>
+  ECARTPreloader.init({
+    zones: [
+      { id: '2',  buildPath: '/zones/zone-02/02_BACK_01/Build', buildName: '02_BACK_01'        },
+      { id: '3',  buildPath: '/zones/zone-03/03_ANT/Build',     buildName: '03_ANT' },
+      { id: '4',  buildPath: '/zones/zone-04/04_NWMV/Build',    buildName: '03_NWMV'           },
+      { id: '6',  buildPath: '/zones/zone-06/06_VILE/Build',    buildName: '06_VILE'           },
+      { id: '7',  buildPath: '/zones/zone-07/07_MC/Build',      buildName: '07_MC'             },
+      { id: '8',  buildPath: '/zones/zone-08/08_FS/Build',      buildName: '08_FS'             },
+      { id: '9',  buildPath: '/zones/zone-09/09_ID/Build',      buildName: '09_ID'             },
+      { id: '10', buildPath: '/zones/zone-10/10_COUM/Build',    buildName: '10_COUM'           },
+      { id: '12', buildPath: '/zones/zone-12/12_MAD/Build',     buildName: '12_MAD'            },
+    ],
+      currentZone: '8', 
+    autoPreload : ['9', '7'],
+    minimap: { selector: '.mini-zone', zoneAttr: 'data-mini-zone' },
+    swPath: '/ecart-sw.js',
+  });
+</script>
 
 </body>
 </html>

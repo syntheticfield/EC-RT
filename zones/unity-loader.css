@@ -5,6 +5,12 @@
 
    Remplace : zone_02.css, zone-02-unity.css
    et leurs équivalents pour les zones 03, 08, etc.
+
+   v1.2 — correctif reload tablette :
+   - Suppression de height: 100dvh (déclenchait resize à chaque
+     apparition/disparition de la barre nav iOS, causant pertes WebGL)
+   - width/height retirés de .zone-content-unity (inset: 0 suffit
+     quand position est fixed)
    ========================= */
 
 /* =========================
@@ -30,13 +36,18 @@ body {
    On évite ainsi le changement de stacking context au passage
    paysage ↔ portrait, qui provoquait une perte du contexte WebGL
    et un rechargement de la scène Unity sur iPad/iPhone.
+
+   IMPORTANT : avec position: fixed + inset: 0, le bloc couvre déjà
+   exactement le viewport. Les propriétés width/height sont retirées
+   car 100vw / 100dvh y seraient redondantes — et 100dvh est
+   dangereux : sa valeur change quand la barre de navigation iOS
+   apparaît/disparaît, ce qui génère des événements resize parasites
+   pouvant provoquer une perte de contexte WebGL.
    ========================= */
 
 .zone-content-unity {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100dvh;
   overflow: hidden;
   background: #000;
 }

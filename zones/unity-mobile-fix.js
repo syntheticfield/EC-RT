@@ -1,11 +1,20 @@
 /* =========================
    EC@RT — UNITY MOBILE FIX
-   Version 1.1
+   Version 1.2
 
    Appelé automatiquement par ECARTLoader après Unity ready.
 
    Si tu as besoin de l'appeler manuellement :
    ECARTUnityMobileFix(document.getElementById("unity-canvas"));
+
+   CHANGELOG v1.2 :
+   ─────────────────────────────
+   - Suppression du listener resize (délégué à unity-loader.js
+     pour éviter les doubles callbacks non coordonnés à la rotation)
+   - Suppression du timer orientationTimer interne (idem — géré
+     de façon centralisée dans le loader)
+   - Conservation du wheel + touchmove pour bloquer le scroll
+     navigateur sur le canvas
    ========================= */
 
 window.ECARTUnityMobileFix = function (canvas) {
@@ -40,17 +49,13 @@ window.ECARTUnityMobileFix = function (canvas) {
     }
   }, { passive: false });
 
-  /* ── Stabilisation au changement d'orientation ──
-     Sur iPad/iPhone, la rotation provoque un resize en deux temps.
-     On attend la fin du redimensionnement avant de refocaliser
-     pour éviter d'interrompre le re-layout du navigateur. */
-  let orientationTimer = null;
-  window.addEventListener("resize", () => {
-    clearTimeout(orientationTimer);
-    orientationTimer = setTimeout(() => {
-      focusCanvas();
-    }, 150);
-  });
+  /* NOTE : le listener resize a été retiré de ce fichier.
+     Il est géré de façon centralisée dans unity-loader.js avec :
+     - un verrou orientationchange pour ignorer les dimensions transitoires
+     - un debounce de 250ms pour absorber les 2 resize successifs iOS
+     Avoir deux listeners resize non coordonnés provoquait des appels en
+     rafale avec des dimensions intermédiaires, pouvant déclencher 2 restarts
+     du renderer Unity au lieu d'un seul (après stabilisation). */
 
   focusCanvas();
   console.log("[ECARTUnityMobileFix] activé.");
