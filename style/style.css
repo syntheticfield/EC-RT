@@ -575,3 +575,53 @@ body.home .about-scroll * {
     width: min(680px, 74vw) !important;
   }
 }
+
+/* ==========================================================
+   FINAL FIX HOME
+   - NOISE invisible mobile/tablette
+   - mots non cliquables derrière le bloc flou desktop
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   MOBILE / TABLETTE
+   ---------------------------------------------------------- */
+
+@media (pointer: coarse) {
+
+  #homeNoiseToggle,
+  .home-noise-status {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+
+/* ----------------------------------------------------------
+   DESKTOP
+   bloque les interactions derrière le bloc texte
+   ---------------------------------------------------------- */
+
+@media (pointer: fine) {
+
+  body.home .about-home {
+    position: relative !important;
+    pointer-events: auto !important;
+  }
+
+  body.home .about-scroll,
+  body.home .about-scroll-outer,
+  body.home .about-text {
+    pointer-events: auto !important;
+  }
+
+  body.home .about-home::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+
+    pointer-events: auto !important;
+  }
+}
