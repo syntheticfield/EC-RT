@@ -9,15 +9,19 @@ import { Zone13GlitchRenderer } from './zone-13-glitch.js';
 /* ─── CONFIG ──────────────────────────────────────── */
 
 const AUDIO_SOURCES = [
-  './audio/SD_01.wav', './audio/SD_02.wav',
-  './audio/SD_03.wav', './audio/SD_04.wav'
+  './audio/SD_01.mp3', './audio/SD_02.mp3',
+  './audio/SD_03.mp3', './audio/SD_04.mp3'
 ];
 
 const IMAGE_SOURCES = [
-  './images/SND_01.jpeg', './images/SND_02.jpeg',
-  './images/SND_03.jpeg', './images/SND_04.jpeg',
-  './images/SND_05.jpeg', './images/SND_06.jpeg',
-  './images/SND_07.jpeg', './images/SND_08.jpeg'
+  './images/SD_01.png', './images/SD_02.png',
+  './images/SD_03.png', './images/SD_04.png',
+  './images/SD_05.png', './images/SD_06.png',
+  './images/SD_07.png', './images/SD_08.png',
+    './images/SD_09.png', './images/SD_10.png',
+      './images/SD_12.jpeg', './images/SD_13.jpeg',
+      './images/SD_14.jpeg',
+  
 ];
 
 const CHAOS_SELECTORS = [
