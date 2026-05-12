@@ -279,7 +279,7 @@ body.home .plan-caption {
 }
 
 #homeNoiseToggle.is-on {
-  color: #ffffff;
+  color: #000000;
   border-color: rgb(255, 255, 255);
   background: rgb(255, 255, 255);
 }
