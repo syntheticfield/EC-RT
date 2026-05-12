@@ -792,7 +792,7 @@ html.ecart-light-mode .ecart-light-btn.is-active {
 .mobile-mini-map-wrap .mini-zone-10 { top:22.25%; left:84.05%;  width:10.13%; height:16.95%; }
 .mobile-mini-map-wrap .mini-zone-11 { top:22.2%;  left:75.05%;  width:8.41%;  height:8.45%;  }
 .mobile-mini-map-wrap .mini-zone-12 { top:47.78%; left:88.65%;  width:7.56%;  height:16.70%; }
-.mobile-mini-map-wrap .mini-zone-13 { top:6.07%;  left:77.12%;  width:19.97%; height:10.86%; }
+.mobile-mini-map-wrap .mini-zone-13 { top:65.07%;  left:77.12%;  width:19.97%; height:10.86%; }
 
 
 /* ==========================================================
@@ -1359,4 +1359,84 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
     --ecart-ui-right: 24px;
     --ecart-ui-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   }
+}
+/* ==========================================================
+   FIX MINI-MAP TEXTE — TELEPHONE PORTRAIT
+   ========================================================== */
+
+@media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
+
+  .mobile-map-status-wrap {
+    margin-top: -6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .map-nav-bar {
+    min-height: 36px !important;
+  }
+
+  .map-nav-label {
+    font-size: clamp(0.74rem, 2.8vw, 0.92rem) !important;
+    line-height: 1.05 !important;
+  }
+
+}
+/* ==========================================================
+   FIX MINI-MAP — TELEPHONES TRES FINS
+   empêche la disparition de la map
+   ========================================================== */
+
+@media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
+
+  .mobile-map-panel {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .mobile-map-panel-inner {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .mobile-map-figure {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 0 !important;
+  }
+
+  .mobile-mini-map-wrap {
+    width: min(82vw, 82vh) !important;
+    height: auto !important;
+
+    aspect-ratio: 1 / 1 !important;
+
+    max-width: 100% !important;
+    max-height: 52dvh !important;
+
+    flex-shrink: 1 !important;
+  }
+
+  .mobile-mini-map-wrap .mini-map-image {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: contain !important;
+  }
+
 }

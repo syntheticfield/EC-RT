@@ -1108,3 +1108,80 @@ and (orientation: landscape) {
     line-height: 1.34 !important;
   }
 }
+/* ==========================================================
+   FIX SIDEBAR — MOBILE PAYSAGE MINIMAL + SCROLL TOUCH
+   ========================================================== */
+
+@media (pointer: coarse)
+and (max-width: 767px)
+and (orientation: landscape) {
+
+  .sidebar {
+    top: 10px !important;
+    left: 10px !important;
+    width: 38px !important;
+  }
+
+  .sidebar-top {
+    width: 38px !important;
+    gap: 7px !important;
+  }
+
+  .home-button {
+    width: 29px !important;
+    height: 29px !important;
+    flex: 0 0 29px !important;
+  }
+
+  .site-title,
+  .menu-toggle {
+    font-size: 1.08rem !important;
+    letter-spacing: 0 !important;
+  }
+
+  .zone-identity {
+    top: 10px !important;
+    left: 58px !important;
+    max-width: 46vw !important;
+  }
+
+  .zone-identity-title {
+    font-size: 0.66rem !important;
+  }
+
+  .zone-identity-desc {
+    font-size: 0.44rem !important;
+  }
+
+  .zones-nav,
+  .sections {
+    width: min(230px, 44vw) !important;
+    height: calc(100dvh - 28px) !important;
+    top: 14px !important;
+    bottom: 14px !important;
+
+    padding:
+      20px
+      14px
+      20px
+      58px !important;
+
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+
+    border-radius: 0 18px 18px 0 !important;
+  }
+
+  .zone-link,
+  .section-link {
+    font-size: 0.72rem !important;
+    line-height: 1.18 !important;
+    padding: 3px 0 !important;
+  }
+}

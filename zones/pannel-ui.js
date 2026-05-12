@@ -387,10 +387,28 @@ if (soundBtn) cluster.appendChild(soundBtn);
 
     if (title) title.textContent = data.title || "Information";
     if (description) {
-      description.innerHTML = `<p>${(data.description || "").replace(/\n/g, "<br><br>")}</p>`;
-      if (data.gameplay) {
-        description.innerHTML += `<div class="info-gameplay"><h3>Gameplay</h3><p>${data.gameplay.replace(/\n/g, "<br><br>")}</p></div>`;
-      }
+      description.innerHTML = `
+  <p>${
+    (data.description || "")
+      .trim()
+      .replace(/\n\s*\n/g, "</p><p>")
+      .replace(/\n/g, "<br>")
+  }</p>
+`;
+
+if (data.gameplay) {
+  description.innerHTML += `
+    <div class="info-gameplay">
+      <h3>Gameplay</h3>
+      <p>${
+        data.gameplay
+          .trim()
+          .replace(/\n\s*\n/g, "</p><p>")
+          .replace(/\n/g, "<br>")
+      }</p>
+    </div>
+  `;
+}
     }
     if (refBox && Array.isArray(data.references) && data.references.length) {
       refBox.innerHTML = "<h3>Références</h3>" + data.references.map(r => `<div class="info-ref-item">${r}</div>`).join("");

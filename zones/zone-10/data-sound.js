@@ -5,10 +5,10 @@ window.ECART_SOUND = [
   },
   {
     title: "Curatorial Voice - COUM (FR)",
-    file: "../../assets/son/FR/491.mp3"
+    file: "../../assets/son/FR/COUM.mp3"
   },
   {
     title: "Curatorial Voice - COUM (ENG)",
-    file: "../../assets/son/EN/4912.mp3"
+    file: "../../assets/son/EN/COUM2.mp3"
   },
 ];

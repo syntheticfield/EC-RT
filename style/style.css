@@ -163,7 +163,16 @@ body.home .plan-caption {
 .about-text strong {
   font-weight: 500;
 }
+.about-signature{
+  text-align: center;
+  width: 100%;
+  margin-top: 24px;
 
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+
+  color: rgba(255,255,255,0.82);
+}
 /* ===============================
    SCROLL ZONE TEXTE
    [7] Scroll fonctionnel sur tous devices, sans barre visible
