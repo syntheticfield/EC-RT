@@ -83,11 +83,14 @@ export class Zone13Audio {
 
   startCycle() { this.triggerRandom(); }
 
-  _scheduleNext() {
-    clearTimeout(this._nextTimer);
-    const delay = 6000 + Math.random() * 22000;
-    this._nextTimer = setTimeout(() => this.triggerRandom(), delay);
-  }
+_scheduleNext() {
+  clearTimeout(this._nextTimer);
+
+  // Plus dense : sons plus rapprochés
+  const delay = 900 + Math.random() * 4200;
+
+  this._nextTimer = setTimeout(() => this.triggerRandom(), delay);
+}
 
   getAnalyser() { return this.analyser; }
 }
