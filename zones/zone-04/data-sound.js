@@ -5,7 +5,7 @@ window.ECART_SOUND = [
   },
   {
     title: "Curatorial Voice - NWMV (FR)",
-    file: "../../assets/son/FR/NWMV.mp3"
+    file: "../../assets/son/FR/NMWV.mp3"
   },
   {
     title: "Curatorial Voice - NWMV (ENG)",

@@ -168,6 +168,14 @@ body.ecart-audio-active .ecart-ui-cluster {
   100% { opacity: 0; letter-spacing: 0.14em; }
 }
 
+/* Sur appareils tactiles portrait : 2 boutons en ligne → décaler le toast */
+@media (pointer: coarse) and (orientation: portrait) {
+  .ecart-toast {
+    right: calc(var(--ecart-ui-right) + var(--ecart-ui-size) + var(--ecart-ui-size) + var(--ecart-ui-gap) + 14px);
+    top: calc(22px + env(safe-area-inset-top, 0px));
+  }
+}
+
 
 /* ==========================================================
    BOUTONS ŒIL + LIGHT
@@ -1035,12 +1043,12 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
 /* ==========================================================
    TÉLÉPHONE PORTRAIT
    haut droite : LIGHT + EYE
-   bas gauche : INFO + MAP + SOUND
+   bas droite : INFO + MAP + SOUND
    ========================================================== */
 
 @media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
   :root {
-    --ecart-ui-size: 46px;
+    --ecart-ui-size: 52px;
     --ecart-ui-gap: 8px;
     --ecart-ui-right: 12px;
     --ecart-ui-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
@@ -1126,10 +1134,10 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
 
 @media (pointer: coarse) and (max-width: 767px) and (orientation: landscape) {
   :root {
-    --ecart-ui-size: clamp(36px, 10vmin, 44px);
+    --ecart-ui-size: clamp(42px, 11vmin, 50px);
     --ecart-ui-gap: 5px;
-    --ecart-ui-right: calc(10px + env(safe-area-inset-right, 0px));
-    --ecart-ui-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    --ecart-ui-right: calc(4px + env(safe-area-inset-right, 0px));
+    --ecart-ui-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
   }
 
   #ecartTopRight {
@@ -1235,9 +1243,10 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
 
   .mobile-mini-map-wrap {
     width: auto !important;
-    height: 100% !important;
+    height: auto !important;
     aspect-ratio: 1 / 1 !important;
-    max-height: calc(100dvh - 42px) !important;
+    max-height: calc(100dvh - 70px) !important;
+    max-width: calc(100dvh - 70px) !important;
   }
 
   .ecart-audio-tracklist {
@@ -1248,11 +1257,13 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
 
 /* ==========================================================
    TABLETTE PORTRAIT
+   haut droite : LIGHT + EYE
+   bas droite  : INFO + MAP + SOUND
    ========================================================== */
 
 @media (pointer: coarse) and (min-width: 768px) and (orientation: portrait) {
   :root {
-    --ecart-ui-size: 56px;
+    --ecart-ui-size: 62px;
     --ecart-ui-gap: 10px;
   }
 
@@ -1264,8 +1275,8 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
   }
 
   .ecart-ui-cluster {
-    left: calc(22px + env(safe-area-inset-left, 0px)) !important;
-    right: auto !important;
+    right: calc(22px + env(safe-area-inset-right, 0px)) !important;
+    left: auto !important;
     bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
     top: auto !important;
     flex-direction: row !important;
@@ -1298,7 +1309,7 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
 
 @media (pointer: coarse) and (min-width: 768px) and (orientation: landscape) {
   :root {
-    --ecart-ui-size: 52px;
+    --ecart-ui-size: 58px;
     --ecart-ui-gap: 8px;
   }
 
