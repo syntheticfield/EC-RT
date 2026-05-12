@@ -9,17 +9,21 @@
   />
 
   <title>EC@RT</title>
-<link rel="apple-touch-icon" href="assets/icone.png">
-<link rel="icon" type="image/png" href="assets/icone.png">
-<link rel="shortcut icon" href="assets/icone.png">
+
+  <link rel="apple-touch-icon" href="assets/icone.png">
+  <link rel="icon" type="image/png" href="assets/icone.png">
+  <link rel="shortcut icon" href="assets/icone.png">
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="EC@RT">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="theme-color" content="#000000">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="HandheldFriendly" content="true">
 
   <link rel="manifest" href="manifest.json">
+
   <link rel="stylesheet" href="zones/zone-core.css" />
   <link rel="stylesheet" href="zones/zone-sidebar.css" />
   <link rel="stylesheet" href="style/style.css" />
@@ -27,6 +31,7 @@
 </head>
 
 <body data-zone="0" class="has-mobile-menu home">
+
   <main class="page">
 
     <aside class="sidebar">
@@ -49,9 +54,8 @@
       </div>
 
       <nav class="zones-nav" aria-label="Zones de l'exposition">
-        
-         <a href="/index.html"          class="zone-link" data-zone-link="0">EC@RT</a>
-         <a href="zones/zone-01/zone-01.html" class="zone-link" data-zone-link="1">BeautyKillers</a>
+        <a href="index.html" class="zone-link" data-zone-link="0">EC@RT</a>
+        <a href="zones/zone-01/zone-01.html" class="zone-link" data-zone-link="1">BeautyKillers</a>
         <a href="zones/zone-02/zone-02.html" class="zone-link" data-zone-link="2">Role Models</a>
         <a href="zones/zone-03/zone-03.html" class="zone-link" data-zone-link="3">Anthropomorph</a>
         <a href="zones/zone-04/zone-04.html" class="zone-link" data-zone-link="4">NWMV</a>
@@ -85,23 +89,22 @@
         </h1>
 
         <h2>EC@RT — Virtual Dada Noisy Quickkopy</h2>
-<div class="about-scroll-outer">
-  <div class="about-scroll">
-    <div class="about-text">
 
-      <p>
-              Dans le cadre de l’exposition <em>Quickkopy Conceptualism: Bay Area Dada to Bay Area Punk</em> au MAMCO,
-        la plateforme <strong>EC@RT — Virtual Dada Noisy Quickkopy</strong> propose un espace de médiation numérique
-        dédié aux archives de l’exposition.
-      </p>
+        <div class="about-scroll-outer">
+          <div class="about-scroll">
+            <div class="about-text">
 
-      <p class="about-signature">
-        Noémy Rubio Méau & Hugo Lemahieu
-      </p>
+              <p>
+                Dans le cadre de l’exposition <em>Quickkopy Conceptualism: Bay Area Dada to Bay Area Punk</em> au MAMCO,
+                la plateforme <strong>EC@RT — Virtual Dada Noisy Quickkopy</strong> propose un espace de médiation numérique
+                dédié aux archives de l’exposition.
+              </p>
 
-    </div>
-  </div>
-</div>
+              <p class="about-signature">
+                Noémy Rubio Méau & Hugo Lemahieu
+              </p>
+
+            </div>
           </div>
         </div>
       </article>
@@ -175,139 +178,142 @@
     </div>
   </div>
 
-  <script src="/zones/no-zoom.js"></script>
+  <script src="zones/no-zoom.js"></script>
   <script src="zones/infos.js"></script>
   <script src="data-sound.js"></script>
 
   <script src="zones/pannel-ui.js"></script>
   <script src="zones/mobile-menu.js"></script>
-  <script src="/style/home-archive-noise.js"></script>
+  <script src="style/home-archive-noise.js"></script>
+
   <script>
-/* ==========================================================
-   HOME — anti zoom rotation + tactile bridge
-   ========================================================== */
-(function () {
-  const viewport = document.querySelector('meta[name="viewport"]');
+    /* ==========================================================
+       HOME — anti zoom rotation + tactile bridge
+       ========================================================== */
+    (function () {
+      const viewport = document.querySelector('meta[name="viewport"]');
 
-  function lockViewport() {
-    if (!viewport) return;
+      function lockViewport() {
+        if (!viewport) return;
 
-    viewport.setAttribute(
-      "content",
-      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    );
-  }
+        viewport.setAttribute(
+          "content",
+          "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        );
+      }
 
-  function updateHeight() {
-    document.documentElement.style.setProperty(
-      "--app-height",
-      window.innerHeight + "px"
-    );
+      function updateHeight() {
+        document.documentElement.style.setProperty(
+          "--app-height",
+          window.innerHeight + "px"
+        );
 
-    document.documentElement.style.height = window.innerHeight + "px";
-    document.body.style.height = window.innerHeight + "px";
-  }
+        document.documentElement.style.height = window.innerHeight + "px";
+        document.body.style.height = window.innerHeight + "px";
+      }
 
-  function refreshViewport() {
-    lockViewport();
-    updateHeight();
-    window.scrollTo(0, 0);
-  }
+      function refreshViewport() {
+        lockViewport();
+        updateHeight();
+        window.scrollTo(0, 0);
+      }
 
-  refreshViewport();
+      refreshViewport();
 
-  window.addEventListener("resize", refreshViewport, { passive: true });
-  window.addEventListener("orientationchange", function () {
-    refreshViewport();
-    setTimeout(refreshViewport, 120);
-    setTimeout(refreshViewport, 420);
-  });
+      window.addEventListener("resize", refreshViewport, { passive: true });
 
-  document.addEventListener("gesturestart", function (e) {
-    e.preventDefault();
-  });
+      window.addEventListener("orientationchange", function () {
+        refreshViewport();
+        setTimeout(refreshViewport, 120);
+        setTimeout(refreshViewport, 420);
+      });
 
-  document.addEventListener("gesturechange", function (e) {
-    e.preventDefault();
-  });
+      document.addEventListener("gesturestart", function (e) {
+        e.preventDefault();
+      });
 
-  document.addEventListener("gestureend", function (e) {
-    e.preventDefault();
-  });
+      document.addEventListener("gesturechange", function (e) {
+        e.preventDefault();
+      });
 
-  /* Bridge tactile → souris pour home-archive-noise.js
-     Utile si ton JS vivant écoute mousemove/click mais pas touch/pointer. */
-  const canvas = document.getElementById("homeArchiveCanvas");
-  if (!canvas) return;
+      document.addEventListener("gestureend", function (e) {
+        e.preventDefault();
+      });
 
-  function isUI(target) {
-    return !!target.closest(
-      ".about-scroll, .sidebar, .zones-nav, .sections, #homeNoiseToggle, #soundToggle, #infoToggle, #mobileMapToggle, #soundPanel, #infoPanel, #mobileMapOverlay"
-    );
-  }
+      const canvas = document.getElementById("homeArchiveCanvas");
+      if (!canvas) return;
 
-  function emitMouse(type, touch) {
-    const event = new MouseEvent(type, {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      screenX: touch.screenX,
-      screenY: touch.screenY
+      function isUI(target) {
+        return !!target.closest(
+          ".about-scroll, .sidebar, .zones-nav, .sections, #homeNoiseToggle, #soundToggle, #infoToggle, #mobileMapToggle, #soundPanel, #infoPanel, #mobileMapOverlay"
+        );
+      }
+
+      function emitMouse(type, touch) {
+        const event = new MouseEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          screenX: touch.screenX,
+          screenY: touch.screenY
+        });
+
+        canvas.dispatchEvent(event);
+      }
+
+      canvas.addEventListener("touchstart", function (e) {
+        if (isUI(e.target)) return;
+        if (!e.touches.length) return;
+
+        e.preventDefault();
+        emitMouse("mousedown", e.touches[0]);
+        emitMouse("mousemove", e.touches[0]);
+      }, { passive: false });
+
+      canvas.addEventListener("touchmove", function (e) {
+        if (isUI(e.target)) return;
+        if (!e.touches.length) return;
+
+        e.preventDefault();
+        emitMouse("mousemove", e.touches[0]);
+      }, { passive: false });
+
+      canvas.addEventListener("touchend", function (e) {
+        if (isUI(e.target)) return;
+
+        const touch = e.changedTouches && e.changedTouches[0];
+        if (!touch) return;
+
+        e.preventDefault();
+        emitMouse("mouseup", touch);
+        emitMouse("click", touch);
+      }, { passive: false });
+    })();
+  </script>
+
+  <script src="zones/ecart-preloader.js"></script>
+
+  <script>
+    ECARTPreloader.init({
+      zones: [
+        { id: '2',  buildPath: 'zones/zone-02/02_BACK_01/Build', buildName: '02_BACK_01' },
+        { id: '3',  buildPath: 'zones/zone-03/03_ANT/Build',     buildName: '03_ANT' },
+        { id: '4',  buildPath: 'zones/zone-04/04_NWMV/Build',    buildName: '03_NWMV' },
+        { id: '6',  buildPath: 'zones/zone-06/06_VILE/Build',    buildName: '06_VILE' },
+        { id: '7',  buildPath: 'zones/zone-07/07_MC/Build',      buildName: '07_MC' },
+        { id: '8',  buildPath: 'zones/zone-08/08_FS/Build',      buildName: '08_FS' },
+        { id: '9',  buildPath: 'zones/zone-09/09_ID/Build',      buildName: '09_ID' },
+        { id: '10', buildPath: 'zones/zone-10/10_COUM/Build',    buildName: '10_COUM' },
+        { id: '12', buildPath: 'zones/zone-12/12_MAD/Build',     buildName: '12_MAD' }
+      ],
+
+      autoPreload: ['2', '3', '4'],
+      minimap: { selector: '.mini-zone', zoneAttr: 'data-mini-zone' },
+      swPath: 'ecart-sw.js'
     });
+  </script>
 
-    canvas.dispatchEvent(event);
-  }
-
-  canvas.addEventListener("touchstart", function (e) {
-    if (isUI(e.target)) return;
-    if (!e.touches.length) return;
-
-    e.preventDefault();
-    emitMouse("mousedown", e.touches[0]);
-    emitMouse("mousemove", e.touches[0]);
-  }, { passive: false });
-
-  canvas.addEventListener("touchmove", function (e) {
-    if (isUI(e.target)) return;
-    if (!e.touches.length) return;
-
-    e.preventDefault();
-    emitMouse("mousemove", e.touches[0]);
-  }, { passive: false });
-
-  canvas.addEventListener("touchend", function (e) {
-    if (isUI(e.target)) return;
-
-    const touch = e.changedTouches && e.changedTouches[0];
-    if (!touch) return;
-
-    e.preventDefault();
-    emitMouse("mouseup", touch);
-    emitMouse("click", touch);
-  }, { passive: false });
-})();
-</script>
-
-  <script src="/zones/ecart-preloader.js"></script>
-<script>
-  ECARTPreloader.init({
-    zones: [
-      { id: '2',  buildPath: '/zones/zone-02/02_BACK_01/Build', buildName: '02_BACK_01'        },
-      { id: '3',  buildPath: '/zones/zone-03/03_ANT/Build',     buildName: '03_ANT' },
-      { id: '4',  buildPath: '/zones/zone-04/04_NWMV/Build',    buildName: '03_NWMV'           },
-      { id: '6',  buildPath: '/zones/zone-06/06_VILE/Build',    buildName: '06_VILE'           },
-      { id: '7',  buildPath: '/zones/zone-07/07_MC/Build',      buildName: '07_MC'             },
-      { id: '8',  buildPath: '/zones/zone-08/08_FS/Build',      buildName: '08_FS'             },
-      { id: '9',  buildPath: '/zones/zone-09/09_ID/Build',      buildName: '09_ID'             },
-      { id: '10', buildPath: '/zones/zone-10/10_COUM/Build',    buildName: '10_COUM'           },
-      { id: '12', buildPath: '/zones/zone-12/12_MAD/Build',     buildName: '12_MAD'            },
-    ],
-    autoPreload : ['2', '3' , '4'],
-    minimap: { selector: '.mini-zone', zoneAttr: 'data-mini-zone' },
-    swPath: '/ecart-sw.js',
-  });
-</script>
 </body>
 </html>
