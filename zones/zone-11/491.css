@@ -247,35 +247,25 @@ html, body {
     bottom: 22px;
   }
 }
-
-/* Mobile + tablette : bouton NOISE collé bas gauche */
+/* MOBILE + TABLETTE */
 @media (pointer: coarse) {
 
   #transmissionToggle {
-    left: calc(6px + env(safe-area-inset-left, 0px)) !important;
-    bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    left: calc(10px + env(safe-area-inset-left, 0px)) !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
 
     z-index: 100430 !important;
 
-    padding: 7px 9px !important;
+    padding: 9px 12px !important;
 
-    font-size: 8px !important;
-    letter-spacing: 0.12em !important;
+    font-size: 9px !important;
+    letter-spacing: 0.14em !important;
+    line-height: 1 !important;
 
-    max-width: 42vw !important;
+    max-width: 46vw !important;
+
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
-  }
-}
-
-/* ═══════════════════════════
-   MOBILE PORTRAIT
-   ═══════════════════════════ */
-
-@media (orientation: portrait) {
-
-  .horizontal-text {
-    max-width: 62vw;
   }
 }
