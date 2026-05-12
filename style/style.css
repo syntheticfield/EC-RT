@@ -576,28 +576,6 @@ body.home .about-scroll * {
   }
 }
 
-/* ==========================================================
-   FINAL FIX HOME
-   - NOISE invisible mobile/tablette
-   - mots non cliquables derrière le bloc flou desktop
-   ========================================================== */
-
-/* ----------------------------------------------------------
-   MOBILE / TABLETTE
-   ---------------------------------------------------------- */
-
-/* HOME — cacher NOISE sur téléphone + tablette */
-@media (hover: none), (pointer: coarse) {
-  body.home #homeNoiseToggle,
-  body.home .home-noise-status {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-}
-
-
 /* ----------------------------------------------------------
    DESKTOP
    bloque les interactions derrière le bloc texte
