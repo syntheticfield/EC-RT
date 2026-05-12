@@ -304,8 +304,8 @@ html, body {
 
   .z13-transmission-btn {
     left: calc(16px + env(safe-area-inset-left, 0px)) !important;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-
+   bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+   
     z-index: 100430 !important;
 
     padding: 12px 17px !important;
