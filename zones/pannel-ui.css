@@ -1426,8 +1426,7 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
    FINAL FIX — MINI MAP MOBILE/TABLETTE PAYSAGE
    responsive, non stretch, non décalée
    ========================================================== */
-
-@media (pointer: coarse) and (orientation: landscape) {
+@media (pointer: coarse) and (max-width: 767px) and (orientation: landscape) {
 
   #mobileMapOverlay {
     left: 0 !important;

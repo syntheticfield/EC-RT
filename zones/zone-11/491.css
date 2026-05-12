@@ -251,18 +251,18 @@ html, body {
 @media (pointer: coarse) {
 
   #transmissionToggle {
-    left: calc(10px + env(safe-area-inset-left, 0px)) !important;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    left: calc(16px + env(safe-area-inset-left, 0px)) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
 
     z-index: 100430 !important;
 
-    padding: 9px 12px !important;
+    padding: 12px 17px !important;
 
-    font-size: 9px !important;
-    letter-spacing: 0.14em !important;
+    font-size: 10px !important;
+    letter-spacing: 0.16em !important;
     line-height: 1 !important;
 
-    max-width: 46vw !important;
+    max-width: 52vw !important;
 
     overflow: hidden !important;
     text-overflow: ellipsis !important;

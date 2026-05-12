@@ -586,13 +586,13 @@ body.home .about-scroll * {
    MOBILE / TABLETTE
    ---------------------------------------------------------- */
 
-@media (pointer: coarse) {
-
-  #homeNoiseToggle,
-  .home-noise-status {
+/* HOME — cacher NOISE sur téléphone + tablette */
+@media (hover: none), (pointer: coarse) {
+  body.home #homeNoiseToggle,
+  body.home .home-noise-status {
     display: none !important;
-    opacity: 0 !important;
     visibility: hidden !important;
+    opacity: 0 !important;
     pointer-events: none !important;
   }
 }
