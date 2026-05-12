@@ -248,10 +248,24 @@ html, body {
   }
 }
 
-/* Mobile/tablette — remonte au-dessus des boutons UI bas */
+/* Mobile + tablette : bouton NOISE collé bas gauche */
 @media (pointer: coarse) {
+
   #transmissionToggle {
-    bottom: clamp(72px, 12vh, 96px);
+    left: calc(6px + env(safe-area-inset-left, 0px)) !important;
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+
+    z-index: 100430 !important;
+
+    padding: 7px 9px !important;
+
+    font-size: 8px !important;
+    letter-spacing: 0.12em !important;
+
+    max-width: 42vw !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
   }
 }
 
