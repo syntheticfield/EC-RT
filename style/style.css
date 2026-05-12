@@ -227,7 +227,7 @@ body.home .plan-caption {
   position: fixed;
 
   left: calc(16px + env(safe-area-inset-left, 0px));
-  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(28px + env(safe-area-inset-bottom, 0px));
 
   z-index: 100430;
 
@@ -251,7 +251,7 @@ body.home .plan-caption {
 
   border: 1px solid rgba(244, 240, 226, 0);
 
-  background: rgb(210, 0, 0);
+  background: rgb(160, 0, 0);
 
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

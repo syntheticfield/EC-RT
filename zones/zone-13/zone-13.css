@@ -232,9 +232,9 @@ html, body {
   align-items: center;
   gap: 10px;
 
-  border: 1px solid rgba(255,255,255,0.22);
-  background: rgba(0,0,0,0.42);
-  color: rgba(255,255,255,0.60);
+  border: 1px solid rgba(255, 255, 255, 0);
+  background: rgba(160, 0, 0, 0.952);
+  color: rgb(255, 255, 255);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
@@ -257,9 +257,9 @@ html, body {
 .z13-transmission-btn:active { transform: scale(0.96); }
 
 .z13-transmission-btn.is-active {
-  color: rgba(255,255,255,0.92);
+  color: rgb(0, 0, 0);
   border-color: rgba(255,255,255,0.44);
-  background: rgba(255,255,255,0.04);
+  background: rgb(255, 255, 255);
 }
 
 .z13-tx-ring {
@@ -272,13 +272,13 @@ html, body {
 }
 
 .z13-transmission-btn.is-active .z13-tx-ring {
-  border-color: rgba(255,255,255,0.80);
+  border-color: rgba(0, 0, 0, 0.8);
   animation: z13TxPulse 1.8s ease-in-out infinite;
 }
 
 .z13-transmission-btn.is-firing .z13-tx-ring {
-  background: rgba(255,255,255,0.75);
-  box-shadow: 0 0 8px 2px rgba(255,255,255,0.50);
+  background: rgb(157, 0, 0);
+  box-shadow: 0 0 8px 2px rgba(0, 0, 0, 0.73);
   animation: z13TxFire 0.5s ease-out forwards;
 }
 
@@ -296,7 +296,7 @@ html, body {
 @media (pointer: fine) {
   .z13-transmission-btn {
     left:   26px;
-    bottom: 22px;
+    bottom: 28px;
   }
 }
 /* MOBILE + TABLETTE */
@@ -304,8 +304,8 @@ html, body {
 
   .z13-transmission-btn {
     left: calc(16px + env(safe-area-inset-left, 0px)) !important;
-   bottom: calc(22px + env(safe-area-inset-bottom, 0px)) !important;
-   
+   bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+
     z-index: 100430 !important;
 
     padding: 12px 17px !important;
