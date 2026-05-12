@@ -218,34 +218,55 @@ body.home .plan-caption {
    [3][4] Visible sur tous les devices et formats
    =============================== */
 
+/* ==========================================================
+   HOME — NOISE BUTTON
+   aligné avec 491 + Zone 13
+   ========================================================== */
+
 #homeNoiseToggle {
   position: fixed;
-  /* [3][4] Safe-area pour les encoches iPhone en paysage */
-  left:   calc(18px + env(safe-area-inset-left,   0px));
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  /* [3] Au-dessus de la sidebar et de tous les panels */
-  z-index: 100070;
+
+  left: calc(16px + env(safe-area-inset-left, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+
+  z-index: 100430;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 40px;
+
+  padding: 12px 17px;
 
   font-family: "Courier New", Courier, monospace;
   font-size: 10px;
   font-weight: 400;
-  letter-spacing: 0.18em;
-  color: rgba(244,240,226,0.60);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  color: rgba(244,240,226,0.72);
 
   border: 1px solid rgba(244,240,226,0.22);
+
   background: rgba(0,0,0,0.42);
+
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
-  padding: 9px 13px;
   cursor: pointer;
-  text-transform: uppercase;
+
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  white-space: nowrap;
 
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.14s ease;
 }
 
 #homeNoiseToggle:hover {
@@ -253,11 +274,13 @@ body.home .plan-caption {
   border-color: rgba(255,255,255,0.44);
 }
 
-#homeNoiseToggle:active { transform: scale(0.96); }
+#homeNoiseToggle:active {
+  transform: scale(0.96);
+}
 
 #homeNoiseToggle.is-on {
   color: #ff3000;
-  border-color: rgba(255,48,0,0.55);
+  border-color: rgb(255, 255, 255);
   background: rgba(35,0,0,0.46);
 }
 
