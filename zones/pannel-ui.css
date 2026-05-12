@@ -1379,11 +1379,11 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
     font-size: clamp(0.74rem, 2.8vw, 0.92rem) !important;
     line-height: 1.05 !important;
   }
-
 }
+
+
 /* ==========================================================
-   FIX MINI-MAP — TELEPHONES TRES FINS
-   empêche la disparition de la map
+   FIX MINI-MAP — TELEPHONES PORTRAIT TRES FINS
    ========================================================== */
 
 @media (pointer: coarse) and (max-width: 767px) and (orientation: portrait) {
@@ -1392,51 +1392,139 @@ body:has(#ecartAudioPanel.is-visible) [class*="Joystick"] {
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
   }
 
   .mobile-map-panel-inner {
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
     align-items: center !important;
   }
 
   .mobile-map-figure {
     width: 100% !important;
-    flex: 1 1 auto !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
     min-height: 0 !important;
   }
 
   .mobile-mini-map-wrap {
-    width: min(82vw, 82vh) !important;
+    width: min(82vw, 52dvh) !important;
     height: auto !important;
-
     aspect-ratio: 1 / 1 !important;
-
     max-width: 100% !important;
     max-height: 52dvh !important;
-
-    flex-shrink: 1 !important;
   }
 
   .mobile-mini-map-wrap .mini-map-image {
     width: 100% !important;
     height: 100% !important;
+    object-fit: contain !important;
+  }
+}
 
+
+/* ==========================================================
+   FINAL FIX — MINI MAP MOBILE/TABLETTE PAYSAGE
+   responsive, non stretch, non décalée
+   ========================================================== */
+
+@media (pointer: coarse) and (orientation: landscape) {
+
+  #mobileMapOverlay {
+    left: 0 !important;
+    right: 0 !important;
+    padding:
+      10px
+      calc(var(--ecart-ui-size) + 28px + env(safe-area-inset-right, 0px))
+      10px
+      calc(54px + env(safe-area-inset-left, 0px)) !important;
+  }
+
+  .mobile-map-panel {
+    width: 100% !important;
+    height: calc(100dvh - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+  }
+
+  .mobile-map-panel-inner {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+    padding: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-map-figure {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .mobile-mini-map-wrap {
+    width: min(calc(100dvh - 56px), calc(100vw - 170px)) !important;
+    height: min(calc(100dvh - 56px), calc(100vw - 170px)) !important;
+
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    aspect-ratio: 1 / 1 !important;
+    flex: 0 0 auto !important;
+
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-mini-map-wrap .mini-map-image {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: contain !important;
   }
 
+  .mobile-map-status-wrap {
+    flex: 0 0 clamp(92px, 24vw, 160px) !important;
+    width: clamp(92px, 24vw, 160px) !important;
+    height: 100% !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .map-nav-bar {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+  }
+
+  .map-nav-btn {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .map-nav-label {
+    white-space: normal !important;
+    font-size: clamp(0.56rem, 1.45vw, 0.74rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  .mobile-mini-map-wrap .mini-zone-13 {
+    top: 6.07% !important;
+    left: 77.12% !important;
+    width: 19.97% !important;
+    height: 10.86% !important;
+  }
 }
